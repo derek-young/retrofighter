@@ -1,7 +1,9 @@
 import React from 'react';
 import {Button, StyleSheet, View} from 'react-native';
+import {NativeStackScreenProps} from '@react-navigation/native-stack';
 
 import Colors from 'types/colors';
+import {RootStackParamList} from 'types/app';
 import GradientText from 'components/GradientText';
 import IBMText from 'components/IBMText';
 import PressStartText from 'components/PressStartText';
@@ -34,16 +36,28 @@ const styles = StyleSheet.create({
   continueText: {
     fontSize: 24,
     color: Colors.GREEN,
+    textDecorationLine: 'underline',
+  },
+  textShadow: {
+    textShadowColor: 'rgba(0, 0, 0, 0.75)',
+    textShadowOffset: {width: -1, height: 1},
+    textShadowRadius: 10,
+  },
+  basicText: {
+    color: 'white',
+    margin: 16,
   },
 });
 
-const Login = (): JSX.Element => {
+type LoginProps = NativeStackScreenProps<RootStackParamList, 'Login'>;
+
+const Login = ({navigation}: LoginProps): JSX.Element => {
   return (
     <View style={styles.container}>
       <View style={styles.top}>
         <GradientText
           gradientProps={{
-            colors: [Colors.GREEN, Colors.RED],
+            colors: [Colors.GREEN, Colors.GREEN, Colors.RED],
           }}
           textProps={{
             children: 'Retro Fighter',
@@ -52,14 +66,18 @@ const Login = (): JSX.Element => {
         />
       </View>
       <View style={styles.center}>
-        <IBMText>Sign In to Track Scores</IBMText>
+        <IBMText style={styles.basicText}>Sign In to Track Scores</IBMText>
         <Button title="Sign In with Facebook" />
         <Button title="Sign In with Google" />
         <Button title="Sign In with Apple" />
       </View>
       <View style={styles.bottom}>
-        <IBMText>or</IBMText>
-        <PressStartText style={styles.continueText}>Continue</PressStartText>
+        <IBMText style={styles.basicText}>or</IBMText>
+        <PressStartText
+          onPress={() => navigation.navigate('Epics')}
+          style={{...styles.continueText, ...styles.textShadow}}>
+          Continue
+        </PressStartText>
       </View>
     </View>
   );
