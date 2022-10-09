@@ -20,7 +20,7 @@ const styles = StyleSheet.create({
   },
 });
 
-const LoginContainer: React.FC = (): JSX.Element => {
+const LoginContainer = (): JSX.Element => {
   return (
     <>
       <SafeAreaView style={styles.upperSafeView} />

@@ -1,6 +1,7 @@
 import React from 'react';
 import {Button, StyleSheet, View} from 'react-native';
-import {NativeStackScreenProps} from '@react-navigation/native-stack';
+import {useNavigation} from '@react-navigation/native';
+import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 
 import Colors from 'types/colors';
 import {RootStackParamList} from 'types/app';
@@ -49,9 +50,14 @@ const styles = StyleSheet.create({
   },
 });
 
-type LoginProps = NativeStackScreenProps<RootStackParamList, 'Login'>;
+type LoginScreenNavigationProp = NativeStackNavigationProp<
+  RootStackParamList,
+  'Login'
+>;
 
-const Login = ({navigation}: LoginProps): JSX.Element => {
+const Login = (): JSX.Element => {
+  const navigation = useNavigation<LoginScreenNavigationProp>();
+
   return (
     <View style={styles.container}>
       <View style={styles.top}>

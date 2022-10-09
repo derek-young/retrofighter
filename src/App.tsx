@@ -15,6 +15,7 @@ const App = (): JSX.Element => {
         screenOptions={{headerShown: false}}>
         <Stack.Screen name="Login" component={Login} />
         <Stack.Screen name="Epics" component={Epics} />
+        {/* <Stack.Screen name="Epics" component={Epics} /> */}
       </Stack.Navigator>
     </NavigationContainer>
   );

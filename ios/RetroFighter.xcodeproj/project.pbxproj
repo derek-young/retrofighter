@@ -8,14 +8,14 @@
 
 /* Begin PBXBuildFile section */
 		00E356F31AD99517003FC87E /* RetroFighterTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 00E356F21AD99517003FC87E /* RetroFighterTests.m */; };
-		0C80B921A6F3F58F76C31292 /* libPods-RetroFighter.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 5DCACB8F33CDC322A6C60F78 /* libPods-RetroFighter.a */; };
 		13B07FBC1A68108700A75B9A /* AppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB01A68108700A75B9A /* AppDelegate.mm */; };
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
-		7699B88040F8A987B510C191 /* libPods-RetroFighter-RetroFighterTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 19F6CBCC0A4E27FBF8BF4A61 /* libPods-RetroFighter-RetroFighterTests.a */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
+		A05F419F8078A487529A31BA /* libPods-RetroFighter.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 751E8B9530D886E9AA4E0C06 /* libPods-RetroFighter.a */; };
 		BB4BC7D728D21B730005C8CE /* PressStart2P-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = BB4BC7D628D21B730005C8CE /* PressStart2P-Regular.ttf */; };
 		BB6C22FD28D235C10089938C /* IBMPlexMono-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = BB6C22FC28D235C00089938C /* IBMPlexMono-Regular.ttf */; };
+		F17AD01622BF466FA5FB6EE6 /* libPods-RetroFighter-RetroFighterTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 22FE84DB0008F4C99F8AAA4F /* libPods-RetroFighter-RetroFighterTests.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -38,16 +38,16 @@
 		13B07FB51A68108700A75B9A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = RetroFighter/Images.xcassets; sourceTree = "<group>"; };
 		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = RetroFighter/Info.plist; sourceTree = "<group>"; };
 		13B07FB71A68108700A75B9A /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = RetroFighter/main.m; sourceTree = "<group>"; };
-		19F6CBCC0A4E27FBF8BF4A61 /* libPods-RetroFighter-RetroFighterTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-RetroFighter-RetroFighterTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
-		3B4392A12AC88292D35C810B /* Pods-RetroFighter.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RetroFighter.debug.xcconfig"; path = "Target Support Files/Pods-RetroFighter/Pods-RetroFighter.debug.xcconfig"; sourceTree = "<group>"; };
-		5709B34CF0A7D63546082F79 /* Pods-RetroFighter.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RetroFighter.release.xcconfig"; path = "Target Support Files/Pods-RetroFighter/Pods-RetroFighter.release.xcconfig"; sourceTree = "<group>"; };
-		5B7EB9410499542E8C5724F5 /* Pods-RetroFighter-RetroFighterTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RetroFighter-RetroFighterTests.debug.xcconfig"; path = "Target Support Files/Pods-RetroFighter-RetroFighterTests/Pods-RetroFighter-RetroFighterTests.debug.xcconfig"; sourceTree = "<group>"; };
-		5DCACB8F33CDC322A6C60F78 /* libPods-RetroFighter.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-RetroFighter.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		22FE84DB0008F4C99F8AAA4F /* libPods-RetroFighter-RetroFighterTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-RetroFighter-RetroFighterTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		2EB84CB06623358931AF5B35 /* Pods-RetroFighter-RetroFighterTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RetroFighter-RetroFighterTests.debug.xcconfig"; path = "Target Support Files/Pods-RetroFighter-RetroFighterTests/Pods-RetroFighter-RetroFighterTests.debug.xcconfig"; sourceTree = "<group>"; };
+		5065F0C6708D1DE419BA3C01 /* Pods-RetroFighter-RetroFighterTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RetroFighter-RetroFighterTests.release.xcconfig"; path = "Target Support Files/Pods-RetroFighter-RetroFighterTests/Pods-RetroFighter-RetroFighterTests.release.xcconfig"; sourceTree = "<group>"; };
+		751E8B9530D886E9AA4E0C06 /* libPods-RetroFighter.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-RetroFighter.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = RetroFighter/LaunchScreen.storyboard; sourceTree = "<group>"; };
-		89C6BE57DB24E9ADA2F236DE /* Pods-RetroFighter-RetroFighterTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RetroFighter-RetroFighterTests.release.xcconfig"; path = "Target Support Files/Pods-RetroFighter-RetroFighterTests/Pods-RetroFighter-RetroFighterTests.release.xcconfig"; sourceTree = "<group>"; };
-		BB4BC7D628D21B730005C8CE /* PressStart2P-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "PressStart2P-Regular.ttf"; path = "../../assets/fonts/PressStart2P-Regular.ttf"; sourceTree = "<group>"; };
-		BB6C22FC28D235C00089938C /* IBMPlexMono-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "IBMPlexMono-Regular.ttf"; path = "../../assets/fonts/IBMPlexMono-Regular.ttf"; sourceTree = "<group>"; };
+		8FB6EEA53D16B047C2976C01 /* Pods-RetroFighter.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RetroFighter.debug.xcconfig"; path = "Target Support Files/Pods-RetroFighter/Pods-RetroFighter.debug.xcconfig"; sourceTree = "<group>"; };
+		BB4BC7D628D21B730005C8CE /* PressStart2P-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "PressStart2P-Regular.ttf"; path = "/Users/derekyoung/Documents/retrofighter/assets/fonts/PressStart2P-Regular.ttf"; sourceTree = "<absolute>"; };
+		BB6C22FC28D235C00089938C /* IBMPlexMono-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "IBMPlexMono-Regular.ttf"; path = "/Users/derekyoung/Documents/retrofighter/assets/fonts/IBMPlexMono-Regular.ttf"; sourceTree = "<absolute>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
+		F1BE10EF4619D6E083DE905A /* Pods-RetroFighter.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RetroFighter.release.xcconfig"; path = "Target Support Files/Pods-RetroFighter/Pods-RetroFighter.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -55,7 +55,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				7699B88040F8A987B510C191 /* libPods-RetroFighter-RetroFighterTests.a in Frameworks */,
+				F17AD01622BF466FA5FB6EE6 /* libPods-RetroFighter-RetroFighterTests.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -63,7 +63,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				0C80B921A6F3F58F76C31292 /* libPods-RetroFighter.a in Frameworks */,
+				A05F419F8078A487529A31BA /* libPods-RetroFighter.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -104,8 +104,8 @@
 			isa = PBXGroup;
 			children = (
 				ED297162215061F000B7C4FE /* JavaScriptCore.framework */,
-				5DCACB8F33CDC322A6C60F78 /* libPods-RetroFighter.a */,
-				19F6CBCC0A4E27FBF8BF4A61 /* libPods-RetroFighter-RetroFighterTests.a */,
+				751E8B9530D886E9AA4E0C06 /* libPods-RetroFighter.a */,
+				22FE84DB0008F4C99F8AAA4F /* libPods-RetroFighter-RetroFighterTests.a */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -154,10 +154,10 @@
 		BBD78D7AC51CEA395F1C20DB /* Pods */ = {
 			isa = PBXGroup;
 			children = (
-				3B4392A12AC88292D35C810B /* Pods-RetroFighter.debug.xcconfig */,
-				5709B34CF0A7D63546082F79 /* Pods-RetroFighter.release.xcconfig */,
-				5B7EB9410499542E8C5724F5 /* Pods-RetroFighter-RetroFighterTests.debug.xcconfig */,
-				89C6BE57DB24E9ADA2F236DE /* Pods-RetroFighter-RetroFighterTests.release.xcconfig */,
+				8FB6EEA53D16B047C2976C01 /* Pods-RetroFighter.debug.xcconfig */,
+				F1BE10EF4619D6E083DE905A /* Pods-RetroFighter.release.xcconfig */,
+				2EB84CB06623358931AF5B35 /* Pods-RetroFighter-RetroFighterTests.debug.xcconfig */,
+				5065F0C6708D1DE419BA3C01 /* Pods-RetroFighter-RetroFighterTests.release.xcconfig */,
 			);
 			path = Pods;
 			sourceTree = "<group>";
@@ -169,12 +169,12 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 00E357021AD99517003FC87E /* Build configuration list for PBXNativeTarget "RetroFighterTests" */;
 			buildPhases = (
-				A55EABD7B0C7F3A422A6CC61 /* [CP] Check Pods Manifest.lock */,
+				79D41985F8946E306F69AED8 /* [CP] Check Pods Manifest.lock */,
 				00E356EA1AD99517003FC87E /* Sources */,
 				00E356EB1AD99517003FC87E /* Frameworks */,
 				00E356EC1AD99517003FC87E /* Resources */,
-				C59DA0FBD6956966B86A3779 /* [CP] Embed Pods Frameworks */,
-				F6A41C54EA430FDDC6A6ED99 /* [CP] Copy Pods Resources */,
+				DBA25F073B8F6F7A37570701 /* [CP] Embed Pods Frameworks */,
+				C53A1F9542FAF57ED934E659 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -190,14 +190,14 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 13B07F931A680F5B00A75B9A /* Build configuration list for PBXNativeTarget "RetroFighter" */;
 			buildPhases = (
-				C38B50BA6285516D6DCD4F65 /* [CP] Check Pods Manifest.lock */,
+				9E23C4A990E90403817B3406 /* [CP] Check Pods Manifest.lock */,
 				FD10A7F022414F080027D42C /* Start Packager */,
 				13B07F871A680F5B00A75B9A /* Sources */,
 				13B07F8C1A680F5B00A75B9A /* Frameworks */,
 				13B07F8E1A680F5B00A75B9A /* Resources */,
 				00DD1BFF1BD5951E006B06BC /* Bundle React Native code and images */,
-				00EEFC60759A1932668264C0 /* [CP] Embed Pods Frameworks */,
-				E235C05ADACE081382539298 /* [CP] Copy Pods Resources */,
+				2734222DB1B960174C218016 /* [CP] Embed Pods Frameworks */,
+				725123EE7DAED6998B78B0D1 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -282,7 +282,7 @@
 			shellPath = /bin/sh;
 			shellScript = "set -e\n\nWITH_ENVIRONMENT=\"../node_modules/react-native/scripts/xcode/with-environment.sh\"\nREACT_NATIVE_XCODE=\"../node_modules/react-native/scripts/react-native-xcode.sh\"\n\n/bin/sh -c \"$WITH_ENVIRONMENT $REACT_NATIVE_XCODE\"\n";
 		};
-		00EEFC60759A1932668264C0 /* [CP] Embed Pods Frameworks */ = {
+		2734222DB1B960174C218016 /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -299,7 +299,24 @@
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-RetroFighter/Pods-RetroFighter-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		A55EABD7B0C7F3A422A6CC61 /* [CP] Check Pods Manifest.lock */ = {
+		725123EE7DAED6998B78B0D1 /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-RetroFighter/Pods-RetroFighter-resources-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Copy Pods Resources";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-RetroFighter/Pods-RetroFighter-resources-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-RetroFighter/Pods-RetroFighter-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		79D41985F8946E306F69AED8 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -321,7 +338,7 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
-		C38B50BA6285516D6DCD4F65 /* [CP] Check Pods Manifest.lock */ = {
+		9E23C4A990E90403817B3406 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -343,41 +360,7 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
-		C59DA0FBD6956966B86A3779 /* [CP] Embed Pods Frameworks */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-RetroFighter-RetroFighterTests/Pods-RetroFighter-RetroFighterTests-frameworks-${CONFIGURATION}-input-files.xcfilelist",
-			);
-			name = "[CP] Embed Pods Frameworks";
-			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-RetroFighter-RetroFighterTests/Pods-RetroFighter-RetroFighterTests-frameworks-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-RetroFighter-RetroFighterTests/Pods-RetroFighter-RetroFighterTests-frameworks.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		E235C05ADACE081382539298 /* [CP] Copy Pods Resources */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-RetroFighter/Pods-RetroFighter-resources-${CONFIGURATION}-input-files.xcfilelist",
-			);
-			name = "[CP] Copy Pods Resources";
-			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-RetroFighter/Pods-RetroFighter-resources-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-RetroFighter/Pods-RetroFighter-resources.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		F6A41C54EA430FDDC6A6ED99 /* [CP] Copy Pods Resources */ = {
+		C53A1F9542FAF57ED934E659 /* [CP] Copy Pods Resources */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -392,6 +375,23 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-RetroFighter-RetroFighterTests/Pods-RetroFighter-RetroFighterTests-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		DBA25F073B8F6F7A37570701 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-RetroFighter-RetroFighterTests/Pods-RetroFighter-RetroFighterTests-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-RetroFighter-RetroFighterTests/Pods-RetroFighter-RetroFighterTests-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-RetroFighter-RetroFighterTests/Pods-RetroFighter-RetroFighterTests-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		FD10A7F022414F080027D42C /* Start Packager */ = {
@@ -446,7 +446,7 @@
 /* Begin XCBuildConfiguration section */
 		00E356F61AD99517003FC87E /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 5B7EB9410499542E8C5724F5 /* Pods-RetroFighter-RetroFighterTests.debug.xcconfig */;
+			baseConfigurationReference = 2EB84CB06623358931AF5B35 /* Pods-RetroFighter-RetroFighterTests.debug.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -473,7 +473,7 @@
 		};
 		00E356F71AD99517003FC87E /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 89C6BE57DB24E9ADA2F236DE /* Pods-RetroFighter-RetroFighterTests.release.xcconfig */;
+			baseConfigurationReference = 5065F0C6708D1DE419BA3C01 /* Pods-RetroFighter-RetroFighterTests.release.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				COPY_PHASE_STRIP = NO;
@@ -497,7 +497,7 @@
 		};
 		13B07F941A680F5B00A75B9A /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 3B4392A12AC88292D35C810B /* Pods-RetroFighter.debug.xcconfig */;
+			baseConfigurationReference = 8FB6EEA53D16B047C2976C01 /* Pods-RetroFighter.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
@@ -523,7 +523,7 @@
 		};
 		13B07F951A680F5B00A75B9A /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 5709B34CF0A7D63546082F79 /* Pods-RetroFighter.release.xcconfig */;
+			baseConfigurationReference = F1BE10EF4619D6E083DE905A /* Pods-RetroFighter.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
