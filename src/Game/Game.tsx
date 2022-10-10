@@ -1,24 +1,31 @@
 import React from 'react';
-import {SafeAreaView, StyleSheet} from 'react-native';
+import {StyleSheet, View} from 'react-native';
+
+import Colors from 'types/colors';
 
 import Arena from './Arena';
 import ButtonSet from './ButtonSet';
 import DPad from './DPad';
 
+const PADDING = 56;
+
 const styles = StyleSheet.create({
   game: {
-    display: 'flex',
+    flex: 1,
     flexDirection: 'row',
+    paddingLeft: PADDING,
+    paddingRight: PADDING,
+    backgroundColor: Colors.PURPLE,
   },
 });
 
 const Game = (): JSX.Element => {
   return (
-    <SafeAreaView style={styles.game}>
-      <DPad />
+    <View style={styles.game}>
+      <DPad padding={PADDING} />
       <Arena />
-      <ButtonSet />
-    </SafeAreaView>
+      <ButtonSet padding={PADDING} />
+    </View>
   );
 };
 

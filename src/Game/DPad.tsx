@@ -1,16 +1,124 @@
-import React from 'react';
-import {StyleSheet, Text, View} from 'react-native';
+import React, {useState} from 'react';
+import {StyleSheet, TouchableOpacity, View, ViewStyle} from 'react-native';
+
+import Colors from 'types/colors';
 
 const styles = StyleSheet.create({
   dPad: {
-    flex: 1,
+    flexBasis: '25%',
+    justifyContent: 'center',
+  },
+  container: {
+    display: 'flex',
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+  },
+  directional: {
+    display: 'flex',
+    alignItems: 'center',
+    backgroundColor: Colors.GREY,
+    borderTopLeftRadius: 4,
+    borderTopRightRadius: 4,
+  },
+  arrow: {
+    height: 0,
+    width: 0,
+    borderLeftColor: 'transparent',
+    borderRightColor: 'transparent',
+    borderTopColor: 'transparent',
+    borderBottomColor: Colors.PURPLE,
+    position: 'absolute',
+    top: 0,
   },
 });
 
-const DPad = (): JSX.Element => {
+type ArrowProps = {
+  buttonWidth: number;
+};
+
+const Arrow = ({buttonWidth}: ArrowProps): JSX.Element => {
+  const arrowStyles = {
+    ...styles.arrow,
+    borderWidth: buttonWidth / 4,
+  } as ViewStyle;
+
+  return <View style={arrowStyles} />;
+};
+
+type EmptyProps = {
+  buttonWidth: number;
+};
+
+const Empty = ({buttonWidth}: EmptyProps): JSX.Element => (
+  <View style={{width: buttonWidth, height: buttonWidth}} />
+);
+
+type Rotation = 0 | 90 | 180 | 270;
+
+type DirectionalProps = {
+  buttonWidth: number;
+  onPress: () => void;
+  rotation: Rotation;
+};
+
+const Directional = ({
+  buttonWidth,
+  onPress,
+  rotation,
+}: DirectionalProps): JSX.Element => (
+  <TouchableOpacity
+    onPress={onPress}
+    style={{
+      ...styles.directional,
+      width: buttonWidth,
+      height: buttonWidth,
+      transform: [{rotate: `${rotation}deg`}],
+    }}>
+    <Arrow buttonWidth={buttonWidth} />
+  </TouchableOpacity>
+);
+
+type DPadProps = {
+  padding: number;
+};
+
+const DPad = ({padding}: DPadProps): JSX.Element => {
+  const [buttonWidth, setButtonWidth] = useState(0);
+
   return (
-    <View style={styles.dPad}>
-      <Text>DPad</Text>
+    <View
+      onLayout={e => {
+        const {width} = e.nativeEvent.layout;
+        console.log('width', width);
+        setButtonWidth((width - padding) / 3);
+      }}
+      style={{...styles.dPad, paddingRight: padding}}>
+      <View style={styles.container}>
+        <Empty buttonWidth={buttonWidth} />
+        <Directional
+          buttonWidth={buttonWidth}
+          onPress={() => console.log('up')}
+          rotation={0}
+        />
+        <Empty buttonWidth={buttonWidth} />
+        <Directional
+          buttonWidth={buttonWidth}
+          onPress={() => console.log('left')}
+          rotation={270}
+        />
+        <Empty buttonWidth={buttonWidth} />
+        <Directional
+          buttonWidth={buttonWidth}
+          onPress={() => console.log('right')}
+          rotation={90}
+        />
+        <Empty buttonWidth={buttonWidth} />
+        <Directional
+          buttonWidth={buttonWidth}
+          onPress={() => console.log('down')}
+          rotation={180}
+        />
+      </View>
     </View>
   );
 };

@@ -1,6 +1,7 @@
 import React from 'react';
 import {StyleSheet, TouchableOpacity, View, ViewStyle} from 'react-native';
 
+import Colors from 'types/colors';
 import PressStartText from 'components/PressStartText';
 
 const BUTTON_WIDTH = 160;
@@ -14,7 +15,7 @@ const styles = StyleSheet.create({
     margin: 8,
   },
   button: {
-    backgroundColor: '#D9D9D9',
+    backgroundColor: Colors.GREY,
     width: BUTTON_WIDTH - 12,
     height: BUTTON_HEIGHT - 12,
     borderRadius: 4,

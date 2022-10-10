@@ -3,9 +3,12 @@ import {StyleSheet, Text, View} from 'react-native';
 
 const styles = StyleSheet.create({
   arena: {
-    flex: 2,
+    flexBasis: '50%',
+    backgroundColor: 'lightgreen',
   },
 });
+
+type ArenaProps = {};
 
 const Arena = (): JSX.Element => {
   return (

@@ -1,16 +1,64 @@
 import React from 'react';
-import {StyleSheet, Text, View} from 'react-native';
+import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import Colors from 'types/colors';
 
 const styles = StyleSheet.create({
   buttonSet: {
+    flexBasis: '25%',
+  },
+  section: {
     flex: 1,
+  },
+  middle: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  actionButton: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    height: 48,
+    width: 48,
+    borderRadius: 24,
+    backgroundColor: Colors.RED,
+    margin: 12,
+    shadowColor: 'black',
+    shadowOffset: {width: 2, height: 2},
+    shadowOpacity: 0.4,
+  },
+  buttonText: {
+    color: 'white',
+    fontSize: 24,
   },
 });
 
-const ButtonSet = (): JSX.Element => {
+type ActionButtonProps = {
+  children: string;
+  onPress: () => void;
+};
+
+const ActionButton = ({children, onPress}: ActionButtonProps): JSX.Element => (
+  <TouchableOpacity onPress={onPress} style={styles.actionButton}>
+    <Text style={styles.buttonText}>{children}</Text>
+  </TouchableOpacity>
+);
+
+type ButtonSetProps = {
+  padding: number;
+};
+
+const ButtonSet = ({padding}: ButtonSetProps): JSX.Element => {
   return (
     <View style={styles.buttonSet}>
-      <Text>ButtonSet</Text>
+      <View style={styles.section}>
+        <Text>Lives: 3</Text>
+      </View>
+      <View style={{...styles.section, ...styles.middle, paddingLeft: padding}}>
+        <ActionButton onPress={() => console.log('A')}>A</ActionButton>
+        <ActionButton onPress={() => console.log('B')}>B</ActionButton>
+      </View>
+      <View style={styles.section} />
     </View>
   );
 };
