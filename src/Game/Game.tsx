@@ -1,6 +1,8 @@
 import React from 'react';
 import {StyleSheet, View} from 'react-native';
+import {RouteProp} from '@react-navigation/native';
 
+import {RootStackParamList} from 'types/app';
 import Colors from 'types/colors';
 
 import Arena from './Arena';
@@ -19,7 +21,16 @@ const styles = StyleSheet.create({
   },
 });
 
-const Game = (): JSX.Element => {
+type GameRouteParam = RouteProp<RootStackParamList, 'Game'>;
+
+type GameProps = {
+  route?: GameRouteParam;
+};
+
+const Game = ({route}: GameProps): JSX.Element => {
+  const epic = route?.params?.epic;
+  console.log('epic', epic);
+
   return (
     <View style={styles.game}>
       <DPad padding={PADDING} />

@@ -89,7 +89,6 @@ const DPad = ({padding}: DPadProps): JSX.Element => {
     <View
       onLayout={e => {
         const {width} = e.nativeEvent.layout;
-        console.log('width', width);
         setButtonWidth((width - padding) / 3);
       }}
       style={{...styles.dPad, paddingRight: padding}}>

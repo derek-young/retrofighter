@@ -1,10 +1,14 @@
 import React from 'react';
-import {StyleSheet, Text, View} from 'react-native';
+import {StyleSheet, View} from 'react-native';
+import Colors from 'types/colors';
+
+import EnemyFighter from './EnemyFighter';
+import Fighter from './Fighter';
 
 const styles = StyleSheet.create({
   arena: {
     flexBasis: '50%',
-    backgroundColor: 'lightgreen',
+    backgroundColor: Colors.PINK,
   },
 });
 
@@ -13,7 +17,8 @@ type ArenaProps = {};
 const Arena = (): JSX.Element => {
   return (
     <View style={styles.arena}>
-      <Text>Arena</Text>
+      <Fighter />
+      <EnemyFighter />
     </View>
   );
 };
