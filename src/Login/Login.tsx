@@ -80,7 +80,7 @@ const Login = (): JSX.Element => {
       <View style={styles.bottom}>
         <IBMText style={styles.basicText}>or</IBMText>
         <PressStartText
-          onPress={() => navigation.navigate('Epics')}
+          onPress={() => navigation.navigate('Catalog')}
           style={{...styles.continueText, ...styles.textShadow}}>
           Continue
         </PressStartText>

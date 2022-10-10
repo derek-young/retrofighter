@@ -1,4 +1,7 @@
 export type RootStackParamList = {
-  Epics: undefined;
+  Catalog: undefined;
+  Game: {
+    epic: number;
+  };
   Login: undefined;
 };
