@@ -17,8 +17,14 @@ type ArenaProps = {};
 const Arena = (): JSX.Element => {
   return (
     <View style={styles.arena}>
-      <Fighter />
-      <EnemyFighter />
+      <Fighter facing="N" />
+      <Fighter facing="E" />
+      <Fighter facing="S" />
+      <Fighter facing="W" />
+      <EnemyFighter facing="N" />
+      <EnemyFighter facing="E" />
+      <EnemyFighter facing="S" />
+      <EnemyFighter facing="W" />
     </View>
   );
 };
