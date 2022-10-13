@@ -5,12 +5,12 @@ import FighterIcon from 'icons/spaceship.svg';
 
 import Craft, {CraftProps} from './Craft';
 
-type FighterProps = {
+interface FighterProps extends Omit<CraftProps, 'Icon' | 'fill'> {
   facing: CraftProps['facing'];
-};
+}
 
-const Fighter = ({facing}: FighterProps): JSX.Element => {
-  return <Craft Icon={FighterIcon} facing={facing} fill={Colors.GREEN} />;
+const Fighter = (props: FighterProps): JSX.Element => {
+  return <Craft Icon={FighterIcon} fill={Colors.GREEN} {...props} />;
 };
 
 export default Fighter;

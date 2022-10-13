@@ -1,13 +1,13 @@
 import React from 'react';
 import {StyleSheet, View} from 'react-native';
 
+export const CRAFT_SIZE = 20;
+
 const styles = StyleSheet.create({
   iconContainer: {
-    height: 20,
-    width: 20,
-    // position: 'absolute',
-    // top: 0,
-    // left: 0,
+    height: CRAFT_SIZE,
+    width: CRAFT_SIZE,
+    position: 'absolute',
   },
   shadow: {
     position: 'absolute',
@@ -33,9 +33,11 @@ export type CraftProps = {
   Icon: React.ElementType;
   facing: keyof typeof Facing;
   fill: string;
+  top: number;
+  left: number;
 };
 
-const Craft = ({Icon, facing, fill}: CraftProps): JSX.Element => {
+const Craft = ({Icon, facing, fill, top, left}: CraftProps): JSX.Element => {
   const rotation = Facing[facing];
   const shadow = SHADOW_POS[rotation];
 
@@ -43,6 +45,8 @@ const Craft = ({Icon, facing, fill}: CraftProps): JSX.Element => {
     <View
       style={{
         ...styles.iconContainer,
+        top,
+        left,
         transform: [{rotate: `${rotation}deg`}],
       }}>
       <Icon fill={fill} />

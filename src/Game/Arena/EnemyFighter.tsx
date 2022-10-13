@@ -5,11 +5,11 @@ import EnemyFighterIcon from 'icons/enemy-plane.svg';
 
 import Craft, {CraftProps} from './Craft';
 
-type EnemyFighterProps = {
+interface EnemyFighterProps extends Omit<CraftProps, 'Icon' | 'fill'> {
   facing: CraftProps['facing'];
-};
+}
 
-const EnemyFighter = ({facing}: EnemyFighterProps): JSX.Element => {
+const EnemyFighter = (props: EnemyFighterProps): JSX.Element => {
   return (
     <Craft
       Icon={({style, ...rest}) => (
@@ -18,8 +18,8 @@ const EnemyFighter = ({facing}: EnemyFighterProps): JSX.Element => {
           {...rest}
         />
       )}
-      facing={facing}
       fill={Colors.RED}
+      {...props}
     />
   );
 };
