@@ -79,10 +79,20 @@ const Directional = ({
 );
 
 type DPadProps = {
+  onDownPress: () => void;
+  onUpPress: () => void;
+  onLeftPress: () => void;
+  onRightPress: () => void;
   padding: number;
 };
 
-const DPad = ({padding}: DPadProps): JSX.Element => {
+const DPad = ({
+  onDownPress,
+  onUpPress,
+  onLeftPress,
+  onRightPress,
+  padding,
+}: DPadProps): JSX.Element => {
   const [buttonWidth, setButtonWidth] = useState(0);
 
   return (
@@ -96,25 +106,25 @@ const DPad = ({padding}: DPadProps): JSX.Element => {
         <Empty buttonWidth={buttonWidth} />
         <Directional
           buttonWidth={buttonWidth}
-          onPress={() => console.log('up')}
+          onPress={onUpPress}
           rotation={0}
         />
         <Empty buttonWidth={buttonWidth} />
         <Directional
           buttonWidth={buttonWidth}
-          onPress={() => console.log('left')}
+          onPress={onLeftPress}
           rotation={270}
         />
         <Empty buttonWidth={buttonWidth} />
         <Directional
           buttonWidth={buttonWidth}
-          onPress={() => console.log('right')}
+          onPress={onRightPress}
           rotation={90}
         />
         <Empty buttonWidth={buttonWidth} />
         <Directional
           buttonWidth={buttonWidth}
-          onPress={() => console.log('down')}
+          onPress={onDownPress}
           rotation={180}
         />
       </View>

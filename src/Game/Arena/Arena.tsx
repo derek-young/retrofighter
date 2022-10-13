@@ -1,10 +1,10 @@
-import React, {useState} from 'react';
-import {Dimensions, StyleSheet, View} from 'react-native';
+import React from 'react';
+import {Animated, Dimensions, StyleSheet, View} from 'react-native';
 import Colors from 'types/colors';
 
 import EnemyFighter from './EnemyFighter';
 import Fighter from './Fighter';
-import {CRAFT_SIZE} from './Craft';
+import {CRAFT_SIZE, Facing} from './Craft';
 
 const columnHeight = CRAFT_SIZE + 2;
 const numColumns = 12;
@@ -37,9 +37,13 @@ const Seperator = (props: SeperatorProps) => (
   <View style={{...styles.seperator, ...props}} />
 );
 
-type ArenaProps = {};
+type ArenaProps = {
+  facing: Facing;
+  topAnim: Animated.Value;
+  leftAnim: Animated.Value;
+};
 
-const Arena = (): JSX.Element => {
+const Arena = ({topAnim, leftAnim, facing}: ArenaProps): JSX.Element => {
   return (
     <View style={styles.arena}>
       {new Array(numColumns - 1)
@@ -49,6 +53,7 @@ const Arena = (): JSX.Element => {
             .fill(0)
             .map((x, j) => (
               <Seperator
+                key={i + j}
                 top={columnHeight * (i + 1) + seperatorHeight * i}
                 left={columnHeight * (j + 1) + seperatorHeight * j}
                 height={seperatorHeight}
@@ -56,12 +61,8 @@ const Arena = (): JSX.Element => {
               />
             )),
         )}
-      <EnemyFighter facing="S" top={0} left={0} />
-      <Fighter
-        facing="N"
-        top={columnHeight + seperatorHeight}
-        left={columnHeight + seperatorHeight}
-      />
+      <EnemyFighter facing={'S'} top={0} left={0} />
+      <Fighter facing={facing} top={topAnim} left={leftAnim} />
     </View>
   );
 };

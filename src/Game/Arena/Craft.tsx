@@ -1,5 +1,5 @@
 import React from 'react';
-import {StyleSheet, View} from 'react-native';
+import {Animated, StyleSheet} from 'react-native';
 
 export const CRAFT_SIZE = 20;
 
@@ -15,43 +15,47 @@ const styles = StyleSheet.create({
   },
 });
 
-enum Facing {
+enum FacingRotation {
   N = 0,
   E = 90,
   S = 180,
   W = 270,
 }
 
+export type Facing = keyof typeof FacingRotation;
+
 const SHADOW_POS = {
-  [Facing.N]: {top: 4, left: 2},
-  [Facing.E]: {top: -4, left: 2},
-  [Facing.S]: {top: -4, left: -2},
-  [Facing.W]: {top: 4, left: -2},
+  [FacingRotation.N]: {top: 4, left: 2},
+  [FacingRotation.E]: {top: -4, left: 2},
+  [FacingRotation.S]: {top: -4, left: -2},
+  [FacingRotation.W]: {top: 4, left: -2},
 };
 
 export type CraftProps = {
   Icon: React.ElementType;
-  facing: keyof typeof Facing;
+  facing: Facing;
   fill: string;
-  top: number;
-  left: number;
+  top: number | Animated.Value;
+  left: number | Animated.Value;
 };
 
 const Craft = ({Icon, facing, fill, top, left}: CraftProps): JSX.Element => {
-  const rotation = Facing[facing];
+  const rotation = FacingRotation[facing];
   const shadow = SHADOW_POS[rotation];
 
   return (
-    <View
-      style={{
-        ...styles.iconContainer,
-        top,
-        left,
-        transform: [{rotate: `${rotation}deg`}],
-      }}>
+    <Animated.View
+      style={[
+        {
+          ...styles.iconContainer,
+          transform: [{rotate: `${rotation}deg`}],
+          top,
+          left,
+        },
+      ]}>
       <Icon fill={fill} />
       <Icon fill="#00000040" style={{...styles.shadow, ...shadow}} />
-    </View>
+    </Animated.View>
   );
 };
 
