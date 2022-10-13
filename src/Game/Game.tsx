@@ -128,7 +128,7 @@ const Game = ({route}: GameProps): JSX.Element => {
         padding={PADDING}
       />
       <Arena topAnim={topAnim} leftAnim={leftAnim} facing={facing} />
-      <ButtonSet padding={PADDING} />
+      <ButtonSet />
     </View>
   );
 };

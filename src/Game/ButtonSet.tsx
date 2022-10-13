@@ -51,11 +51,9 @@ const ActionButton = ({children, onPress}: ActionButtonProps): JSX.Element => (
   </TouchableOpacity>
 );
 
-type ButtonSetProps = {
-  padding: number;
-};
+type ButtonSetProps = {};
 
-const ButtonSet = ({padding}: ButtonSetProps): JSX.Element => {
+const ButtonSet = (): JSX.Element => {
   return (
     <View style={styles.buttonSet}>
       <View style={{...styles.section, ...styles.top}}>
@@ -68,7 +66,7 @@ const ButtonSet = ({padding}: ButtonSetProps): JSX.Element => {
         <EnemyFighter facing="S" top={20} left={40} />
         <EnemyFighter facing="W" top={20} left={60} />
       </View>
-      <View style={{...styles.section, ...styles.middle, paddingLeft: padding}}>
+      <View style={{...styles.section, ...styles.middle}}>
         <ActionButton onPress={() => console.log('A')}>A</ActionButton>
         <ActionButton onPress={() => console.log('B')}>B</ActionButton>
       </View>
