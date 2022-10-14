@@ -41,6 +41,25 @@ const topAnimValue = new Animated.Value(maxTop);
 const leftAnimValue = new Animated.Value(minLeft);
 const pixelsPerSecond = 60;
 
+function animate({
+  animation,
+  pixelsToMove,
+  toValue,
+}: {
+  animation: Animated.Value;
+  pixelsToMove: number;
+  toValue: number;
+}) {
+  const durationMs = (pixelsToMove / pixelsPerSecond) * 1000;
+
+  Animated.timing(animation, {
+    toValue,
+    duration: durationMs,
+    easing: Easing.linear,
+    useNativeDriver: false,
+  }).start();
+}
+
 const Game = ({route}: GameProps): JSX.Element => {
   const epic = route?.params?.epic;
   console.log('epic', epic);
@@ -64,57 +83,33 @@ const Game = ({route}: GameProps): JSX.Element => {
 
   const onDownPress = () => {
     const pixelsToMove = maxTop - topRef.current;
-    const durationMs = (pixelsToMove / pixelsPerSecond) * 1000;
 
-    Animated.timing(topAnim, {
-      toValue: maxTop,
-      duration: durationMs,
-      easing: Easing.linear,
-      useNativeDriver: false,
-    }).start();
-
+    leftAnim.stopAnimation();
+    animate({animation: topAnim, pixelsToMove, toValue: maxTop});
     setFacing('S');
   };
 
   const onUpPress = () => {
     const pixelsToMove = topRef.current;
-    const durationMs = (pixelsToMove / pixelsPerSecond) * 1000;
 
-    Animated.timing(topAnim, {
-      toValue: minTop,
-      duration: durationMs,
-      easing: Easing.linear,
-      useNativeDriver: false,
-    }).start();
-
+    leftAnim.stopAnimation();
+    animate({animation: topAnim, pixelsToMove, toValue: minTop});
     setFacing('N');
   };
 
   const onLeftPress = () => {
     const pixelsToMove = leftRef.current;
-    const durationMs = (pixelsToMove / pixelsPerSecond) * 1000;
 
-    Animated.timing(leftAnim, {
-      toValue: minLeft,
-      duration: durationMs,
-      easing: Easing.linear,
-      useNativeDriver: false,
-    }).start();
-
+    topAnim.stopAnimation();
+    animate({animation: leftAnim, pixelsToMove, toValue: minLeft});
     setFacing('W');
   };
 
   const onRightPress = () => {
     const pixelsToMove = maxLeft - leftRef.current;
-    const durationMs = (pixelsToMove / pixelsPerSecond) * 1000;
 
-    Animated.timing(leftAnim, {
-      toValue: maxLeft,
-      duration: durationMs,
-      easing: Easing.linear,
-      useNativeDriver: false,
-    }).start();
-
+    topAnim.stopAnimation();
+    animate({animation: leftAnim, pixelsToMove, toValue: maxLeft});
     setFacing('E');
   };
 
