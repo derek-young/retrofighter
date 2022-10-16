@@ -1,12 +1,13 @@
 import React from 'react';
 import {Animated, StyleSheet} from 'react-native';
 
-export const CRAFT_SIZE = 20;
+import {craftSize} from '../gameConstants';
+import {Facing} from '../types';
 
 const styles = StyleSheet.create({
   iconContainer: {
-    height: CRAFT_SIZE,
-    width: CRAFT_SIZE,
+    height: craftSize,
+    width: craftSize,
     position: 'absolute',
   },
   shadow: {
@@ -15,20 +16,18 @@ const styles = StyleSheet.create({
   },
 });
 
-enum FacingRotation {
-  N = 0,
-  E = 90,
-  S = 180,
-  W = 270,
-}
-
-export type Facing = keyof typeof FacingRotation;
+const FACING_ROTATION: Record<Facing, number> = {
+  ['N']: 0,
+  ['E']: 90,
+  ['S']: 180,
+  ['W']: 270,
+};
 
 const SHADOW_POS = {
-  [FacingRotation.N]: {top: 4, left: 2},
-  [FacingRotation.E]: {top: -4, left: 2},
-  [FacingRotation.S]: {top: -4, left: -2},
-  [FacingRotation.W]: {top: 4, left: -2},
+  [FACING_ROTATION.N]: {top: 4, left: 2},
+  [FACING_ROTATION.E]: {top: -4, left: 2},
+  [FACING_ROTATION.S]: {top: -4, left: -2},
+  [FACING_ROTATION.W]: {top: 4, left: -2},
 };
 
 export type CraftProps = {
@@ -40,7 +39,7 @@ export type CraftProps = {
 };
 
 const Craft = ({Icon, facing, fill, top, left}: CraftProps): JSX.Element => {
-  const rotation = FacingRotation[facing];
+  const rotation = FACING_ROTATION[facing];
   const shadow = SHADOW_POS[rotation];
 
   return (

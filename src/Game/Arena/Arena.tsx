@@ -4,7 +4,7 @@ import Colors from 'types/colors';
 
 import EnemyFighter from './EnemyFighter';
 import Fighter from './Fighter';
-import {Facing} from './Craft';
+import {Facing} from '../types';
 
 import {
   alleyWidth,

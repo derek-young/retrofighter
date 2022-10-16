@@ -1,5 +1,5 @@
 import React, {useEffect, useRef, useState} from 'react';
-import {Animated, Easing, StyleSheet, View} from 'react-native';
+import {Animated, StyleSheet, View} from 'react-native';
 import {RouteProp} from '@react-navigation/native';
 
 import {RootStackParamList} from 'types/app';
@@ -8,28 +8,18 @@ import Colors from 'types/colors';
 import Arena from './Arena';
 import ButtonSet from './ButtonSet';
 import DPad from './DPad';
-import {Facing} from './Arena/Craft';
+
 import {
   alleyWidth,
+  leftRightPadding,
   maxLeft,
   minLeft,
   maxTop,
   minTop,
-  pixelsPerSecond,
   seperatorWidth,
 } from './gameConstants';
-
-const PADDING = 56;
-
-const styles = StyleSheet.create({
-  game: {
-    flex: 1,
-    flexDirection: 'row',
-    paddingLeft: PADDING,
-    paddingRight: PADDING,
-    backgroundColor: Colors.PURPLE,
-  },
-});
+import {Facing} from './types';
+import {animate, getNextAlley} from './utils';
 
 type GameRouteParam = RouteProp<RootStackParamList, 'Game'>;
 
@@ -41,36 +31,15 @@ type UpdaterProps = {
   value: number;
 };
 
-function animate({
-  animation,
-  callback = () => {},
-  pixelsToMove,
-  toValue,
-}: {
-  animation: Animated.Value;
-  callback?: () => void;
-  pixelsToMove: number;
-  toValue: number;
-}) {
-  const durationMs = (pixelsToMove / pixelsPerSecond) * 1000;
-
-  Animated.timing(animation, {
-    toValue,
-    duration: durationMs,
-    easing: Easing.linear,
-    useNativeDriver: false,
-  }).start(callback);
-}
-
-function getNextAlley(position: number, direction: Facing) {
-  const nextAlley = position / (alleyWidth + seperatorWidth);
-
-  if (direction === 'N' || direction === 'W') {
-    return Math.floor(nextAlley);
-  }
-
-  return Math.ceil(nextAlley);
-}
+const styles = StyleSheet.create({
+  game: {
+    flex: 1,
+    flexDirection: 'row',
+    paddingLeft: leftRightPadding,
+    paddingRight: leftRightPadding,
+    backgroundColor: Colors.PURPLE,
+  },
+});
 
 const startTop = maxTop;
 const startLeft = minLeft;
@@ -184,7 +153,6 @@ const Game = ({route}: GameProps): JSX.Element => {
         onUpPress={onUpPress}
         onLeftPress={onLeftPress}
         onRightPress={onRightPress}
-        padding={PADDING}
       />
       <Arena topAnim={topAnim} leftAnim={leftAnim} facing={facing} />
       <ButtonSet />

@@ -3,6 +3,8 @@ import {StyleSheet, TouchableOpacity, View, ViewStyle} from 'react-native';
 
 import Colors from 'types/colors';
 
+import {leftRightPadding} from './gameConstants';
+
 const styles = StyleSheet.create({
   dPad: {
     flexBasis: '25%',
@@ -83,7 +85,6 @@ type DPadProps = {
   onUpPress: () => void;
   onLeftPress: () => void;
   onRightPress: () => void;
-  padding: number;
 };
 
 const DPad = ({
@@ -91,7 +92,6 @@ const DPad = ({
   onUpPress,
   onLeftPress,
   onRightPress,
-  padding,
 }: DPadProps): JSX.Element => {
   const [buttonWidth, setButtonWidth] = useState(0);
 
@@ -99,9 +99,9 @@ const DPad = ({
     <View
       onLayout={e => {
         const {width} = e.nativeEvent.layout;
-        setButtonWidth((width - padding) / 3);
+        setButtonWidth((width - leftRightPadding) / 3);
       }}
-      style={{...styles.dPad, paddingRight: padding}}>
+      style={{...styles.dPad, paddingRight: leftRightPadding}}>
       <View style={styles.container}>
         <Empty buttonWidth={buttonWidth} />
         <Directional

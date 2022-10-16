@@ -1,8 +1,9 @@
 import {Dimensions} from 'react-native';
 
-import {CRAFT_SIZE} from './Arena/Craft';
+export const leftRightPadding = 56;
 
-export const alleyWidth = CRAFT_SIZE + 2; // Column height/width
+export const craftSize = 20;
+export const alleyWidth = craftSize + 2; // Column height/width
 export const numColumns = 12;
 export const pixelsPerSecond = 60; // Craft speed
 
