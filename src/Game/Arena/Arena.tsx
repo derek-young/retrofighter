@@ -16,7 +16,7 @@ import {
 const styles = StyleSheet.create({
   arena: {
     width: windowHeight,
-    backgroundColor: Colors.PINK,
+    backgroundColor: `${Colors.PINK}40`,
   },
   seperator: {
     position: 'absolute',

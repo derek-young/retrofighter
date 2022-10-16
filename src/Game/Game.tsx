@@ -1,9 +1,9 @@
 import React, {useEffect, useRef, useState} from 'react';
-import {Animated, StyleSheet, View} from 'react-native';
+import {Animated, ImageBackground, StyleSheet, View} from 'react-native';
 import {RouteProp} from '@react-navigation/native';
 
 import {RootStackParamList} from 'types/app';
-import Colors from 'types/colors';
+import backgroundImage from 'images/backdrop.jpg';
 
 import Arena from './Arena';
 import ButtonSet from './ButtonSet';
@@ -37,7 +37,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     paddingLeft: leftRightPadding,
     paddingRight: leftRightPadding,
-    backgroundColor: Colors.PURPLE,
+  },
+  backdrop: {
+    flex: 1,
   },
 });
 
@@ -163,16 +165,18 @@ const Game = ({route}: GameProps): JSX.Element => {
   const onRightPress = () => onHorizontalMove(onMoveRight);
 
   return (
-    <View style={styles.game}>
-      <DPad
-        onDownPress={onDownPress}
-        onUpPress={onUpPress}
-        onLeftPress={onLeftPress}
-        onRightPress={onRightPress}
-      />
-      <Arena topAnim={topAnim} leftAnim={leftAnim} facing={facing} />
-      <ButtonSet />
-    </View>
+    <ImageBackground source={backgroundImage} style={styles.backdrop}>
+      <View style={styles.game}>
+        <DPad
+          onDownPress={onDownPress}
+          onUpPress={onUpPress}
+          onLeftPress={onLeftPress}
+          onRightPress={onRightPress}
+        />
+        <Arena topAnim={topAnim} leftAnim={leftAnim} facing={facing} />
+        <ButtonSet />
+      </View>
+    </ImageBackground>
   );
 };
 

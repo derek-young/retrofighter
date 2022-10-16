@@ -84,7 +84,7 @@ const Craft = ({Icon, facing, fill, top, left}: CraftProps): JSX.Element => {
 
     Animated.timing(rotationAnim, {
       toValue: nextRotation,
-      duration: 300,
+      duration: 200,
       useNativeDriver: true,
     }).start(() => {
       // Normalize values on animation finish
