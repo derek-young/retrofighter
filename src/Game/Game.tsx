@@ -106,45 +106,61 @@ const Game = ({route}: GameProps): JSX.Element => {
     });
   };
 
-  const onDownPress = () => {
-    interceptHorizontalAnimation(() => {
-      const pixelsToMove = maxTop - topRef.current;
-
-      leftAnim.stopAnimation();
-      animate({animation: topAnim, pixelsToMove, toValue: maxTop});
-      setFacing('S');
-    });
+  const onVerticalMove = (onMove: () => void) => {
+    if (facingRef.current === 'E' || facingRef.current === 'W') {
+      interceptHorizontalAnimation(onMove);
+    } else {
+      onMove();
+    }
   };
 
-  const onUpPress = () => {
-    interceptHorizontalAnimation(() => {
-      const pixelsToMove = topRef.current;
-
-      leftAnim.stopAnimation();
-      animate({animation: topAnim, pixelsToMove, toValue: minTop});
-      setFacing('N');
-    });
+  const onHorizontalMove = (onMove: () => void) => {
+    if (facingRef.current === 'N' || facingRef.current === 'S') {
+      interceptVerticalAnimation(onMove);
+    } else {
+      onMove();
+    }
   };
 
-  const onLeftPress = () => {
-    interceptVerticalAnimation(() => {
-      const pixelsToMove = leftRef.current;
+  const onMoveDown = () => {
+    const pixelsToMove = maxTop - topRef.current;
 
-      topAnim.stopAnimation();
-      animate({animation: leftAnim, pixelsToMove, toValue: minLeft});
-      setFacing('W');
-    });
+    leftAnim.stopAnimation();
+    animate({animation: topAnim, pixelsToMove, toValue: maxTop});
+    setFacing('S');
   };
 
-  const onRightPress = () => {
-    interceptVerticalAnimation(() => {
-      const pixelsToMove = maxLeft - leftRef.current;
+  const onMoveUp = () => {
+    const pixelsToMove = topRef.current;
 
-      topAnim.stopAnimation();
-      animate({animation: leftAnim, pixelsToMove, toValue: maxLeft});
-      setFacing('E');
-    });
+    leftAnim.stopAnimation();
+    animate({animation: topAnim, pixelsToMove, toValue: minTop});
+    setFacing('N');
   };
+
+  const onMoveLeft = () => {
+    const pixelsToMove = leftRef.current;
+
+    topAnim.stopAnimation();
+    animate({animation: leftAnim, pixelsToMove, toValue: minLeft});
+    setFacing('W');
+  };
+
+  const onMoveRight = () => {
+    const pixelsToMove = maxLeft - leftRef.current;
+
+    topAnim.stopAnimation();
+    animate({animation: leftAnim, pixelsToMove, toValue: maxLeft});
+    setFacing('E');
+  };
+
+  const onDownPress = () => onVerticalMove(onMoveDown);
+
+  const onUpPress = () => onVerticalMove(onMoveUp);
+
+  const onLeftPress = () => onHorizontalMove(onMoveLeft);
+
+  const onRightPress = () => onHorizontalMove(onMoveRight);
 
   return (
     <View style={styles.game}>
