@@ -1,5 +1,5 @@
 import React, {useEffect, useRef, useState} from 'react';
-import {Animated, Easing, Dimensions, StyleSheet, View} from 'react-native';
+import {Animated, Easing, StyleSheet, View} from 'react-native';
 import {RouteProp} from '@react-navigation/native';
 
 import {RootStackParamList} from 'types/app';
@@ -9,6 +9,15 @@ import Arena from './Arena';
 import ButtonSet from './ButtonSet';
 import DPad from './DPad';
 import {Facing} from './Arena/Craft';
+import {
+  alleyWidth,
+  maxLeft,
+  minLeft,
+  maxTop,
+  minTop,
+  pixelsPerSecond,
+  seperatorWidth,
+} from './gameConstants';
 
 const PADDING = 56;
 
@@ -32,21 +41,14 @@ type UpdaterProps = {
   value: number;
 };
 
-const windowHeight = Dimensions.get('window').height;
-const minTop = 0;
-const maxTop = windowHeight - 22;
-const minLeft = 0;
-const maxLeft = windowHeight - 22;
-const topAnimValue = new Animated.Value(maxTop);
-const leftAnimValue = new Animated.Value(minLeft);
-const pixelsPerSecond = 60;
-
 function animate({
   animation,
+  callback = () => {},
   pixelsToMove,
   toValue,
 }: {
   animation: Animated.Value;
+  callback?: () => void;
   pixelsToMove: number;
   toValue: number;
 }) {
@@ -57,23 +59,53 @@ function animate({
     duration: durationMs,
     easing: Easing.linear,
     useNativeDriver: false,
-  }).start();
+  }).start(callback);
 }
+
+function getNextAlley(position: number, direction: Facing) {
+  const nextAlley = position / (alleyWidth + seperatorWidth);
+
+  if (direction === 'N' || direction === 'W') {
+    return Math.floor(nextAlley);
+  }
+
+  return Math.ceil(nextAlley);
+}
+
+const startTop = maxTop;
+const startLeft = minLeft;
+const topAnimValue = new Animated.Value(startTop);
+const leftAnimValue = new Animated.Value(startLeft);
 
 const Game = ({route}: GameProps): JSX.Element => {
   const epic = route?.params?.epic;
   console.log('epic', epic);
 
   const [facing, setFacing] = useState<Facing>('N');
+  const facingRef = useRef(facing);
+
   const topAnim = useRef(topAnimValue).current;
   const leftAnim = useRef(leftAnimValue).current;
-  const topRef = useRef(maxTop);
-  const leftRef = useRef(minLeft);
+
+  const topRef = useRef(startTop);
+  const leftRef = useRef(startLeft);
+
+  const nextRowRef = useRef(getNextAlley(startTop, facing));
+  const nextColRef = useRef(getNextAlley(startLeft, facing));
+
+  facingRef.current = facing;
+
   const topUpdaterRef = useRef<(props: UpdaterProps) => void>(
-    ({value}: UpdaterProps) => (topRef.current = value),
+    ({value}: UpdaterProps) => {
+      nextRowRef.current = getNextAlley(value, facingRef.current);
+      topRef.current = value;
+    },
   );
   const leftUpdaterRef = useRef<(props: UpdaterProps) => void>(
-    ({value}: UpdaterProps) => (leftRef.current = value),
+    ({value}: UpdaterProps) => {
+      nextColRef.current = getNextAlley(value, facingRef.current);
+      leftRef.current = value;
+    },
   );
 
   useEffect(() => {
@@ -81,36 +113,68 @@ const Game = ({route}: GameProps): JSX.Element => {
     leftAnimValue.addListener(leftUpdaterRef.current);
   }, []);
 
-  const onDownPress = () => {
-    const pixelsToMove = maxTop - topRef.current;
+  const interceptVerticalAnimation = (callback: () => void) => {
+    const nextRowPosition =
+      nextRowRef.current * (alleyWidth + seperatorWidth) + 1;
 
-    leftAnim.stopAnimation();
-    animate({animation: topAnim, pixelsToMove, toValue: maxTop});
-    setFacing('S');
+    animate({
+      animation: topAnim,
+      callback,
+      pixelsToMove: Math.abs(nextRowPosition - topRef.current) + 1,
+      toValue: nextRowPosition,
+    });
+  };
+
+  const interceptHorizontalAnimation = (callback: () => void) => {
+    const nextColPosition =
+      nextColRef.current * (alleyWidth + seperatorWidth) + 1;
+
+    animate({
+      animation: leftAnim,
+      callback,
+      pixelsToMove: Math.abs(nextColPosition - leftRef.current),
+      toValue: nextColPosition,
+    });
+  };
+
+  const onDownPress = () => {
+    interceptHorizontalAnimation(() => {
+      const pixelsToMove = maxTop - topRef.current;
+
+      leftAnim.stopAnimation();
+      animate({animation: topAnim, pixelsToMove, toValue: maxTop});
+      setFacing('S');
+    });
   };
 
   const onUpPress = () => {
-    const pixelsToMove = topRef.current;
+    interceptHorizontalAnimation(() => {
+      const pixelsToMove = topRef.current;
 
-    leftAnim.stopAnimation();
-    animate({animation: topAnim, pixelsToMove, toValue: minTop});
-    setFacing('N');
+      leftAnim.stopAnimation();
+      animate({animation: topAnim, pixelsToMove, toValue: minTop});
+      setFacing('N');
+    });
   };
 
   const onLeftPress = () => {
-    const pixelsToMove = leftRef.current;
+    interceptVerticalAnimation(() => {
+      const pixelsToMove = leftRef.current;
 
-    topAnim.stopAnimation();
-    animate({animation: leftAnim, pixelsToMove, toValue: minLeft});
-    setFacing('W');
+      topAnim.stopAnimation();
+      animate({animation: leftAnim, pixelsToMove, toValue: minLeft});
+      setFacing('W');
+    });
   };
 
   const onRightPress = () => {
-    const pixelsToMove = maxLeft - leftRef.current;
+    interceptVerticalAnimation(() => {
+      const pixelsToMove = maxLeft - leftRef.current;
 
-    topAnim.stopAnimation();
-    animate({animation: leftAnim, pixelsToMove, toValue: maxLeft});
-    setFacing('E');
+      topAnim.stopAnimation();
+      animate({animation: leftAnim, pixelsToMove, toValue: maxLeft});
+      setFacing('E');
+    });
   };
 
   return (

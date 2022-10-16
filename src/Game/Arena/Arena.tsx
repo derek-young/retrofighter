@@ -1,15 +1,17 @@
 import React from 'react';
-import {Animated, Dimensions, StyleSheet, View} from 'react-native';
+import {Animated, StyleSheet, View} from 'react-native';
 import Colors from 'types/colors';
 
 import EnemyFighter from './EnemyFighter';
 import Fighter from './Fighter';
-import {CRAFT_SIZE, Facing} from './Craft';
+import {Facing} from './Craft';
 
-const columnHeight = CRAFT_SIZE + 2;
-const numColumns = 12;
-const windowHeight = Dimensions.get('window').height;
-const seperatorHeight = (windowHeight - numColumns * columnHeight) / 11;
+import {
+  alleyWidth,
+  numColumns,
+  seperatorWidth,
+  windowHeight,
+} from '../gameConstants';
 
 const styles = StyleSheet.create({
   arena: {
@@ -18,7 +20,7 @@ const styles = StyleSheet.create({
   },
   seperator: {
     position: 'absolute',
-    backgroundColor: Colors.GREY,
+    backgroundColor: '#FFF',
     borderRadius: 2,
     shadowColor: 'black',
     shadowOffset: {width: 2, height: 2},
@@ -54,10 +56,10 @@ const Arena = ({topAnim, leftAnim, facing}: ArenaProps): JSX.Element => {
             .map((x, j) => (
               <Seperator
                 key={i + j}
-                top={columnHeight * (i + 1) + seperatorHeight * i}
-                left={columnHeight * (j + 1) + seperatorHeight * j}
-                height={seperatorHeight}
-                width={seperatorHeight}
+                top={alleyWidth * (i + 1) + seperatorWidth * i}
+                left={alleyWidth * (j + 1) + seperatorWidth * j}
+                height={seperatorWidth}
+                width={seperatorWidth}
               />
             )),
         )}
