@@ -55,12 +55,12 @@ const Empty = ({buttonWidth}: EmptyProps): JSX.Element => (
   <View style={{width: buttonWidth, height: buttonWidth}} />
 );
 
-type Rotation = 0 | 90 | 180 | 270;
+type ButtonRotation = 0 | 90 | 180 | 270;
 
 type DirectionalProps = {
   buttonWidth: number;
   onPress: () => void;
-  rotation: Rotation;
+  rotation: ButtonRotation;
 };
 
 const Directional = ({

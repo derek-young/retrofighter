@@ -27,10 +27,6 @@ export function animate({
 export function getNextAlley(position: number, direction: Facing) {
   const nextAlley = position / (alleyWidth + seperatorWidth);
 
-  console.log('position', position);
-  console.log('direction', direction);
-  console.log('alleyWidth + seperatorWidth', alleyWidth + seperatorWidth);
-
   if (direction === 'N' || direction === 'W') {
     return Math.floor(nextAlley);
   }
