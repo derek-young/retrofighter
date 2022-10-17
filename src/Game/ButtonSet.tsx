@@ -2,8 +2,8 @@ import React from 'react';
 import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import Colors from 'types/colors';
 
-import EnemyFighter from './Arena/EnemyFighter';
-import Fighter from './Arena/Fighter';
+import EnemyFighter from './EnemyFighter/EnemyFighter';
+import Fighter from './Fighter';
 
 const styles = StyleSheet.create({
   buttonSet: {
@@ -57,14 +57,14 @@ const ButtonSet = (): JSX.Element => {
   return (
     <View style={styles.buttonSet}>
       <View style={{...styles.section, ...styles.top}}>
-        <Fighter facing="N" top={0} left={0} />
-        <Fighter facing="E" top={0} left={20} />
-        <Fighter facing="S" top={0} left={40} />
-        <Fighter facing="W" top={0} left={60} />
-        <EnemyFighter facing="N" top={20} left={0} />
-        <EnemyFighter facing="E" top={20} left={20} />
-        <EnemyFighter facing="S" top={20} left={40} />
-        <EnemyFighter facing="W" top={20} left={60} />
+        <Fighter />
+        <Fighter />
+        <Fighter />
+        <Fighter />
+        <EnemyFighter defaultFacing="N" startingTop={20} startingLeft={0} />
+        <EnemyFighter defaultFacing="E" startingTop={20} startingLeft={20} />
+        <EnemyFighter defaultFacing="S" startingTop={20} startingLeft={40} />
+        <EnemyFighter defaultFacing="W" startingTop={20} startingLeft={60} />
       </View>
       <View style={{...styles.section, ...styles.middle}}>
         <ActionButton onPress={() => console.log('A')}>A</ActionButton>

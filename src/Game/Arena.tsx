@@ -1,17 +1,16 @@
 import React from 'react';
-import {Animated, StyleSheet, View} from 'react-native';
+import {StyleSheet, View} from 'react-native';
 import Colors from 'types/colors';
 
 import EnemyFighter from './EnemyFighter';
 import Fighter from './Fighter';
-import {Facing} from '../types';
 
 import {
   alleyWidth,
   numColumns,
   seperatorWidth,
   windowHeight,
-} from '../gameConstants';
+} from './gameConstants';
 
 const styles = StyleSheet.create({
   arena: {
@@ -39,13 +38,7 @@ const Seperator = (props: SeperatorProps) => (
   <View style={{...styles.seperator, ...props}} />
 );
 
-type ArenaProps = {
-  facing: Facing;
-  topAnim: Animated.Value;
-  leftAnim: Animated.Value;
-};
-
-const Arena = ({topAnim, leftAnim, facing}: ArenaProps): JSX.Element => {
+const Arena = (): JSX.Element => {
   return (
     <View style={styles.arena}>
       {new Array(numColumns - 1)
@@ -63,8 +56,8 @@ const Arena = ({topAnim, leftAnim, facing}: ArenaProps): JSX.Element => {
               />
             )),
         )}
-      <EnemyFighter facing={'S'} top={0} left={0} />
-      <Fighter facing={facing} top={topAnim} left={leftAnim} />
+      <EnemyFighter />
+      <Fighter />
     </View>
   );
 };

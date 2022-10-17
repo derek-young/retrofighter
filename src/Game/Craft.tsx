@@ -1,8 +1,8 @@
 import React, {useEffect, useRef, useState} from 'react';
 import {Animated, StyleSheet} from 'react-native';
 
-import {craftSize} from '../gameConstants';
-import {Facing} from '../types';
+import {craftSize} from './gameConstants';
+import {Facing} from './types';
 
 const styles = StyleSheet.create({
   iconContainer: {
@@ -33,7 +33,7 @@ const wFacingRotation = {
   ['S']: -180,
 };
 
-function getRotationSet(facing: Facing) {
+function getNextRotationSet(facing: Facing) {
   switch (facing) {
     case 'N':
       return DEFAULT_FACING_ROTATION;
@@ -78,7 +78,7 @@ const Craft = ({Icon, facing, fill, top, left}: CraftProps): JSX.Element => {
   }, [rotationAnim]);
 
   useEffect(() => {
-    const nextRotation = getRotationSet(facingRef.current)[facing];
+    const nextRotation = getNextRotationSet(facingRef.current)[facing];
 
     facingRef.current = facing;
 

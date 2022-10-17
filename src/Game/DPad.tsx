@@ -3,6 +3,7 @@ import {StyleSheet, TouchableOpacity, View, ViewStyle} from 'react-native';
 
 import Colors from 'types/colors';
 
+import {useFighterContext} from './Fighter/FigherContext';
 import {leftRightPadding} from './gameConstants';
 
 const styles = StyleSheet.create({
@@ -80,19 +81,9 @@ const Directional = ({
   </TouchableOpacity>
 );
 
-type DPadProps = {
-  onDownPress: () => void;
-  onUpPress: () => void;
-  onLeftPress: () => void;
-  onRightPress: () => void;
-};
-
-const DPad = ({
-  onDownPress,
-  onUpPress,
-  onLeftPress,
-  onRightPress,
-}: DPadProps): JSX.Element => {
+const DPad = (): JSX.Element => {
+  const {onDownPress, onUpPress, onLeftPress, onRightPress} =
+    useFighterContext();
   const [buttonWidth, setButtonWidth] = useState(0);
 
   return (
