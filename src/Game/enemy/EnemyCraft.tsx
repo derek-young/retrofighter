@@ -1,25 +1,27 @@
 import React, {useEffect, useRef, useState} from 'react';
 import {Animated} from 'react-native';
+import {SvgProps} from 'react-native-svg';
 
 import Colors from 'types/colors';
-import EnemyFighterIcon from 'icons/enemy-plane.svg';
 import Craft, {CraftProps} from 'Game/Craft';
 import {animateCraft} from 'Game/utils';
 import {Facing} from 'Game/types';
 
 import {useEnemyContext} from './EnemyContext';
 
-interface EnemyFighterProps {
+export interface EnemyCraftProps {
   defaultFacing?: CraftProps['facing'];
+  Icon: React.FC<SvgProps>;
   startingTop?: number;
   startingLeft?: number;
 }
 
-const EnemyFighter = ({
+const EnemyCraft = ({
   defaultFacing = 'S',
+  Icon,
   startingTop = 0,
   startingLeft = 0,
-}: EnemyFighterProps): JSX.Element => {
+}: EnemyCraftProps): JSX.Element => {
   const {playerLeft, playerTop} = useEnemyContext();
   const [facing, setFacing] = useState<Facing>(defaultFacing);
   const [hasInitialized, setHasInitialized] = useState(false);
@@ -28,7 +30,6 @@ const EnemyFighter = ({
 
   useEffect(() => {
     if (!hasInitialized && (playerLeft !== null || playerTop !== null)) {
-      console.log('initializing');
       animateCraft({animation: topAnim, pixelsToMove: 200, toValue: 200});
       setHasInitialized(true);
     }
@@ -36,12 +37,7 @@ const EnemyFighter = ({
 
   return (
     <Craft
-      Icon={({style, ...rest}) => (
-        <EnemyFighterIcon
-          style={{...style, transform: [{rotate: '-45deg'}]}}
-          {...rest}
-        />
-      )}
+      Icon={Icon}
       facing={facing}
       fill={Colors.RED}
       left={leftAnim}
@@ -50,4 +46,4 @@ const EnemyFighter = ({
   );
 };
 
-export default EnemyFighter;
+export default EnemyCraft;

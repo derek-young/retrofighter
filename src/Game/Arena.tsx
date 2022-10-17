@@ -2,8 +2,8 @@ import React from 'react';
 import {StyleSheet, View} from 'react-native';
 import Colors from 'types/colors';
 
-import EnemyFighter from './EnemyFighter';
-import {EnemyProvider} from './EnemyFighter/EnemyContext';
+import {DualFighter, Bomber} from './enemy';
+import {EnemyProvider} from './enemy/EnemyContext';
 import Fighter from './Fighter';
 
 import {
@@ -44,7 +44,8 @@ const Arena = (): JSX.Element => {
     <View style={styles.arena}>
       <EnemyProvider>
         <View>
-          <EnemyFighter />
+          <Bomber startingLeft={33.7} />
+          <DualFighter />
         </View>
       </EnemyProvider>
       <Fighter />
