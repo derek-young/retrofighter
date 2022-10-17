@@ -3,6 +3,7 @@ import {StyleSheet, View} from 'react-native';
 import Colors from 'types/colors';
 
 import EnemyFighter from './EnemyFighter';
+import {EnemyProvider} from './EnemyFighter/EnemyContext';
 import Fighter from './Fighter';
 
 import {
@@ -41,6 +42,12 @@ const Seperator = (props: SeperatorProps) => (
 const Arena = (): JSX.Element => {
   return (
     <View style={styles.arena}>
+      <EnemyProvider>
+        <View>
+          <EnemyFighter />
+        </View>
+      </EnemyProvider>
+      <Fighter />
       {new Array(numColumns - 1)
         .fill(0)
         .map((y, i) =>
@@ -56,8 +63,6 @@ const Arena = (): JSX.Element => {
               />
             )),
         )}
-      <EnemyFighter />
-      <Fighter />
     </View>
   );
 };

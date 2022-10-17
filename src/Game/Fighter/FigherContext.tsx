@@ -11,7 +11,7 @@ import {
   seperatorWidth,
 } from '../gameConstants';
 import {Facing} from '../types';
-import {animate, getNextAlley} from '../utils';
+import {animateCraft, getNextAlley} from '../utils';
 
 type UpdaterProps = {
   value: number;
@@ -85,7 +85,7 @@ export const FighterProvider = ({children}: {children: React.ReactNode}) => {
     const nextRowPosition =
       nextRowRef.current * (alleyWidth + seperatorWidth) + 1;
 
-    animate({
+    animateCraft({
       animation: topAnim,
       callback,
       pixelsToMove: Math.abs(nextRowPosition - topRef.current) + 1,
@@ -97,7 +97,7 @@ export const FighterProvider = ({children}: {children: React.ReactNode}) => {
     const nextColPosition =
       nextColRef.current * (alleyWidth + seperatorWidth) + 1;
 
-    animate({
+    animateCraft({
       animation: leftAnim,
       callback,
       pixelsToMove: Math.abs(nextColPosition - leftRef.current),
@@ -125,7 +125,7 @@ export const FighterProvider = ({children}: {children: React.ReactNode}) => {
     const pixelsToMove = maxTop - topRef.current;
 
     leftAnim.stopAnimation();
-    animate({animation: topAnim, pixelsToMove, toValue: maxTop});
+    animateCraft({animation: topAnim, pixelsToMove, toValue: maxTop});
     setFacing('S');
   };
 
@@ -133,7 +133,7 @@ export const FighterProvider = ({children}: {children: React.ReactNode}) => {
     const pixelsToMove = topRef.current;
 
     leftAnim.stopAnimation();
-    animate({animation: topAnim, pixelsToMove, toValue: minTop});
+    animateCraft({animation: topAnim, pixelsToMove, toValue: minTop});
     setFacing('N');
   };
 
@@ -141,7 +141,7 @@ export const FighterProvider = ({children}: {children: React.ReactNode}) => {
     const pixelsToMove = leftRef.current;
 
     topAnim.stopAnimation();
-    animate({animation: leftAnim, pixelsToMove, toValue: minLeft});
+    animateCraft({animation: leftAnim, pixelsToMove, toValue: minLeft});
     setFacing('W');
   };
 
@@ -149,7 +149,7 @@ export const FighterProvider = ({children}: {children: React.ReactNode}) => {
     const pixelsToMove = maxLeft - leftRef.current;
 
     topAnim.stopAnimation();
-    animate({animation: leftAnim, pixelsToMove, toValue: maxLeft});
+    animateCraft({animation: leftAnim, pixelsToMove, toValue: maxLeft});
     setFacing('E');
   };
 

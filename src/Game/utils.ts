@@ -3,7 +3,7 @@ import {Animated, Easing} from 'react-native';
 import {Facing} from './types';
 import {alleyWidth, pixelsPerSecond, seperatorWidth} from './gameConstants';
 
-export function animate({
+export function animateCraft({
   animation,
   callback = () => {},
   pixelsToMove,

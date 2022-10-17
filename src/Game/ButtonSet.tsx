@@ -2,8 +2,7 @@ import React from 'react';
 import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import Colors from 'types/colors';
 
-import EnemyFighter from './EnemyFighter/EnemyFighter';
-import Fighter from './Fighter';
+import LifeIndicator from './LifeIndicator';
 
 const styles = StyleSheet.create({
   buttonSet: {
@@ -51,20 +50,13 @@ const ActionButton = ({children, onPress}: ActionButtonProps): JSX.Element => (
   </TouchableOpacity>
 );
 
-type ButtonSetProps = {};
-
 const ButtonSet = (): JSX.Element => {
   return (
     <View style={styles.buttonSet}>
       <View style={{...styles.section, ...styles.top}}>
-        <Fighter />
-        <Fighter />
-        <Fighter />
-        <Fighter />
-        <EnemyFighter defaultFacing="N" startingTop={20} startingLeft={0} />
-        <EnemyFighter defaultFacing="E" startingTop={20} startingLeft={20} />
-        <EnemyFighter defaultFacing="S" startingTop={20} startingLeft={40} />
-        <EnemyFighter defaultFacing="W" startingTop={20} startingLeft={60} />
+        <LifeIndicator />
+        <LifeIndicator />
+        <LifeIndicator />
       </View>
       <View style={{...styles.section, ...styles.middle}}>
         <ActionButton onPress={() => console.log('A')}>A</ActionButton>
