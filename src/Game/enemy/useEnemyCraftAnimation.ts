@@ -27,6 +27,33 @@ function getRandomNumber([start, end]: number[]) {
   return end - Math.ceil(Math.random() * range);
 }
 
+function getIsPlayerInLineOfSight(
+  facing: Facing,
+  currTop: number,
+  currLeft: number,
+  playerTop: number,
+  playerLeft: number,
+) {
+  switch (facing) {
+    case 'N':
+      return (
+        playerTop < currTop && Math.abs(playerLeft - currLeft) < alleyWidth / 2
+      );
+    case 'S':
+      return (
+        currTop < playerTop && Math.abs(playerLeft - currLeft) < alleyWidth / 2
+      );
+    case 'E':
+      return (
+        currLeft < playerLeft && Math.abs(playerTop - currTop) < alleyWidth / 2
+      );
+    case 'W':
+      return (
+        playerLeft < currLeft && Math.abs(playerTop - currTop) < alleyWidth / 2
+      );
+  }
+}
+
 function getValidFacings(top: number, left: number) {
   const directions: Facing[] = [];
 
@@ -46,14 +73,11 @@ function getValidFacings(top: number, left: number) {
   return directions;
 }
 
-export function getNextAlley(position: number, direction: Facing) {
-  const nextAlley = position / (alleyWidth + seperatorWidth);
+function getNextFacing(top: number, left: number) {
+  const validFacings = getValidFacings(top, left);
+  const nextFacingIndex = getRandomNumber([0, validFacings.length]);
 
-  if (direction === 'N' || direction === 'W') {
-    return Math.floor(nextAlley);
-  }
-
-  return Math.ceil(nextAlley);
+  return validFacings[nextFacingIndex];
 }
 
 function getRandomColumnPosition(facing: Facing, left: number) {
@@ -85,6 +109,21 @@ function getRandomAlleyPosition(facing: Facing, top: number, left: number) {
   }
 }
 
+function getPositionOfPlayerCraft(
+  facing: Facing,
+  playerTop: number,
+  playerLeft: number,
+) {
+  switch (facing) {
+    case 'N':
+    case 'S':
+      return playerTop;
+    case 'E':
+    case 'W':
+      return playerLeft;
+  }
+}
+
 function getPixelsToMove(
   facing: Facing,
   nextPosition: number,
@@ -108,49 +147,79 @@ function useEnemyCraftAnimation({
   startingLeft,
   startingTop,
 }: CraftAnimationProps) {
-  const {playerLeft, playerTop} = useEnemyContext();
+  const {hasPlayerMoved, playerLeft, playerTop} = useEnemyContext();
   const [facing, setFacing] = useState<Facing>(defaultFacing);
+  const facingRef = useRef(facing);
   const leftAnim = useRef(new Animated.Value(startingLeft)).current;
   const topAnim = useRef(new Animated.Value(startingTop)).current;
   const leftRef = useRef(startingLeft);
   const topRef = useRef(startingTop);
+  const playerLeftRef = useRef(playerLeft);
+  const playerTopRef = useRef(playerTop);
+  const isPlayerInLineOfSightRef = useRef(false);
+
+  const isPlayerInLineOfSight = getIsPlayerInLineOfSight(
+    facing,
+    topRef.current,
+    leftRef.current,
+    playerTop,
+    playerLeft,
+  );
+
+  facingRef.current = facing;
+  playerLeftRef.current = playerLeft;
+  playerTopRef.current = playerTop;
+  isPlayerInLineOfSightRef.current = isPlayerInLineOfSight;
 
   useEffect(() => {
     leftAnim.addListener(({value}) => (leftRef.current = value));
     topAnim.addListener(({value}) => (topRef.current = value));
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
+  useEffect(() => {
+    if (hasPlayerMoved && isPlayerInLineOfSight) {
+      topAnim.stopAnimation();
+    }
+  }, [isPlayerInLineOfSight]); // eslint-disable-line react-hooks/exhaustive-deps
+
   const animate = () => {
-    // TODO: If player is in line of sight, go to player
-    const validFacings = getValidFacings(topRef.current, leftRef.current);
-    const nextFacingIndex = getRandomNumber([0, validFacings.length]);
-    const nextFacing = validFacings[nextFacingIndex];
+    const nextFacing = isPlayerInLineOfSightRef.current
+      ? facingRef.current
+      : getNextFacing(topRef.current, leftRef.current);
 
-    setFacing(nextFacing);
+    const nextAlleyPosition = isPlayerInLineOfSightRef.current
+      ? getPositionOfPlayerCraft(
+          nextFacing,
+          playerTopRef.current,
+          playerLeftRef.current,
+        )
+      : getRandomAlleyPosition(nextFacing, topRef.current, leftRef.current);
 
-    const nextAlleyPosition = getRandomAlleyPosition(
-      nextFacing,
-      topRef.current,
-      leftRef.current,
-    );
     const pixelsToMove = getPixelsToMove(
       nextFacing,
       nextAlleyPosition,
       topRef.current,
       leftRef.current,
     );
+
+    if (pixelsToMove < 1) {
+      return;
+    }
+
     const animation =
       nextFacing === 'N' || nextFacing === 'S' ? topAnim : leftAnim;
+
+    setFacing(nextFacing);
 
     animateCraft({
       callback: animate,
       animation,
-      pixelsToMove: pixelsToMove,
+      pixelsToMove,
       toValue: nextAlleyPosition,
     });
   };
 
-  const initialize = useCallback(animate, [topAnim, leftAnim]);
+  const initialize = useCallback(animate, [topAnim, leftAnim]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return {
     facing,

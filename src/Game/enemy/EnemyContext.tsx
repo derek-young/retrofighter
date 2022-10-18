@@ -1,15 +1,21 @@
 import React, {useContext, useEffect, useState} from 'react';
 
-import {useFighterContext} from 'Game/Fighter/FigherContext';
+import {
+  startTop,
+  startLeft,
+  useFighterContext,
+} from 'Game/Fighter/FigherContext';
 
 type EnemyValue = {
-  playerLeft: null | number;
-  playerTop: null | number;
+  hasPlayerMoved: boolean;
+  playerLeft: number;
+  playerTop: number;
 };
 
 const defaultValue: EnemyValue = {
-  playerLeft: null,
-  playerTop: null,
+  hasPlayerMoved: false,
+  playerLeft: startLeft,
+  playerTop: startTop,
 };
 
 const EnemyContext = React.createContext(defaultValue);
@@ -17,9 +23,9 @@ const EnemyContext = React.createContext(defaultValue);
 export const useEnemyContext = () => useContext(EnemyContext);
 
 export const EnemyProvider = ({children}: {children: React.ReactNode}) => {
-  const {topAnim, leftAnim} = useFighterContext();
-  const [playerLeft, setPlayerLeft] = useState<null | number>(null);
-  const [playerTop, setPlayerTop] = useState<null | number>(null);
+  const {hasPlayerMoved, topAnim, leftAnim} = useFighterContext();
+  const [playerLeft, setPlayerLeft] = useState<number>(startLeft);
+  const [playerTop, setPlayerTop] = useState<number>(startTop);
 
   useEffect(() => {
     leftAnim.addListener(({value}) => setPlayerLeft(value));
@@ -29,7 +35,7 @@ export const EnemyProvider = ({children}: {children: React.ReactNode}) => {
   return (
     <EnemyContext.Provider
       children={children}
-      value={{playerLeft, playerTop}}
+      value={{hasPlayerMoved, playerLeft, playerTop}}
     />
   );
 };

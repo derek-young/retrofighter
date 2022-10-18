@@ -19,6 +19,7 @@ type UpdaterProps = {
 
 type FigherValue = {
   facing: Facing;
+  hasPlayerMoved: boolean;
   topAnim: Animated.Value;
   leftAnim: Animated.Value;
   onDownPress: () => void;
@@ -29,13 +30,14 @@ type FigherValue = {
 
 const noop = () => {};
 
-const startTop = maxTop;
-const startLeft = minLeft;
+export const startTop = maxTop;
+export const startLeft = minLeft;
 const topAnimValue = new Animated.Value(startTop);
 const leftAnimValue = new Animated.Value(startLeft);
 
 const defaultValue: FigherValue = {
   facing: 'N',
+  hasPlayerMoved: false,
   topAnim: topAnimValue,
   leftAnim: leftAnimValue,
   onDownPress: noop,
@@ -49,6 +51,7 @@ const FighterContext = React.createContext(defaultValue);
 export const useFighterContext = () => useContext(FighterContext);
 
 export const FighterProvider = ({children}: {children: React.ReactNode}) => {
+  const [hasPlayerMoved, setHasPlayerMoved] = useState(false);
   const [facing, setFacing] = useState<Facing>('N');
   const facingRef = useRef(facing);
 
@@ -106,6 +109,9 @@ export const FighterProvider = ({children}: {children: React.ReactNode}) => {
   };
 
   const onVerticalMove = (onMove: () => void) => {
+    if (!hasPlayerMoved) {
+      setHasPlayerMoved(true);
+    }
     if (facingRef.current === 'E' || facingRef.current === 'W') {
       interceptHorizontalAnimation(onMove);
     } else {
@@ -114,6 +120,9 @@ export const FighterProvider = ({children}: {children: React.ReactNode}) => {
   };
 
   const onHorizontalMove = (onMove: () => void) => {
+    if (!hasPlayerMoved) {
+      setHasPlayerMoved(true);
+    }
     if (facingRef.current === 'N' || facingRef.current === 'S') {
       interceptVerticalAnimation(onMove);
     } else {
@@ -166,6 +175,7 @@ export const FighterProvider = ({children}: {children: React.ReactNode}) => {
       children={children}
       value={{
         facing,
+        hasPlayerMoved,
         topAnim,
         leftAnim,
         onDownPress,
