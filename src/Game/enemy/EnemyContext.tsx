@@ -1,5 +1,7 @@
 import React, {useContext, useEffect, useState} from 'react';
 
+import {Facing} from 'Game/types';
+import {defaultPlayerFacing} from 'Game/gameConstants';
 import {
   startTop,
   startLeft,
@@ -7,12 +9,14 @@ import {
 } from 'Game/Fighter/FigherContext';
 
 type EnemyValue = {
+  playerFacing: Facing;
   hasPlayerMoved: boolean;
   playerLeft: number;
   playerTop: number;
 };
 
 const defaultValue: EnemyValue = {
+  playerFacing: defaultPlayerFacing,
   hasPlayerMoved: false,
   playerLeft: startLeft,
   playerTop: startTop,
@@ -23,7 +27,7 @@ const EnemyContext = React.createContext(defaultValue);
 export const useEnemyContext = () => useContext(EnemyContext);
 
 export const EnemyProvider = ({children}: {children: React.ReactNode}) => {
-  const {hasPlayerMoved, topAnim, leftAnim} = useFighterContext();
+  const {facing, hasPlayerMoved, topAnim, leftAnim} = useFighterContext();
   const [playerLeft, setPlayerLeft] = useState<number>(startLeft);
   const [playerTop, setPlayerTop] = useState<number>(startTop);
 
@@ -35,7 +39,7 @@ export const EnemyProvider = ({children}: {children: React.ReactNode}) => {
   return (
     <EnemyContext.Provider
       children={children}
-      value={{hasPlayerMoved, playerLeft, playerTop}}
+      value={{hasPlayerMoved, playerFacing: facing, playerLeft, playerTop}}
     />
   );
 };

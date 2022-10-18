@@ -1,7 +1,7 @@
 import {useCallback, useEffect, useRef, useState} from 'react';
 import {Animated} from 'react-native';
 
-import {animateCraft} from 'Game/utils';
+import {animateCraft, getNextAlley, isVerticalFacing} from 'Game/utils';
 import {Facing} from 'Game/types';
 
 import {useEnemyContext} from './EnemyContext';
@@ -117,10 +117,14 @@ function getPositionOfPlayerCraft(
   switch (facing) {
     case 'N':
     case 'S':
-      return playerTop;
+      return (
+        (getNextAlley(playerTop, facing) - 1) * (alleyWidth + seperatorWidth)
+      );
     case 'E':
     case 'W':
-      return playerLeft;
+      return (
+        (getNextAlley(playerLeft, facing) - 1) * (alleyWidth + seperatorWidth)
+      );
   }
 }
 
@@ -147,7 +151,8 @@ function useEnemyCraftAnimation({
   startingLeft,
   startingTop,
 }: CraftAnimationProps) {
-  const {hasPlayerMoved, playerLeft, playerTop} = useEnemyContext();
+  const {hasPlayerMoved, playerFacing, playerLeft, playerTop} =
+    useEnemyContext();
   const [facing, setFacing] = useState<Facing>(defaultFacing);
   const facingRef = useRef(facing);
   const leftAnim = useRef(new Animated.Value(startingLeft)).current;
@@ -156,7 +161,9 @@ function useEnemyCraftAnimation({
   const topRef = useRef(startingTop);
   const playerLeftRef = useRef(playerLeft);
   const playerTopRef = useRef(playerTop);
+  const detectedPlayerFacingRef = useRef<null | Facing>(null);
   const isPlayerInLineOfSightRef = useRef(false);
+  const isPlayerInLineOfSightOverrideRef = useRef(false);
 
   const isPlayerInLineOfSight = getIsPlayerInLineOfSight(
     facing,
@@ -178,16 +185,30 @@ function useEnemyCraftAnimation({
 
   useEffect(() => {
     if (hasPlayerMoved && isPlayerInLineOfSight) {
+      isPlayerInLineOfSightOverrideRef.current = true;
       topAnim.stopAnimation();
     }
   }, [isPlayerInLineOfSight]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const animate = () => {
-    const nextFacing = isPlayerInLineOfSightRef.current
+  useEffect(() => {
+    if (isPlayerInLineOfSightRef.current) {
+      detectedPlayerFacingRef.current = playerFacing;
+    }
+  }, [playerFacing]);
+
+  const animate = (
+    facingOverride: Facing | null,
+    isPlayerInLineOfSightOverride: boolean,
+  ) => {
+    const isInLightOfSight =
+      isPlayerInLineOfSightOverride || isPlayerInLineOfSightRef.current;
+    const nextFacing = facingOverride
+      ? facingOverride
+      : isInLightOfSight
       ? facingRef.current
       : getNextFacing(topRef.current, leftRef.current);
 
-    const nextAlleyPosition = isPlayerInLineOfSightRef.current
+    const nextAlleyPosition = isInLightOfSight
       ? getPositionOfPlayerCraft(
           nextFacing,
           playerTopRef.current,
@@ -202,17 +223,23 @@ function useEnemyCraftAnimation({
       leftRef.current,
     );
 
+    const animation = isVerticalFacing(nextFacing) ? topAnim : leftAnim;
+
     if (pixelsToMove < 1) {
       return;
     }
 
-    const animation =
-      nextFacing === 'N' || nextFacing === 'S' ? topAnim : leftAnim;
-
     setFacing(nextFacing);
 
     animateCraft({
-      callback: animate,
+      callback: () => {
+        animate(
+          detectedPlayerFacingRef.current,
+          isPlayerInLineOfSightOverrideRef.current,
+        );
+        detectedPlayerFacingRef.current = null;
+        isPlayerInLineOfSightOverrideRef.current = false;
+      },
       animation,
       pixelsToMove,
       toValue: nextAlleyPosition,

@@ -24,6 +24,14 @@ export function animateCraft({
   }).start(callback);
 }
 
+export function isHorizontalFacing(facing: Facing) {
+  return facing === 'E' || facing === 'W';
+}
+
+export function isVerticalFacing(facing: Facing) {
+  return facing === 'N' || facing === 'S';
+}
+
 export function getNextAlley(position: number, direction: Facing) {
   const nextAlley = position / (alleyWidth + seperatorWidth);
 

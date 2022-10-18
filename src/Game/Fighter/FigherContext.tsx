@@ -4,6 +4,7 @@ import {Animated} from 'react-native';
 
 import {
   alleyWidth,
+  defaultPlayerFacing,
   maxLeft,
   minLeft,
   maxTop,
@@ -36,7 +37,7 @@ const topAnimValue = new Animated.Value(startTop);
 const leftAnimValue = new Animated.Value(startLeft);
 
 const defaultValue: FigherValue = {
-  facing: 'N',
+  facing: defaultPlayerFacing,
   hasPlayerMoved: false,
   topAnim: topAnimValue,
   leftAnim: leftAnimValue,
@@ -52,7 +53,7 @@ export const useFighterContext = () => useContext(FighterContext);
 
 export const FighterProvider = ({children}: {children: React.ReactNode}) => {
   const [hasPlayerMoved, setHasPlayerMoved] = useState(false);
-  const [facing, setFacing] = useState<Facing>('N');
+  const [facing, setFacing] = useState<Facing>(defaultPlayerFacing);
   const facingRef = useRef(facing);
 
   const topAnim = useRef(topAnimValue).current;
