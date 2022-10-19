@@ -1,6 +1,8 @@
 import React, {useEffect, useRef, useState} from 'react';
 import {Animated, StyleSheet} from 'react-native';
 
+import ExposionIcon from 'icons/supernova.svg';
+
 import {craftSize} from './gameConstants';
 import {Facing} from './types';
 
@@ -9,10 +11,16 @@ const styles = StyleSheet.create({
     height: craftSize,
     width: craftSize,
     position: 'absolute',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   shadow: {
     position: 'absolute',
     zIndex: -1,
+  },
+  elimination: {
+    position: 'absolute',
   },
 });
 
@@ -57,25 +65,50 @@ const SHADOW_POS = {
 
 export type CraftProps = {
   Icon: React.ElementType;
+  isEliminated: boolean;
   facing: Facing;
   fill: string;
+  onEliminationEnd: () => void;
   top: number | Animated.Value;
   left: number | Animated.Value;
 };
 
-const Craft = ({Icon, facing, fill, top, left}: CraftProps): JSX.Element => {
+const Craft = ({
+  Icon,
+  isEliminated,
+  facing,
+  fill,
+  onEliminationEnd = () => {},
+  top,
+  left,
+}: CraftProps): JSX.Element => {
   const rotation = DEFAULT_FACING_ROTATION[facing];
   const shadow = SHADOW_POS[facing];
   const rotationAnim = useRef(new Animated.Value(rotation)).current;
+  const elimAnimation = useRef(new Animated.Value(0)).current;
+  const [elimValue, setElimValue] = useState(0);
   const facingRef = useRef(facing);
   const [rotationState, setRotationState] = useState(0);
+
+  const elimValueListener = ({value}: {value: number}) => setElimValue(value);
 
   const rotationValueListener = ({value}: {value: number}) =>
     setRotationState(Math.round(value));
 
   useEffect(() => {
+    elimAnimation.addListener(elimValueListener);
     rotationAnim.addListener(rotationValueListener);
-  }, [rotationAnim]);
+  }, [elimAnimation, rotationAnim]);
+
+  useEffect(() => {
+    if (isEliminated) {
+      Animated.timing(elimAnimation, {
+        toValue: 50,
+        duration: 400,
+        useNativeDriver: true,
+      }).start(onEliminationEnd);
+    }
+  }, [elimAnimation, isEliminated, onEliminationEnd]);
 
   useEffect(() => {
     const nextRotation = getNextRotationSet(facingRef.current)[facing];
@@ -109,6 +142,11 @@ const Craft = ({Icon, facing, fill, top, left}: CraftProps): JSX.Element => {
       ]}>
       <Icon fill={fill} />
       <Icon fill="#00000040" style={{...styles.shadow, ...shadow}} />
+      <ExposionIcon
+        height={elimValue}
+        width={elimValue}
+        style={styles.elimination}
+      />
     </Animated.View>
   );
 };

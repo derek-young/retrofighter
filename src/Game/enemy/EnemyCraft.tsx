@@ -3,9 +3,9 @@ import {SvgProps} from 'react-native-svg';
 
 import Colors from 'types/colors';
 import Craft, {CraftProps} from 'Game/Craft';
+import {useAnimationContext} from 'Game/Fighter/AnimationContext';
 
 import useEnemyCraftAnimation from './useEnemyCraftAnimation';
-import {useFighterContext} from 'Game/Fighter/FigherContext';
 
 export interface EnemyCraftProps {
   defaultFacing?: CraftProps['facing'];
@@ -20,7 +20,7 @@ const EnemyCraft = ({
   startingTop = 0,
   startingLeft = 0,
 }: EnemyCraftProps): JSX.Element => {
-  const {hasPlayerMoved} = useFighterContext();
+  const {hasPlayerMoved} = useAnimationContext();
   const [hasInitialized, setHasInitialized] = useState(false);
 
   const {facing, initialize, leftAnim, topAnim} = useEnemyCraftAnimation({

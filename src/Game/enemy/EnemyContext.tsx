@@ -5,8 +5,8 @@ import {defaultPlayerFacing} from 'Game/gameConstants';
 import {
   startTop,
   startLeft,
-  useFighterContext,
-} from 'Game/Fighter/FigherContext';
+  useAnimationContext,
+} from 'Game/Fighter/AnimationContext';
 
 type EnemyValue = {
   playerFacing: Facing;
@@ -27,7 +27,7 @@ const EnemyContext = React.createContext(defaultValue);
 export const useEnemyContext = () => useContext(EnemyContext);
 
 export const EnemyProvider = ({children}: {children: React.ReactNode}) => {
-  const {facing, hasPlayerMoved, topAnim, leftAnim} = useFighterContext();
+  const {facing, hasPlayerMoved, topAnim, leftAnim} = useAnimationContext();
   const [playerLeft, setPlayerLeft] = useState<number>(startLeft);
   const [playerTop, setPlayerTop] = useState<number>(startTop);
 

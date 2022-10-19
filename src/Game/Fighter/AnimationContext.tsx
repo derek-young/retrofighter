@@ -1,4 +1,10 @@
-import React, {useContext, useEffect, useRef, useState} from 'react';
+import React, {
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 
 import {Animated} from 'react-native';
 
@@ -18,7 +24,7 @@ type UpdaterProps = {
   value: number;
 };
 
-type FigherValue = {
+type AnimationContextValue = {
   facing: Facing;
   hasPlayerMoved: boolean;
   topAnim: Animated.Value;
@@ -27,6 +33,7 @@ type FigherValue = {
   onUpPress: () => void;
   onLeftPress: () => void;
   onRightPress: () => void;
+  resetAnimationContext: () => void;
 };
 
 const noop = () => {};
@@ -36,7 +43,7 @@ export const startLeft = minLeft;
 const topAnimValue = new Animated.Value(startTop);
 const leftAnimValue = new Animated.Value(startLeft);
 
-const defaultValue: FigherValue = {
+const defaultValue: AnimationContextValue = {
   facing: defaultPlayerFacing,
   hasPlayerMoved: false,
   topAnim: topAnimValue,
@@ -45,13 +52,14 @@ const defaultValue: FigherValue = {
   onUpPress: noop,
   onLeftPress: noop,
   onRightPress: noop,
+  resetAnimationContext: noop,
 };
 
-const FighterContext = React.createContext(defaultValue);
+const AnimationContext = React.createContext(defaultValue);
 
-export const useFighterContext = () => useContext(FighterContext);
+export const useAnimationContext = () => useContext(AnimationContext);
 
-export const FighterProvider = ({children}: {children: React.ReactNode}) => {
+export const AnimationProvider = ({children}: {children: React.ReactNode}) => {
   const [hasPlayerMoved, setHasPlayerMoved] = useState(false);
   const [facing, setFacing] = useState<Facing>(defaultPlayerFacing);
   const facingRef = useRef(facing);
@@ -84,6 +92,12 @@ export const FighterProvider = ({children}: {children: React.ReactNode}) => {
     topAnimValue.addListener(topUpdaterRef.current);
     leftAnimValue.addListener(leftUpdaterRef.current);
   }, []);
+
+  const resetAnimationContext = useCallback(() => {
+    leftAnim.setValue(startLeft);
+    topAnim.setValue(startTop);
+    setFacing(defaultPlayerFacing);
+  }, [leftAnim, topAnim]);
 
   const interceptVerticalAnimation = (callback: () => void) => {
     const nextRowPosition =
@@ -172,17 +186,18 @@ export const FighterProvider = ({children}: {children: React.ReactNode}) => {
   const onRightPress = () => onHorizontalMove(onMoveRight);
 
   return (
-    <FighterContext.Provider
+    <AnimationContext.Provider
       children={children}
       value={{
         facing,
         hasPlayerMoved,
-        topAnim,
         leftAnim,
+        topAnim,
         onDownPress,
         onUpPress,
         onLeftPress,
         onRightPress,
+        resetAnimationContext,
       }}
     />
   );

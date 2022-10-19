@@ -114,18 +114,15 @@ function getPositionOfPlayerCraft(
   playerTop: number,
   playerLeft: number,
 ) {
-  switch (facing) {
-    case 'N':
-    case 'S':
-      return (
-        (getNextAlley(playerTop, facing) - 1) * (alleyWidth + seperatorWidth)
-      );
-    case 'E':
-    case 'W':
-      return (
-        (getNextAlley(playerLeft, facing) - 1) * (alleyWidth + seperatorWidth)
-      );
-  }
+  const playerPosition = isVerticalFacing(facing) ? playerTop : playerLeft;
+  const isPlayerFlushToAlley =
+    playerPosition % (alleyWidth + seperatorWidth) < 1;
+  const nextAlley = getNextAlley(playerPosition, facing);
+
+  return (
+    (isPlayerFlushToAlley ? nextAlley : nextAlley - 1) *
+    (alleyWidth + seperatorWidth)
+  );
 }
 
 function getPixelsToMove(
@@ -197,8 +194,8 @@ function useEnemyCraftAnimation({
   }, [playerFacing]);
 
   const animate = (
-    facingOverride: Facing | null,
-    isPlayerInLineOfSightOverride: boolean,
+    facingOverride?: Facing | null,
+    isPlayerInLineOfSightOverride?: boolean,
   ) => {
     const isInLightOfSight =
       isPlayerInLineOfSightOverride || isPlayerInLineOfSightRef.current;
