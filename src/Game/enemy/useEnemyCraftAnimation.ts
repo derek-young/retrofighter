@@ -7,7 +7,7 @@ import {Facing} from 'Game/types';
 import {alleyWidth} from 'Game/gameConstants';
 
 import {useEnemyContext} from './EnemyContext';
-import {controlledAnimation, randomAnimation} from './animation';
+import {controlledAnimation, randomAnimation} from './enemyAnimation';
 
 type CraftAnimationProps = {
   defaultFacing: Facing;
