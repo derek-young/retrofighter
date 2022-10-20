@@ -6,12 +6,12 @@ import {Facing} from 'Game/types';
 
 import {useEnemyContext} from './EnemyContext';
 import {
+  controlledAnimation,
+  randomAnimation,
   getPixelsToMove,
   getIsPlayerInLineOfSight,
   getShouldTrackToPlayerPosition,
-} from './enemyAnimation';
-import controlledAnimation from './controlledAnimation';
-import randomAnimation from './randomAnimation';
+} from './animation';
 
 type CraftAnimationProps = {
   defaultFacing: Facing;
