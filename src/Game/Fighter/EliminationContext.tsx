@@ -29,9 +29,9 @@ export const EliminationProvider = ({
   const [hasEliminationAnimationEnded, setHasEliminationAnimationEnded] =
     useState(false);
 
-  useEffect(() => {
-    setTimeout(() => setIsEliminated(true), 5000);
-  }, []);
+  // useEffect(() => {
+  //   setTimeout(() => setIsEliminated(true), 5000);
+  // }, []);
 
   const resetEliminationContext = useCallback(() => {
     setIsEliminated(false);

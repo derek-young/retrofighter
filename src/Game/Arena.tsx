@@ -44,7 +44,7 @@ const Arena = (): JSX.Element => {
     <View style={styles.arena}>
       <EnemyProvider>
         <View>
-          <Bomber startingLeft={33.7} />
+          {/* <Bomber startingLeft={33.7} /> */}
           <DualFighter />
         </View>
       </EnemyProvider>
