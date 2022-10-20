@@ -36,7 +36,24 @@ type SeperatorProps = {
 };
 
 const Seperator = (props: SeperatorProps) => (
-  <View style={{...styles.seperator, ...props}} />
+  <View style={{...styles.seperator, ...props}}>
+    {/* Debugger */}
+    {/* <Text
+      style={{
+        position: 'absolute',
+        width: 30,
+      }}>
+      {Math.round(props.top)}
+    </Text>
+    <Text
+      style={{
+        position: 'absolute',
+        top: 15,
+        width: 30,
+      }}>
+      {Math.round(props.left)}
+    </Text> */}
+  </View>
 );
 
 const Arena = (): JSX.Element => {
@@ -44,7 +61,7 @@ const Arena = (): JSX.Element => {
     <View style={styles.arena}>
       <EnemyProvider>
         <View>
-          {/* <Bomber startingLeft={33.7} /> */}
+          <Bomber startingLeft={33.7} />
           <DualFighter />
         </View>
       </EnemyProvider>

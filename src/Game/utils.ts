@@ -1,7 +1,7 @@
 import {Animated, Easing} from 'react-native';
 
 import {Facing} from './types';
-import {alleyWidth, pixelsPerSecond, seperatorWidth} from './gameConstants';
+import {pixelsPerSecond, totalWidth} from './gameConstants';
 
 export function animateCraft({
   animation,
@@ -10,7 +10,7 @@ export function animateCraft({
   toValue,
 }: {
   animation: Animated.Value;
-  callback?: () => void;
+  callback?: (value: {finished: boolean}) => void;
   pixelsToMove: number;
   toValue: number;
 }) {
@@ -33,7 +33,7 @@ export function isVerticalFacing(facing: Facing) {
 }
 
 export function getNextAlley(position: number, direction: Facing) {
-  const nextAlley = position / (alleyWidth + seperatorWidth);
+  const nextAlley = position / totalWidth;
 
   if (direction === 'N' || direction === 'W') {
     return Math.floor(nextAlley);

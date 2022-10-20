@@ -15,5 +15,9 @@ export const maxTop = windowHeight - 22;
 export const minTop = 0;
 export const maxLeft = windowHeight - 22;
 export const minLeft = 0;
+export const playerStartLeft = minLeft;
+export const playerStartTop = maxTop;
 
 export const defaultPlayerFacing: Facing = 'N';
+
+export const totalWidth = alleyWidth + seperatorWidth;

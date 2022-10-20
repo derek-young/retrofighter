@@ -15,6 +15,8 @@ import {
   minLeft,
   maxTop,
   minTop,
+  playerStartLeft,
+  playerStartTop,
   seperatorWidth,
 } from '../gameConstants';
 import {Facing} from '../types';
@@ -38,10 +40,8 @@ type AnimationContextValue = {
 
 const noop = () => {};
 
-export const startTop = maxTop;
-export const startLeft = minLeft;
-const topAnimValue = new Animated.Value(startTop);
-const leftAnimValue = new Animated.Value(startLeft);
+const leftAnimValue = new Animated.Value(playerStartLeft);
+const topAnimValue = new Animated.Value(playerStartTop);
 
 const defaultValue: AnimationContextValue = {
   facing: defaultPlayerFacing,
@@ -67,11 +67,11 @@ export const AnimationProvider = ({children}: {children: React.ReactNode}) => {
   const topAnim = useRef(topAnimValue).current;
   const leftAnim = useRef(leftAnimValue).current;
 
-  const topRef = useRef(startTop);
-  const leftRef = useRef(startLeft);
+  const topRef = useRef(playerStartTop);
+  const leftRef = useRef(playerStartLeft);
 
-  const nextRowRef = useRef(getNextAlley(startTop, facing));
-  const nextColRef = useRef(getNextAlley(startLeft, facing));
+  const nextRowRef = useRef(getNextAlley(playerStartTop, facing));
+  const nextColRef = useRef(getNextAlley(playerStartLeft, facing));
 
   facingRef.current = facing;
 
@@ -94,8 +94,8 @@ export const AnimationProvider = ({children}: {children: React.ReactNode}) => {
   }, []);
 
   const resetAnimationContext = useCallback(() => {
-    leftAnim.setValue(startLeft);
-    topAnim.setValue(startTop);
+    leftAnim.setValue(playerStartLeft);
+    topAnim.setValue(playerStartTop);
     setFacing(defaultPlayerFacing);
   }, [leftAnim, topAnim]);
 

@@ -4,43 +4,20 @@ import {Animated} from 'react-native';
 import {animateCraft, isVerticalFacing} from 'Game/utils';
 import {Facing} from 'Game/types';
 
-import {alleyWidth} from 'Game/gameConstants';
-
 import {useEnemyContext} from './EnemyContext';
-import {controlledAnimation, randomAnimation} from './enemyAnimation';
+import {
+  getPixelsToMove,
+  getIsPlayerInLineOfSight,
+  getShouldTrackToPlayerPosition,
+} from './enemyAnimation';
+import controlledAnimation from './controlledAnimation';
+import randomAnimation from './randomAnimation';
 
 type CraftAnimationProps = {
   defaultFacing: Facing;
   startingTop: number;
   startingLeft: number;
 };
-
-function getIsPlayerInLineOfSight(
-  facing: Facing,
-  currTop: number,
-  currLeft: number,
-  playerTop: number,
-  playerLeft: number,
-) {
-  switch (facing) {
-    case 'N':
-      return (
-        playerTop < currTop && Math.abs(playerLeft - currLeft) < alleyWidth / 2
-      );
-    case 'S':
-      return (
-        currTop < playerTop && Math.abs(playerLeft - currLeft) < alleyWidth / 2
-      );
-    case 'E':
-      return (
-        currLeft < playerLeft && Math.abs(playerTop - currTop) < alleyWidth / 2
-      );
-    case 'W':
-      return (
-        playerLeft < currLeft && Math.abs(playerTop - currTop) < alleyWidth / 2
-      );
-  }
-}
 
 function useEnemyCraftAnimation({
   defaultFacing,
@@ -57,9 +34,12 @@ function useEnemyCraftAnimation({
   const topRef = useRef(startingTop);
   const playerLeftRef = useRef(playerLeft);
   const playerTopRef = useRef(playerTop);
+  const playerFacingRef = useRef(playerFacing);
   const detectedPlayerFacingRef = useRef<null | Facing>(null);
+  const detectedPlayerPositionRef = useRef<null | {top: number; left: number}>(
+    null,
+  );
   const isPlayerInLineOfSightRef = useRef(false);
-  const isPlayerInLineOfSightOverrideRef = useRef(false);
 
   const isPlayerInLineOfSight = getIsPlayerInLineOfSight(
     facing,
@@ -70,8 +50,6 @@ function useEnemyCraftAnimation({
   );
 
   facingRef.current = facing;
-  playerLeftRef.current = playerLeft;
-  playerTopRef.current = playerTop;
   isPlayerInLineOfSightRef.current = isPlayerInLineOfSight;
 
   useEffect(() => {
@@ -80,39 +58,78 @@ function useEnemyCraftAnimation({
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
-    if (hasPlayerMoved && isPlayerInLineOfSight) {
-      isPlayerInLineOfSightOverrideRef.current = true;
+    if (!hasPlayerMoved) {
+      return;
+    }
+
+    if (isPlayerInLineOfSight) {
+      topAnim.stopAnimation();
+    } else {
+      detectedPlayerFacingRef.current = playerFacingRef.current;
+      detectedPlayerPositionRef.current = {
+        left: playerLeftRef.current,
+        top: playerTopRef.current,
+      };
       topAnim.stopAnimation();
     }
   }, [isPlayerInLineOfSight]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  useEffect(() => {
-    if (isPlayerInLineOfSightRef.current) {
-      detectedPlayerFacingRef.current = playerFacing;
-    }
-  }, [playerFacing]);
+  // Update values after useEffect to preserve previous value
+  playerLeftRef.current = playerLeft;
+  playerTopRef.current = playerTop;
+  playerFacingRef.current = playerFacing;
 
-  const animate = (
-    facingOverride?: Facing | null | undefined,
-    isPlayerInLineOfSightOverride?: boolean,
-  ) => {
+  const animate = () => {
     let nextAnimation = {
       nextFacing: facingRef.current,
-      pixelsToMove: 0,
       toValue: 0,
     };
-    const wasPlayerSighted =
-      isPlayerInLineOfSightOverride || isPlayerInLineOfSightRef.current;
 
-    if (wasPlayerSighted) {
-      nextAnimation = controlledAnimation({
-        facingOverride,
+    const shouldTrackToPlayerPosition =
+      detectedPlayerPositionRef.current &&
+      getShouldTrackToPlayerPosition({
         currFacing: facingRef.current,
+        currPosition: {top: topRef.current, left: leftRef.current},
+        playerPosition: detectedPlayerPositionRef.current,
+      });
+
+    if (isPlayerInLineOfSightRef.current) {
+      console.log('player is in line of sight, getting controlled amin');
+      nextAnimation = controlledAnimation({
+        nextFacing: facingRef.current,
+        playerLeft: playerLeftRef.current,
+        playerTop: playerTopRef.current,
+      });
+    } else if (
+      detectedPlayerPositionRef.current &&
+      shouldTrackToPlayerPosition
+    ) {
+      console.log('player left line of sight, moving to last position');
+
+      const nextPosition = isVerticalFacing(facingRef.current)
+        ? detectedPlayerPositionRef.current.top
+        : detectedPlayerPositionRef.current.left;
+
+      nextAnimation = {
+        nextFacing: facingRef.current,
+        toValue: nextPosition,
+      };
+
+      console.table({
+        name: 'Direct',
+        ...nextAnimation,
+      });
+
+      detectedPlayerPositionRef.current = null;
+    } else if (detectedPlayerFacingRef.current) {
+      nextAnimation = randomAnimation({
+        detectedFacing: detectedPlayerFacingRef.current,
         left: leftRef.current,
         top: topRef.current,
-        playerTop: playerTopRef.current,
-        playerLeft: playerLeftRef.current,
       });
+
+      detectedPlayerFacingRef.current = null;
+      detectedPlayerPositionRef.current = null;
     } else {
       nextAnimation = randomAnimation({
         left: leftRef.current,
@@ -120,7 +137,14 @@ function useEnemyCraftAnimation({
       });
     }
 
-    const {nextFacing, pixelsToMove, toValue} = nextAnimation;
+    const {nextFacing, toValue} = nextAnimation;
+
+    const pixelsToMove = getPixelsToMove(
+      nextFacing,
+      toValue,
+      topRef.current,
+      leftRef.current,
+    );
 
     const animation = isVerticalFacing(nextFacing) ? topAnim : leftAnim;
 
@@ -131,14 +155,7 @@ function useEnemyCraftAnimation({
     setFacing(nextFacing);
 
     animateCraft({
-      callback: () => {
-        animate(
-          detectedPlayerFacingRef.current,
-          isPlayerInLineOfSightOverrideRef.current,
-        );
-        detectedPlayerFacingRef.current = null;
-        isPlayerInLineOfSightOverrideRef.current = false;
-      },
+      callback: animate,
       animation,
       pixelsToMove,
       toValue,
