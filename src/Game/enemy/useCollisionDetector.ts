@@ -42,7 +42,7 @@ function useCollisionDetector({
   startingLeft: number;
   startingTop: number;
 }) {
-  const {setIsEliminated} = useEliminationContext();
+  const {handleIsElimnated} = useEliminationContext();
   const {leftRef: playerLeftRef, topRef: playerTopRef} = useAnimationContext();
   const leftRef = useRef<number>(startingLeft);
   const topRef = useRef<number>(startingTop);
@@ -56,9 +56,9 @@ function useCollisionDetector({
       playerLeftRef.current,
     );
     if (hasOverlap) {
-      setIsEliminated(true);
+      handleIsElimnated();
     }
-  }, [playerLeftRef, playerTopRef, setIsEliminated]);
+  }, [playerLeftRef, playerTopRef, handleIsElimnated]);
 
   checkOverlapRef.current = checkOverlap;
 

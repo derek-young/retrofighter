@@ -43,13 +43,15 @@ function useEnemyCraftAnimation({
   );
   const isPlayerInLineOfSightRef = useRef(false);
 
-  const isPlayerInLineOfSight = getIsPlayerInLineOfSight(
-    facing,
-    topRef.current,
-    leftRef.current,
-    playerTopRef.current,
-    playerLeftRef.current,
-  );
+  const isPlayerInLineOfSight =
+    hasPlayerMoved &&
+    getIsPlayerInLineOfSight(
+      facing,
+      topRef.current,
+      leftRef.current,
+      playerTopRef.current,
+      playerLeftRef.current,
+    );
 
   facingRef.current = facing;
   isPlayerInLineOfSightRef.current = isPlayerInLineOfSight;
@@ -60,10 +62,6 @@ function useEnemyCraftAnimation({
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
-    if (!hasPlayerMoved) {
-      return;
-    }
-
     if (isPlayerInLineOfSight) {
       topAnim.stopAnimation();
     } else {
@@ -133,27 +131,32 @@ function useEnemyCraftAnimation({
 
       detectedPlayerFacingRef.current = null;
       detectedPlayerPositionRef.current = null;
-    } else {
-      nextAnimation = randomAnimation({
-        left: leftRef.current,
-        top: topRef.current,
-      });
     }
 
-    const {nextFacing, toValue} = nextAnimation;
+    let {nextFacing, toValue} = nextAnimation;
 
-    const pixelsToMove = getPixelsToMove(
+    let pixelsToMove = getPixelsToMove(
       nextFacing,
       toValue,
       topRef.current,
       leftRef.current,
     );
 
-    const animation = isVerticalFacing(nextFacing) ? topAnim : leftAnim;
-
     if (pixelsToMove < 1) {
-      return;
+      ({nextFacing, toValue} = randomAnimation({
+        left: leftRef.current,
+        top: topRef.current,
+      }));
+
+      pixelsToMove = getPixelsToMove(
+        nextFacing,
+        toValue,
+        topRef.current,
+        leftRef.current,
+      );
     }
+
+    const animation = isVerticalFacing(nextFacing) ? topAnim : leftAnim;
 
     setFacing(nextFacing);
 

@@ -7,14 +7,14 @@ import Fighter from './Fighter';
 
 import {
   alleyWidth,
+  arenaSize,
   numColumns,
   seperatorWidth,
-  windowHeight,
 } from './gameConstants';
 
 const styles = StyleSheet.create({
   arena: {
-    width: windowHeight,
+    width: arenaSize,
     backgroundColor: `${Colors.PINK}40`,
   },
   seperator: {

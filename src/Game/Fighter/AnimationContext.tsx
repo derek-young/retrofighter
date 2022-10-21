@@ -101,6 +101,7 @@ export const AnimationProvider = ({children}: {children: React.ReactNode}) => {
     leftAnim.setValue(playerStartLeft);
     topAnim.setValue(playerStartTop);
     setFacing(defaultPlayerFacing);
+    setHasPlayerMoved(false);
   }, [leftAnim, topAnim]);
 
   const interceptVerticalAnimation = useCallback(

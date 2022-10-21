@@ -3,21 +3,21 @@ import React, {useCallback, useContext, useState} from 'react';
 import {useAnimationContext} from './AnimationContext';
 
 type EliminationContextValue = {
+  handleIsElimnated: () => void;
   hasEliminationAnimationEnded: boolean;
   isEliminated: boolean;
   onEliminationEnd: () => void;
   resetEliminationContext: () => void;
-  setIsEliminated: (isEliminated: boolean) => void;
 };
 
 const noop = () => {};
 
 const defaultValue: EliminationContextValue = {
+  handleIsElimnated: noop,
   hasEliminationAnimationEnded: false,
   isEliminated: false,
   onEliminationEnd: noop,
   resetEliminationContext: noop,
-  setIsEliminated: noop,
 };
 
 const EliminationContext = React.createContext(defaultValue);
@@ -34,21 +34,29 @@ export const EliminationProvider = ({
   const [hasEliminationAnimationEnded, setHasEliminationAnimationEnded] =
     useState(false);
 
+  const handleIsElimnated = useCallback(() => {
+    setIsEliminated(true);
+  }, []);
+
+  const onEliminationEnd = useCallback(() => {
+    setHasEliminationAnimationEnded(true);
+    resetAnimationContext();
+  }, [resetAnimationContext]);
+
   const resetEliminationContext = useCallback(() => {
     setIsEliminated(false);
     setHasEliminationAnimationEnded(false);
-    resetAnimationContext();
-  }, [resetAnimationContext]);
+  }, []);
 
   return (
     <EliminationContext.Provider
       children={children}
       value={{
+        handleIsElimnated,
         hasEliminationAnimationEnded,
         isEliminated,
-        onEliminationEnd: () => setHasEliminationAnimationEnded(true),
+        onEliminationEnd,
         resetEliminationContext,
-        setIsEliminated,
       }}
     />
   );

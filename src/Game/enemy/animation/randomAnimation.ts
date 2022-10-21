@@ -21,13 +21,13 @@ function getValidFacings(top: number, left: number) {
   if (top !== minTop) {
     directions.push('N');
   }
-  if (top !== maxTop) {
+  if (top < maxTop - totalWidth) {
     directions.push('S');
   }
   if (left !== minLeft) {
     directions.push('W');
   }
-  if (left !== maxLeft) {
+  if (left < maxLeft - totalWidth) {
     directions.push('E');
   }
 
@@ -79,7 +79,11 @@ function randomAnimation({
   left: number;
   top: number;
 }): AnimationProps {
-  const nextFacing = detectedFacing ?? getRandomFacing(top, left);
+  const nextFacing =
+    detectedFacing && getValidFacings(top, left).includes(detectedFacing)
+      ? detectedFacing
+      : getRandomFacing(top, left);
+
   const nextAlleyPosition = getRandomAlleyPosition(nextFacing, top, left);
 
   console.table({
