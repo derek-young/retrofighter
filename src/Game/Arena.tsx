@@ -3,7 +3,6 @@ import {StyleSheet, View} from 'react-native';
 import Colors from 'types/colors';
 
 import {DualFighter, EnemyUAV} from './enemy';
-import {EnemyProvider} from './enemy/EnemyContext';
 import Fighter from './Fighter';
 
 import {
@@ -59,12 +58,10 @@ const Seperator = (props: SeperatorProps) => (
 const Arena = (): JSX.Element => {
   return (
     <View style={styles.arena}>
-      <EnemyProvider>
-        <View>
-          <EnemyUAV startingLeft={33.7} />
-          <DualFighter />
-        </View>
-      </EnemyProvider>
+      <View>
+        <EnemyUAV startingLeft={33.7} />
+        <DualFighter />
+      </View>
       <Fighter />
       {new Array(numColumns - 1)
         .fill(0)

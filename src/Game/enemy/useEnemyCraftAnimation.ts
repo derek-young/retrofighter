@@ -1,10 +1,10 @@
 import {useCallback, useEffect, useRef, useState} from 'react';
 import {Animated} from 'react-native';
 
-import {animateCraft, isVerticalFacing} from 'Game/utils';
 import {Facing} from 'Game/types';
+import {animateCraft, isVerticalFacing} from 'Game/utils';
+import {useAnimationContext} from 'Game/Fighter/AnimationContext';
 
-import {useEnemyContext} from './EnemyContext';
 import {
   controlledAnimation,
   randomAnimation,
@@ -12,6 +12,7 @@ import {
   getIsPlayerInLineOfSight,
   getShouldTrackToPlayerPosition,
 } from './animation';
+import usePlayerTracking from './usePlayerTracking';
 
 type CraftAnimationProps = {
   defaultFacing: Facing;
@@ -24,8 +25,9 @@ function useEnemyCraftAnimation({
   startingLeft,
   startingTop,
 }: CraftAnimationProps) {
-  const {hasPlayerMoved, playerFacing, playerLeft, playerTop} =
-    useEnemyContext();
+  const {facing: playerFacing, hasPlayerMoved} = useAnimationContext();
+  const {playerLeft, playerTop} = usePlayerTracking();
+
   const [facing, setFacing] = useState<Facing>(defaultFacing);
   const facingRef = useRef(facing);
   const leftAnim = useRef(new Animated.Value(startingLeft)).current;
