@@ -29,8 +29,10 @@ type UpdaterProps = {
 type AnimationContextValue = {
   facing: Facing;
   hasPlayerMoved: boolean;
-  topAnim: Animated.Value;
   leftAnim: Animated.Value;
+  topAnim: Animated.Value;
+  leftRef: React.MutableRefObject<number>;
+  topRef: React.MutableRefObject<number>;
   onDownPress: () => void;
   onUpPress: () => void;
   onLeftPress: () => void;
@@ -46,8 +48,10 @@ const topAnimValue = new Animated.Value(playerStartTop);
 const defaultValue: AnimationContextValue = {
   facing: defaultPlayerFacing,
   hasPlayerMoved: false,
-  topAnim: topAnimValue,
   leftAnim: leftAnimValue,
+  topAnim: topAnimValue,
+  leftRef: {current: playerStartLeft},
+  topRef: {current: playerStartTop},
   onDownPress: noop,
   onUpPress: noop,
   onLeftPress: noop,
@@ -193,6 +197,8 @@ export const AnimationProvider = ({children}: {children: React.ReactNode}) => {
         hasPlayerMoved,
         leftAnim,
         topAnim,
+        leftRef,
+        topRef,
         onDownPress,
         onUpPress,
         onLeftPress,

@@ -5,6 +5,7 @@ import Colors from 'types/colors';
 import Craft, {CraftProps} from 'Game/Craft';
 import {useAnimationContext} from 'Game/Fighter/AnimationContext';
 
+import useCollisionDetector from './useCollisionDetector';
 import useEnemyCraftAnimation from './useEnemyCraftAnimation';
 
 export interface EnemyCraftProps {
@@ -28,6 +29,8 @@ const EnemyCraft = ({
     startingLeft,
     startingTop,
   });
+
+  useCollisionDetector({leftAnim, topAnim, startingLeft, startingTop});
 
   useEffect(() => {
     if (hasPlayerMoved && !hasInitialized) {

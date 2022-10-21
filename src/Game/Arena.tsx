@@ -2,7 +2,7 @@ import React from 'react';
 import {StyleSheet, View} from 'react-native';
 import Colors from 'types/colors';
 
-import {DualFighter, Bomber} from './enemy';
+import {DualFighter, EnemyUAV} from './enemy';
 import {EnemyProvider} from './enemy/EnemyContext';
 import Fighter from './Fighter';
 
@@ -61,7 +61,7 @@ const Arena = (): JSX.Element => {
     <View style={styles.arena}>
       <EnemyProvider>
         <View>
-          <Bomber startingLeft={33.7} />
+          <EnemyUAV startingLeft={33.7} />
           <DualFighter />
         </View>
       </EnemyProvider>

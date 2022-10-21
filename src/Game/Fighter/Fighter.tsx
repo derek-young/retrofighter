@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import React from 'react';
 
 import Colors from 'types/colors';
 import FighterIcon from 'icons/spaceship.svg';
@@ -8,28 +8,9 @@ import Craft from '../Craft';
 import {useAnimationContext} from './AnimationContext';
 
 const Fighter = (): null | JSX.Element => {
-  const {facing, leftAnim, topAnim, resetAnimationContext} =
-    useAnimationContext();
-  const {
-    hasEliminationAnimationEnded,
-    isEliminated,
-    onEliminationEnd,
-    resetEliminationContext,
-  } = useEliminationContext();
-
-  useEffect(() => {
-    if (isEliminated && hasEliminationAnimationEnded) {
-      setTimeout(() => {
-        resetAnimationContext();
-        resetEliminationContext();
-      }, 3000);
-    }
-  }, [
-    isEliminated,
-    hasEliminationAnimationEnded,
-    resetAnimationContext,
-    resetEliminationContext,
-  ]);
+  const {facing, leftAnim, topAnim} = useAnimationContext();
+  const {hasEliminationAnimationEnded, isEliminated, onEliminationEnd} =
+    useEliminationContext();
 
   if (isEliminated && hasEliminationAnimationEnded) {
     return null;

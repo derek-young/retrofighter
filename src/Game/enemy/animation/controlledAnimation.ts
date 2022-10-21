@@ -1,4 +1,4 @@
-import {getNextAlley, isVerticalFacing} from 'Game/utils';
+import {isVerticalFacing} from 'Game/utils';
 import {Facing} from 'Game/types';
 import {totalWidth} from 'Game/gameConstants';
 
@@ -9,14 +9,9 @@ function getPositionOfPlayerCraft(
   playerTop: number,
   playerLeft: number,
 ) {
-  const playerPosition = isVerticalFacing(facing) ? playerTop : playerLeft;
-  const isPlayerFlushToAlley = playerPosition % totalWidth < 10;
-  const nextAlley = getNextAlley(playerPosition, facing);
+  const nextPosition = isVerticalFacing(facing) ? playerTop : playerLeft;
 
-  console.log('playerPosition', playerPosition);
-  console.log('isPlayerFlushToAlley', isPlayerFlushToAlley);
-
-  return (isPlayerFlushToAlley ? nextAlley : nextAlley - 1) * totalWidth;
+  return Math.floor(nextPosition / totalWidth) * totalWidth;
 }
 
 function controlledAnimation({

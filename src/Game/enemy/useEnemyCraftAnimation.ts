@@ -45,8 +45,8 @@ function useEnemyCraftAnimation({
     facing,
     topRef.current,
     leftRef.current,
-    playerTop,
-    playerLeft,
+    playerTopRef.current,
+    playerLeftRef.current,
   );
 
   facingRef.current = facing;
@@ -122,6 +122,7 @@ function useEnemyCraftAnimation({
 
       detectedPlayerPositionRef.current = null;
     } else if (detectedPlayerFacingRef.current) {
+      console.log('moving to last player detected facing');
       nextAnimation = randomAnimation({
         detectedFacing: detectedPlayerFacingRef.current,
         left: leftRef.current,

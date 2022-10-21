@@ -1,10 +1,13 @@
-import React, {useCallback, useContext, useEffect, useState} from 'react';
+import React, {useCallback, useContext, useState} from 'react';
+
+import {useAnimationContext} from './AnimationContext';
 
 type EliminationContextValue = {
   hasEliminationAnimationEnded: boolean;
   isEliminated: boolean;
   onEliminationEnd: () => void;
   resetEliminationContext: () => void;
+  setIsEliminated: (isEliminated: boolean) => void;
 };
 
 const noop = () => {};
@@ -14,6 +17,7 @@ const defaultValue: EliminationContextValue = {
   isEliminated: false,
   onEliminationEnd: noop,
   resetEliminationContext: noop,
+  setIsEliminated: noop,
 };
 
 const EliminationContext = React.createContext(defaultValue);
@@ -25,18 +29,16 @@ export const EliminationProvider = ({
 }: {
   children: React.ReactNode;
 }) => {
+  const {resetAnimationContext} = useAnimationContext();
   const [isEliminated, setIsEliminated] = useState(false);
   const [hasEliminationAnimationEnded, setHasEliminationAnimationEnded] =
     useState(false);
 
-  // useEffect(() => {
-  //   setTimeout(() => setIsEliminated(true), 5000);
-  // }, []);
-
   const resetEliminationContext = useCallback(() => {
     setIsEliminated(false);
     setHasEliminationAnimationEnded(false);
-  }, []);
+    resetAnimationContext();
+  }, [resetAnimationContext]);
 
   return (
     <EliminationContext.Provider
@@ -46,6 +48,7 @@ export const EliminationProvider = ({
         isEliminated,
         onEliminationEnd: () => setHasEliminationAnimationEnded(true),
         resetEliminationContext,
+        setIsEliminated,
       }}
     />
   );
