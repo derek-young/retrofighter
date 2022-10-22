@@ -78,7 +78,7 @@ const Craft = ({
   isEliminated,
   facing,
   fill,
-  onEliminationEnd = () => {},
+  onEliminationEnd,
   top,
   left,
 }: CraftProps): JSX.Element => {
@@ -86,9 +86,12 @@ const Craft = ({
   const shadow = SHADOW_POS[facing];
   const rotationAnim = useRef(new Animated.Value(rotation)).current;
   const elimAnimation = useRef(new Animated.Value(0)).current;
-  const [elimValue, setElimValue] = useState(0);
   const facingRef = useRef(facing);
+  const onEliminationEndRef = useRef<() => void>();
+  const [elimValue, setElimValue] = useState(0);
   const [rotationState, setRotationState] = useState(0);
+
+  onEliminationEndRef.current = onEliminationEnd;
 
   const elimValueListener = ({value}: {value: number}) => setElimValue(value);
 
@@ -106,9 +109,9 @@ const Craft = ({
         toValue: 50,
         duration: 400,
         useNativeDriver: true,
-      }).start(onEliminationEnd);
+      }).start(onEliminationEndRef.current);
     }
-  }, [elimAnimation, isEliminated, onEliminationEnd]);
+  }, [elimAnimation, isEliminated]);
 
   useEffect(() => {
     const nextRotation = getNextRotationSet(facingRef.current)[facing];

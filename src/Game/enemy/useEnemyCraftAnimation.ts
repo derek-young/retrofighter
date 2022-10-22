@@ -16,12 +16,14 @@ import usePlayerTracking from './usePlayerTracking';
 
 type CraftAnimationProps = {
   defaultFacing: Facing;
+  hasEliminationAnimationEnded: boolean;
   startingTop: number;
   startingLeft: number;
 };
 
 function useEnemyCraftAnimation({
   defaultFacing,
+  hasEliminationAnimationEnded,
   startingLeft,
   startingTop,
 }: CraftAnimationProps) {
@@ -41,6 +43,7 @@ function useEnemyCraftAnimation({
   const detectedPlayerPositionRef = useRef<null | {top: number; left: number}>(
     null,
   );
+  const isEliminatedRef = useRef(false);
   const isPlayerInLineOfSightRef = useRef(false);
 
   const isPlayerInLineOfSight =
@@ -54,6 +57,7 @@ function useEnemyCraftAnimation({
     );
 
   facingRef.current = facing;
+  isEliminatedRef.current = hasEliminationAnimationEnded;
   isPlayerInLineOfSightRef.current = isPlayerInLineOfSight;
 
   useEffect(() => {
@@ -62,7 +66,15 @@ function useEnemyCraftAnimation({
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
+    if (hasEliminationAnimationEnded) {
+      leftAnim.stopAnimation();
+      topAnim.stopAnimation();
+    }
+  }, [hasEliminationAnimationEnded]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
     if (isPlayerInLineOfSight) {
+      leftAnim.stopAnimation();
       topAnim.stopAnimation();
     } else {
       detectedPlayerFacingRef.current = playerFacingRef.current;
@@ -70,6 +82,7 @@ function useEnemyCraftAnimation({
         left: playerLeftRef.current,
         top: playerTopRef.current,
       };
+      leftAnim.stopAnimation();
       topAnim.stopAnimation();
     }
   }, [isPlayerInLineOfSight]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -80,6 +93,10 @@ function useEnemyCraftAnimation({
   playerFacingRef.current = playerFacing;
 
   const animate = () => {
+    if (isEliminatedRef.current) {
+      return;
+    }
+
     let nextAnimation = {
       nextFacing: facingRef.current,
       toValue: 0,

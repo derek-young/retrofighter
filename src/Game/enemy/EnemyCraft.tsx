@@ -20,17 +20,28 @@ const EnemyCraft = ({
   Icon,
   startingTop = 0,
   startingLeft = 0,
-}: EnemyCraftProps): JSX.Element => {
+}: EnemyCraftProps): null | JSX.Element => {
   const {hasPlayerMoved} = useAnimationContext();
   const [hasInitialized, setHasInitialized] = useState(false);
+  const [isEliminated, setIsEliminated] = useState(false);
+  const [hasEliminationAnimationEnded, setHasEliminationAnimationEnded] =
+    useState(false);
 
   const {facing, initialize, leftAnim, topAnim} = useEnemyCraftAnimation({
     defaultFacing,
+    hasEliminationAnimationEnded,
     startingLeft,
     startingTop,
   });
 
-  useCollisionDetector({leftAnim, topAnim, startingLeft, startingTop});
+  useCollisionDetector({
+    hasPlayerMoved,
+    leftAnim,
+    topAnim,
+    startingLeft,
+    startingTop,
+    setIsEliminated,
+  });
 
   useEffect(() => {
     if (hasPlayerMoved && !hasInitialized) {
@@ -39,13 +50,19 @@ const EnemyCraft = ({
     }
   }, [hasInitialized, hasPlayerMoved, initialize]);
 
+  if (hasEliminationAnimationEnded) {
+    return null;
+  }
+
   return (
     <Craft
       Icon={Icon}
+      isEliminated={isEliminated}
       facing={facing}
       fill={Colors.RED}
       left={leftAnim}
       top={topAnim}
+      onEliminationEnd={() => setHasEliminationAnimationEnded(true)}
     />
   );
 };

@@ -31,24 +31,37 @@ function doAreasIntersect(
   });
 }
 
-function useCollisionDetector({
-  leftAnim,
-  topAnim,
-  startingLeft,
-  startingTop,
-}: {
+interface CollisionDetectorProps {
+  hasPlayerMoved: boolean;
   leftAnim: Animated.Value;
   topAnim: Animated.Value;
   startingLeft: number;
   startingTop: number;
-}) {
-  const {handleIsElimnated} = useEliminationContext();
+  setIsEliminated: (isEliminated: boolean) => void;
+}
+
+function useCollisionDetector({
+  hasPlayerMoved,
+  leftAnim,
+  topAnim,
+  startingLeft,
+  startingTop,
+  setIsEliminated,
+}: CollisionDetectorProps) {
+  const {handleIsPlayerEliminated} = useEliminationContext();
   const {leftRef: playerLeftRef, topRef: playerTopRef} = useAnimationContext();
   const leftRef = useRef<number>(startingLeft);
   const topRef = useRef<number>(startingTop);
   const checkOverlapRef = useRef(() => {});
+  const hasPlayerMovedRef = useRef(hasPlayerMoved);
+
+  hasPlayerMovedRef.current = hasPlayerMoved;
 
   const checkOverlap = useCallback(() => {
+    if (!hasPlayerMovedRef.current) {
+      return;
+    }
+
     const hasOverlap = doAreasIntersect(
       topRef.current,
       leftRef.current,
@@ -56,9 +69,10 @@ function useCollisionDetector({
       playerLeftRef.current,
     );
     if (hasOverlap) {
-      handleIsElimnated();
+      handleIsPlayerEliminated();
+      setIsEliminated(true);
     }
-  }, [playerLeftRef, playerTopRef, handleIsElimnated]);
+  }, [handleIsPlayerEliminated, playerLeftRef, playerTopRef, setIsEliminated]);
 
   checkOverlapRef.current = checkOverlap;
 
