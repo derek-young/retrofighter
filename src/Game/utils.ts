@@ -1,7 +1,7 @@
 import {Animated, Easing} from 'react-native';
 
 import {Facing} from './types';
-import {pixelsPerSecond, totalWidth} from './gameConstants';
+import {craftPixelsPerSecond, totalWidth} from './gameConstants';
 
 export function animateCraft({
   animation,
@@ -14,7 +14,7 @@ export function animateCraft({
   pixelsToMove: number;
   toValue: number;
 }) {
-  const durationMs = (pixelsToMove / pixelsPerSecond) * 1000;
+  const durationMs = (pixelsToMove / craftPixelsPerSecond) * 1000;
 
   Animated.timing(animation, {
     toValue,

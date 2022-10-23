@@ -10,6 +10,7 @@ import ButtonSet from './ButtonSet';
 import DPad from './DPad';
 import {AnimationProvider} from './Fighter/AnimationContext';
 import {EliminationProvider} from './Fighter/EliminationContext';
+import {MissileProvider} from './Fighter/MissileContext';
 import {leftRightPadding} from './gameConstants';
 
 type GameRouteParam = RouteProp<RootStackParamList, 'Game'>;
@@ -37,13 +38,15 @@ const Game = ({route}: GameProps): JSX.Element => {
   return (
     <ImageBackground source={backgroundImage} style={styles.backdrop}>
       <AnimationProvider>
-        <EliminationProvider>
-          <View style={styles.game}>
-            <DPad />
-            <Arena />
-            <ButtonSet />
-          </View>
-        </EliminationProvider>
+        <MissileProvider>
+          <EliminationProvider>
+            <View style={styles.game}>
+              <DPad />
+              <Arena />
+              <ButtonSet />
+            </View>
+          </EliminationProvider>
+        </MissileProvider>
       </AnimationProvider>
     </ImageBackground>
   );

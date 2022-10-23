@@ -71,6 +71,7 @@ export type CraftProps = {
   onEliminationEnd: () => void;
   top: number | Animated.Value;
   left: number | Animated.Value;
+  rotationListener?: (props: {value: number}) => void;
 };
 
 const Craft = ({
@@ -79,8 +80,9 @@ const Craft = ({
   facing,
   fill,
   onEliminationEnd,
-  top,
   left,
+  top,
+  rotationListener,
 }: CraftProps): JSX.Element => {
   const rotation = DEFAULT_FACING_ROTATION[facing];
   const shadow = SHADOW_POS[facing];
@@ -88,9 +90,11 @@ const Craft = ({
   const elimAnimation = useRef(new Animated.Value(0)).current;
   const facingRef = useRef(facing);
   const onEliminationEndRef = useRef<() => void>();
+  const rotationListenerRef = useRef(rotationListener);
   const [elimValue, setElimValue] = useState(0);
   const [rotationState, setRotationState] = useState(0);
 
+  rotationListenerRef.current = rotationListener;
   onEliminationEndRef.current = onEliminationEnd;
 
   const elimValueListener = ({value}: {value: number}) => setElimValue(value);
@@ -101,6 +105,10 @@ const Craft = ({
   useEffect(() => {
     elimAnimation.addListener(elimValueListener);
     rotationAnim.addListener(rotationValueListener);
+
+    if (rotationListenerRef.current) {
+      rotationAnim.addListener(rotationListenerRef.current);
+    }
   }, [elimAnimation, rotationAnim]);
 
   useEffect(() => {

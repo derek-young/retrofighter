@@ -7,9 +7,13 @@ export const leftRightPadding = 56;
 export const craftSize = 20;
 export const alleyWidth = craftSize + 2; // Column height/width
 export const numColumns = 12;
-export const pixelsPerSecond = 60; // Craft speed
+export const craftPixelsPerSecond = 60; // Craft speed
 
 export const arenaSize = Math.min(
+  Dimensions.get('window').width,
+  Dimensions.get('window').height,
+);
+export const maxScreenSize = Math.max(
   Dimensions.get('window').width,
   Dimensions.get('window').height,
 );

@@ -2,6 +2,7 @@ import React from 'react';
 import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import Colors from 'types/colors';
 
+import {useMissileContext} from './Fighter/MissileContext';
 import LifeIndicator from './LifeIndicator';
 
 const styles = StyleSheet.create({
@@ -51,6 +52,8 @@ const ActionButton = ({children, onPress}: ActionButtonProps): JSX.Element => (
 );
 
 const ButtonSet = (): JSX.Element => {
+  const {onFireLeftMissile, onFireRightMissile} = useMissileContext();
+
   return (
     <View style={styles.buttonSet}>
       <View style={{...styles.section, ...styles.top}}>
@@ -59,8 +62,8 @@ const ButtonSet = (): JSX.Element => {
         <LifeIndicator />
       </View>
       <View style={{...styles.section, ...styles.middle}}>
-        <ActionButton onPress={() => console.log('A')}>A</ActionButton>
-        <ActionButton onPress={() => console.log('B')}>B</ActionButton>
+        <ActionButton onPress={onFireLeftMissile}>A</ActionButton>
+        <ActionButton onPress={onFireRightMissile}>B</ActionButton>
       </View>
       <View style={styles.section} />
     </View>
