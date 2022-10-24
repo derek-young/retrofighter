@@ -49,17 +49,18 @@ const Arrow = ({buttonWidth}: ArrowProps): JSX.Element => {
 };
 
 type EmptyProps = {
-  buttonWidth: number;
+  buttonWidth: null | number;
 };
 
-const Empty = ({buttonWidth}: EmptyProps): JSX.Element => (
-  <View style={{width: buttonWidth, height: buttonWidth}} />
-);
+const Empty = ({buttonWidth}: EmptyProps): null | JSX.Element =>
+  buttonWidth === null ? null : (
+    <View style={{width: buttonWidth, height: buttonWidth}} />
+  );
 
 type ButtonRotation = 0 | 90 | 180 | 270;
 
 type DirectionalProps = {
-  buttonWidth: number;
+  buttonWidth: null | number;
   onPress: () => void;
   rotation: ButtonRotation;
 };
@@ -68,23 +69,24 @@ const Directional = ({
   buttonWidth,
   onPress,
   rotation,
-}: DirectionalProps): JSX.Element => (
-  <TouchableOpacity
-    onPress={onPress}
-    style={{
-      ...styles.directional,
-      width: buttonWidth,
-      height: buttonWidth,
-      transform: [{rotate: `${rotation}deg`}],
-    }}>
-    <Arrow buttonWidth={buttonWidth} />
-  </TouchableOpacity>
-);
+}: DirectionalProps): null | JSX.Element =>
+  buttonWidth === null ? null : (
+    <TouchableOpacity
+      onPress={onPress}
+      style={{
+        ...styles.directional,
+        width: buttonWidth,
+        height: buttonWidth,
+        transform: [{rotate: `${rotation}deg`}],
+      }}>
+      <Arrow buttonWidth={buttonWidth} />
+    </TouchableOpacity>
+  );
 
 const DPad = (): JSX.Element => {
   const {onDownPress, onUpPress, onLeftPress, onRightPress} =
     useAnimationContext();
-  const [buttonWidth, setButtonWidth] = useState(0);
+  const [buttonWidth, setButtonWidth] = useState<null | number>(null);
 
   return (
     <View

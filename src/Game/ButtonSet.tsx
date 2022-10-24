@@ -52,7 +52,10 @@ const ActionButton = ({children, onPress}: ActionButtonProps): JSX.Element => (
 );
 
 const ButtonSet = (): JSX.Element => {
-  const {onFireLeftMissile, onFireRightMissile} = useMissileContext();
+  const [
+    {onFireMissile: onFireLeftMissile},
+    {onFireMissile: onFireRightMissile},
+  ] = useMissileContext();
 
   return (
     <View style={styles.buttonSet}>

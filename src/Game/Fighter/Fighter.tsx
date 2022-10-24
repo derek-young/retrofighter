@@ -1,9 +1,8 @@
-import React, {useRef, useState} from 'react';
+import React, {useState} from 'react';
 import {StyleSheet} from 'react-native';
 
 import Colors from 'types/colors';
 import FighterIcon from 'icons/spaceship.svg';
-import {MissileAnimation} from 'Game/Missile';
 import {useEliminationContext} from 'Game/Fighter/EliminationContext';
 
 import Craft from '../Craft';
@@ -24,13 +23,8 @@ const Fighter = (): null | JSX.Element => {
   const {facing, leftAnim, topAnim} = useAnimationContext();
   const {hasEliminationAnimationEnded, isEliminated, onEliminationEnd} =
     useEliminationContext();
-  const {hasLeftMissileFired, hasRightMissileFired} = useMissileContext();
+  const [leftMissileProps, rightMissileProps] = useMissileContext();
   const [craftRotation, setCraftRotation] = useState(0);
-  const hasLeftMissileFiredRef = useRef(hasLeftMissileFired);
-  const hasRightMissileFiredRef = useRef(hasRightMissileFired);
-
-  hasLeftMissileFiredRef.current = hasLeftMissileFired;
-  hasRightMissileFiredRef.current = hasLeftMissileFired;
 
   if (isEliminated && hasEliminationAnimationEnded) {
     return null;
@@ -51,28 +45,20 @@ const Fighter = (): null | JSX.Element => {
         top={topAnim}
         rotationListener={onRotationChange}
       />
-      <MissileAnimation
+      <FighterMissile
         craftRotation={craftRotation}
-        isDetachedFromParent={hasLeftMissileFired}
+        iconStyle={styles.missileLeft}
         leftAnim={leftAnim}
-        topAnim={topAnim}>
-        <FighterMissile
-          className={styles.missileLeft}
-          hasMissileFired={hasLeftMissileFired}
-          hasMissileImpacted={false}
-        />
-      </MissileAnimation>
-      <MissileAnimation
+        topAnim={topAnim}
+        missileProps={leftMissileProps}
+      />
+      <FighterMissile
         craftRotation={craftRotation}
-        isDetachedFromParent={hasRightMissileFired}
+        iconStyle={styles.missileRight}
         leftAnim={leftAnim}
-        topAnim={topAnim}>
-        <FighterMissile
-          className={styles.missileRight}
-          hasMissileFired={hasRightMissileFired}
-          hasMissileImpacted={false}
-        />
-      </MissileAnimation>
+        topAnim={topAnim}
+        missileProps={rightMissileProps}
+      />
     </>
   );
 };

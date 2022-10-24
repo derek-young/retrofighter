@@ -132,7 +132,7 @@ function useEnemyCraftAnimation({
         toValue: nextPosition,
       };
 
-      console.table({
+      console.log({
         name: 'Direct',
         ...nextAnimation,
       });

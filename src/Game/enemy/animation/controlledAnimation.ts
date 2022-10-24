@@ -29,7 +29,7 @@ function controlledAnimation({
     playerLeft,
   );
 
-  console.table({
+  console.log({
     name: 'Controlled Amination',
     nextFacing,
     nextAlleyPosition,

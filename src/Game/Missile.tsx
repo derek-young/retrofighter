@@ -3,12 +3,10 @@ import {Animated, Easing, StyleSheet} from 'react-native';
 
 import {
   craftSize,
-  craftPixelsPerSecond,
   maxScreenSize,
+  missileSize,
+  missileSpeed,
 } from 'Game/gameConstants';
-
-const missileSize = craftSize * 0.6;
-const missileSpeed = craftPixelsPerSecond * 2;
 
 const styles = StyleSheet.create({
   missile: {
@@ -22,24 +20,21 @@ const styles = StyleSheet.create({
   },
 });
 
-export interface MissileProps {
-  className: Record<string, unknown>;
-  fill: string;
+interface MissileIconProps {
   hasMissileFired: boolean;
   hasMissileImpacted: boolean;
   Icon: React.ElementType;
+  missileAnim: Animated.Value;
 }
 
-const Missile = ({
-  className,
-  fill,
+const MissileIcon = ({
   hasMissileFired,
   hasMissileImpacted,
   Icon,
-}: MissileProps) => {
+  missileAnim,
+}: MissileIconProps) => {
   const [hasFireAnimationEnded, setHasFireAnimationEnded] = useState(false);
   const [missileTop, setMissileTop] = useState(missileSize / 2);
-  const missileAnim = useRef(new Animated.Value(missileTop)).current;
 
   useEffect(() => {
     missileAnim.addListener(({value}: {value: number}) => setMissileTop(value));
@@ -66,44 +61,37 @@ const Missile = ({
     return null;
   }
 
-  return (
-    <Icon
-      fill={fill}
-      height={missileSize}
-      width={missileSize}
-      style={{...styles.missile, ...className, top: missileTop}}
-    />
-  );
+  return <Icon style={{...styles.missile, top: missileTop}} />;
 };
 
-interface MissileAnimationProps {
-  children: React.ReactNode;
+export interface MissileProps {
   craftRotation: number;
-  isDetachedFromParent: boolean;
+  Icon: React.ElementType;
   leftAnim: Animated.Value;
   topAnim: Animated.Value;
+  missileProps: Omit<MissileIconProps, 'Icon'>;
 }
 
-export const MissileAnimation = ({
-  children,
+const Missile = ({
   craftRotation,
-  isDetachedFromParent,
+  Icon,
   leftAnim,
   topAnim,
-}: MissileAnimationProps) => {
+  missileProps,
+}: MissileProps) => {
   const [leftValue, setLeftValue] = useState(null);
   const [topValue, setTopValue] = useState(null);
   const craftRotationRef = useRef<null | number>(null);
 
   useEffect(() => {
-    if (isDetachedFromParent) {
+    if (missileProps.hasMissileFired) {
       craftRotationRef.current = craftRotation;
       // @ts-ignore
       setLeftValue(leftAnim._value);
       // @ts-ignore
       setTopValue(topAnim._value);
     }
-  }, [isDetachedFromParent]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [missileProps.hasMissileFired]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const left = leftValue ?? leftAnim;
   const top = topValue ?? topAnim;
@@ -118,7 +106,7 @@ export const MissileAnimation = ({
           {rotate: `${craftRotationRef.current ?? craftRotation}deg`},
         ],
       }}>
-      {children}
+      <MissileIcon Icon={Icon} {...missileProps} />
     </Animated.View>
   );
 };

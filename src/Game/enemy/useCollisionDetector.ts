@@ -3,6 +3,7 @@ import {Animated} from 'react-native';
 
 import {useAnimationContext} from 'Game/Fighter/AnimationContext';
 import {useEliminationContext} from 'Game/Fighter/EliminationContext';
+import {useMissileContext} from 'Game/Fighter/MissileContext';
 import {craftSize} from 'Game/gameConstants';
 
 function getArea(top: number, left: number) {
@@ -48,16 +49,17 @@ function useCollisionDetector({
   startingTop,
   setIsEliminated,
 }: CollisionDetectorProps) {
-  const {handleIsPlayerEliminated} = useEliminationContext();
   const {leftRef: playerLeftRef, topRef: playerTopRef} = useAnimationContext();
+  const playerMissiles = useMissileContext();
+  const {handleIsPlayerEliminated} = useEliminationContext();
   const leftRef = useRef<number>(startingLeft);
   const topRef = useRef<number>(startingTop);
-  const checkOverlapRef = useRef(() => {});
+  const checkCraftOverlapRef = useRef(() => {});
   const hasPlayerMovedRef = useRef(hasPlayerMoved);
 
   hasPlayerMovedRef.current = hasPlayerMoved;
 
-  const checkOverlap = useCallback(() => {
+  const checkCraftOverlap = useCallback(() => {
     if (!hasPlayerMovedRef.current) {
       return;
     }
@@ -74,18 +76,26 @@ function useCollisionDetector({
     }
   }, [handleIsPlayerEliminated, playerLeftRef, playerTopRef, setIsEliminated]);
 
-  checkOverlapRef.current = checkOverlap;
+  checkCraftOverlapRef.current = checkCraftOverlap;
 
   useEffect(() => {
     leftAnim.addListener(({value}) => {
       leftRef.current = value;
-      checkOverlapRef.current();
+      checkCraftOverlapRef.current();
     });
     topAnim.addListener(({value}) => {
       topRef.current = value;
-      checkOverlapRef.current();
+      checkCraftOverlapRef.current();
     });
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
+    playerMissiles.forEach(({missileAnim}) => {
+      missileAnim.addListener(({value}, i) => {
+        console.log('Missile ', i, 'firing, at position: ', value);
+      });
+    });
+  }, []);
 }
 
 export default useCollisionDetector;

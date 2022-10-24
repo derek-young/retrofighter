@@ -86,7 +86,7 @@ function randomAnimation({
 
   const nextAlleyPosition = getRandomAlleyPosition(nextFacing, top, left);
 
-  console.table({
+  console.log({
     name: 'Random Amination',
     detectedFacing,
     nextFacing,
