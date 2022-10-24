@@ -2,10 +2,11 @@ import React from 'react';
 
 import Colors from 'types/colors';
 import {missileSize} from 'Game/gameConstants';
-import Missile, {MissileProps} from 'Game/Missile';
+import Missile from 'Game/Missile';
 import MissileIcon from 'icons/missile.svg';
+import {MissileAnimationProps} from 'Game/types';
 
-interface FighterMissileProps extends Omit<MissileProps, 'Icon'> {
+interface FighterMissileProps extends Omit<MissileAnimationProps, 'Icon'> {
   iconStyle: Record<string, unknown>;
 }
 

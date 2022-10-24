@@ -2,24 +2,24 @@ import React, {useCallback, useContext, useRef, useState} from 'react';
 import {Animated} from 'react-native';
 
 import {missileSize} from 'Game/gameConstants';
+import {MissileProps} from 'Game/types';
+import missilePositionFactory from 'Game/missilePositionFactory';
 
-interface MissileValue {
-  hasMissileFired: boolean;
-  hasMissileImpacted: boolean;
-  missileAnim: Animated.Value;
-  onFireMissile: () => void;
-}
-
-type MissileContextValue = MissileValue[];
+type MissileContextValue = MissileProps[];
 
 const noop = () => {};
+
+const leftMissilePosition = missilePositionFactory();
+const rightMissilePosition = missilePositionFactory();
 
 const defaultValue: MissileContextValue = [
   {
     hasMissileFired: false,
     hasMissileImpacted: false,
     missileAnim: new Animated.Value(missileSize / 2),
+    missilePosition: leftMissilePosition,
     onFireMissile: noop,
+    onMissileImpact: noop,
   },
 ];
 
@@ -40,6 +40,14 @@ export const MissileProvider = ({children}: {children: React.ReactNode}) => {
     () => setHasRightMissileFired(true),
     [],
   );
+  const onLeftMissileImpact = useCallback(
+    () => setHasLeftMissileImpacted(true),
+    [],
+  );
+  const onRightMissileImpact = useCallback(
+    () => setHasRightMissileImpacted(true),
+    [],
+  );
 
   return (
     <MissileContext.Provider
@@ -49,13 +57,17 @@ export const MissileProvider = ({children}: {children: React.ReactNode}) => {
           hasMissileFired: hasLeftMissileFired,
           hasMissileImpacted: hasLeftMissileImpacted,
           missileAnim: leftMissileAnim,
+          missilePosition: leftMissilePosition,
           onFireMissile: onFireLeftMissile,
+          onMissileImpact: onLeftMissileImpact,
         },
         {
           hasMissileFired: hasRightMissileFired,
           hasMissileImpacted: hasRightMissileImpacted,
           missileAnim: rightMissileAnim,
+          missilePosition: rightMissilePosition,
           onFireMissile: onFireRightMissile,
+          onMissileImpact: onRightMissileImpact,
         },
       ]}
     />

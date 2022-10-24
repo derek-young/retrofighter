@@ -4,7 +4,7 @@ import {Animated} from 'react-native';
 import {useAnimationContext} from 'Game/Fighter/AnimationContext';
 import {useEliminationContext} from 'Game/Fighter/EliminationContext';
 import {useMissileContext} from 'Game/Fighter/MissileContext';
-import {craftSize} from 'Game/gameConstants';
+import {craftSize, totalWidth} from 'Game/gameConstants';
 
 function getArea(top: number, left: number) {
   return [
@@ -32,8 +32,17 @@ function doAreasIntersect(
   });
 }
 
+type MissileImpactChecker = (
+  position: {
+    missileLeft: number;
+    missileTop: number;
+  },
+  onMissileImpact: () => void,
+) => void;
+
 interface CollisionDetectorProps {
   hasPlayerMoved: boolean;
+  isEliminated: boolean;
   leftAnim: Animated.Value;
   topAnim: Animated.Value;
   startingLeft: number;
@@ -43,6 +52,7 @@ interface CollisionDetectorProps {
 
 function useCollisionDetector({
   hasPlayerMoved,
+  isEliminated,
   leftAnim,
   topAnim,
   startingLeft,
@@ -55,9 +65,12 @@ function useCollisionDetector({
   const leftRef = useRef<number>(startingLeft);
   const topRef = useRef<number>(startingTop);
   const checkCraftOverlapRef = useRef(() => {});
+  const checkMissileImpactRef = useRef<null | MissileImpactChecker>(null);
   const hasPlayerMovedRef = useRef(hasPlayerMoved);
+  const isEliminatedRef = useRef(isEliminated);
 
   hasPlayerMovedRef.current = hasPlayerMoved;
+  isEliminatedRef.current = isEliminated;
 
   const checkCraftOverlap = useCallback(() => {
     if (!hasPlayerMovedRef.current) {
@@ -78,8 +91,35 @@ function useCollisionDetector({
 
   checkCraftOverlapRef.current = checkCraftOverlap;
 
+  const checkMissileImpact = useCallback(
+    (
+      position: {missileLeft: number; missileTop: number},
+      onMissileImpact: () => void,
+    ) => {
+      const {missileLeft, missileTop} = position;
+      const craftLeftAlley = Math.round(leftRef.current / totalWidth);
+      const craftTopAlley = Math.round(topRef.current / totalWidth);
+      const missileLeftAlley = Math.round(missileLeft / totalWidth);
+      const missileTopAlley = Math.round(missileTop / totalWidth);
+
+      if (
+        craftLeftAlley === missileLeftAlley &&
+        craftTopAlley === missileTopAlley
+      ) {
+        setIsEliminated(true);
+        onMissileImpact();
+      }
+    },
+    [setIsEliminated],
+  );
+
+  checkMissileImpactRef.current = checkMissileImpact;
+
   useEffect(() => {
     leftAnim.addListener(({value}) => {
+      if (isEliminatedRef.current) {
+        return;
+      }
       leftRef.current = value;
       checkCraftOverlapRef.current();
     });
@@ -90,12 +130,21 @@ function useCollisionDetector({
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
-    playerMissiles.forEach(({missileAnim}) => {
-      missileAnim.addListener(({value}, i) => {
-        console.log('Missile ', i, 'firing, at position: ', value);
+    playerMissiles.forEach(({missilePosition, onMissileImpact}) => {
+      missilePosition.addListener(({top, left}) => {
+        if (isEliminatedRef.current) {
+          return;
+        }
+
+        if (checkMissileImpactRef.current) {
+          checkMissileImpactRef.current(
+            {missileLeft: left, missileTop: top},
+            onMissileImpact,
+          );
+        }
       });
     });
-  }, []);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 }
 
 export default useCollisionDetector;

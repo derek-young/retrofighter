@@ -8,6 +8,8 @@ import {
   missileSpeed,
 } from 'Game/gameConstants';
 
+import {MissileAnimationProps, MissileIconProps} from './types';
+
 const styles = StyleSheet.create({
   missile: {
     position: 'absolute',
@@ -19,13 +21,6 @@ const styles = StyleSheet.create({
     width: craftSize,
   },
 });
-
-interface MissileIconProps {
-  hasMissileFired: boolean;
-  hasMissileImpacted: boolean;
-  Icon: React.ElementType;
-  missileAnim: Animated.Value;
-}
 
 const MissileIcon = ({
   hasMissileFired,
@@ -64,37 +59,61 @@ const MissileIcon = ({
   return <Icon style={{...styles.missile, top: missileTop}} />;
 };
 
-export interface MissileProps {
-  craftRotation: number;
-  Icon: React.ElementType;
-  leftAnim: Animated.Value;
-  topAnim: Animated.Value;
-  missileProps: Omit<MissileIconProps, 'Icon'>;
-}
-
 const Missile = ({
   craftRotation,
   Icon,
-  leftAnim,
-  topAnim,
+  playerLeftAnim,
+  playerTopAnim,
   missileProps,
-}: MissileProps) => {
+}: MissileAnimationProps) => {
   const [leftValue, setLeftValue] = useState(null);
   const [topValue, setTopValue] = useState(null);
   const craftRotationRef = useRef<null | number>(null);
+  const leftValueRef = useRef(0);
+  const topValueRef = useRef(0);
+  const left = leftValue ?? playerLeftAnim;
+  const top = topValue ?? playerTopAnim;
+
+  leftValueRef.current = leftValue ?? 0;
+  topValueRef.current = topValue ?? 0;
 
   useEffect(() => {
     if (missileProps.hasMissileFired) {
       craftRotationRef.current = craftRotation;
       // @ts-ignore
-      setLeftValue(leftAnim._value);
+      setLeftValue(playerLeftAnim._value);
       // @ts-ignore
-      setTopValue(topAnim._value);
+      setTopValue(playerTopAnim._value);
     }
   }, [missileProps.hasMissileFired]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const left = leftValue ?? leftAnim;
-  const top = topValue ?? topAnim;
+  useEffect(() => {
+    missileProps.missileAnim.addListener(({value}: {value: number}) => {
+      const listeners = missileProps.missilePosition.getListeners();
+
+      listeners.forEach(listener => {
+        let missileLeft = leftValueRef.current;
+        let missileTop = topValueRef.current;
+
+        switch (craftRotationRef.current) {
+          case 0:
+            missileTop = topValueRef.current + value;
+            break;
+          case 90:
+            missileLeft = leftValueRef.current - value;
+            break;
+          case 180:
+            missileTop = topValueRef.current - value;
+            break;
+          case -90:
+            missileLeft = leftValueRef.current + value;
+            break;
+        }
+
+        listener({left: missileLeft, top: missileTop});
+      });
+    });
+  });
 
   return (
     <Animated.View

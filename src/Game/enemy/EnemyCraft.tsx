@@ -36,6 +36,7 @@ const EnemyCraft = ({
 
   useCollisionDetector({
     hasPlayerMoved,
+    isEliminated,
     leftAnim,
     topAnim,
     startingLeft,
