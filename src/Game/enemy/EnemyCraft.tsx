@@ -6,6 +6,7 @@ import Craft, {CraftProps} from 'Game/Craft';
 import {useAnimationContext} from 'Game/Fighter/AnimationContext';
 
 import useCollisionDetector from './useCollisionDetector';
+import useMissileImpactDetector from './useMissileImpactDetector';
 import useEnemyCraftAnimation from './useEnemyCraftAnimation';
 
 export interface EnemyCraftProps {
@@ -32,6 +33,15 @@ const EnemyCraft = ({
     hasEliminationAnimationEnded,
     startingLeft,
     startingTop,
+  });
+
+  useMissileImpactDetector({
+    isEliminated,
+    leftAnim,
+    topAnim,
+    startingLeft,
+    startingTop,
+    setIsEliminated,
   });
 
   useCollisionDetector({

@@ -3,8 +3,7 @@ import {Animated} from 'react-native';
 
 import {useAnimationContext} from 'Game/Fighter/AnimationContext';
 import {useEliminationContext} from 'Game/Fighter/EliminationContext';
-import {useMissileContext} from 'Game/Fighter/MissileContext';
-import {craftSize, totalWidth} from 'Game/gameConstants';
+import {craftSize} from 'Game/gameConstants';
 
 function getArea(top: number, left: number) {
   return [
@@ -60,12 +59,10 @@ function useCollisionDetector({
   setIsEliminated,
 }: CollisionDetectorProps) {
   const {leftRef: playerLeftRef, topRef: playerTopRef} = useAnimationContext();
-  const playerMissiles = useMissileContext();
   const {handleIsPlayerEliminated} = useEliminationContext();
   const leftRef = useRef<number>(startingLeft);
   const topRef = useRef<number>(startingTop);
   const checkCraftOverlapRef = useRef(() => {});
-  const checkMissileImpactRef = useRef<null | MissileImpactChecker>(null);
   const hasPlayerMovedRef = useRef(hasPlayerMoved);
   const isEliminatedRef = useRef(isEliminated);
 
@@ -73,7 +70,7 @@ function useCollisionDetector({
   isEliminatedRef.current = isEliminated;
 
   const checkCraftOverlap = useCallback(() => {
-    if (!hasPlayerMovedRef.current) {
+    if (isEliminatedRef.current || !hasPlayerMovedRef.current) {
       return;
     }
 
@@ -91,58 +88,14 @@ function useCollisionDetector({
 
   checkCraftOverlapRef.current = checkCraftOverlap;
 
-  const checkMissileImpact = useCallback(
-    (
-      position: {missileLeft: number; missileTop: number},
-      onMissileImpact: () => void,
-    ) => {
-      const {missileLeft, missileTop} = position;
-      const craftLeftAlley = Math.round(leftRef.current / totalWidth);
-      const craftTopAlley = Math.round(topRef.current / totalWidth);
-      const missileLeftAlley = Math.round(missileLeft / totalWidth);
-      const missileTopAlley = Math.round(missileTop / totalWidth);
-
-      if (
-        craftLeftAlley === missileLeftAlley &&
-        craftTopAlley === missileTopAlley
-      ) {
-        setIsEliminated(true);
-        onMissileImpact();
-      }
-    },
-    [setIsEliminated],
-  );
-
-  checkMissileImpactRef.current = checkMissileImpact;
-
   useEffect(() => {
     leftAnim.addListener(({value}) => {
-      if (isEliminatedRef.current) {
-        return;
-      }
       leftRef.current = value;
       checkCraftOverlapRef.current();
     });
     topAnim.addListener(({value}) => {
       topRef.current = value;
       checkCraftOverlapRef.current();
-    });
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
-
-  useEffect(() => {
-    playerMissiles.forEach(({missilePosition, onMissileImpact}) => {
-      missilePosition.addListener(({top, left}) => {
-        if (isEliminatedRef.current) {
-          return;
-        }
-
-        if (checkMissileImpactRef.current) {
-          checkMissileImpactRef.current(
-            {missileLeft: left, missileTop: top},
-            onMissileImpact,
-          );
-        }
-      });
     });
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 }
