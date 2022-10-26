@@ -1,5 +1,5 @@
-import React from 'react';
-import {ImageBackground, StyleSheet, View} from 'react-native';
+import React, {useState} from 'react';
+import {Button, ImageBackground, StyleSheet, View} from 'react-native';
 import {RouteProp} from '@react-navigation/native';
 
 import {RootStackParamList} from 'types/app';
@@ -29,14 +29,22 @@ const styles = StyleSheet.create({
   backdrop: {
     flex: 1,
   },
+  resetButton: {
+    position: 'absolute',
+    left: 20,
+  },
 });
 
-const Game = ({route}: GameProps): JSX.Element => {
+const Game = ({route}: GameProps): null | JSX.Element => {
+  const [uniqueKey, setUniqueKey] = useState(Date.now());
   const epic = route?.params?.epic;
   console.log('epic', epic);
 
   return (
-    <ImageBackground source={backgroundImage} style={styles.backdrop}>
+    <ImageBackground
+      key={uniqueKey}
+      source={backgroundImage}
+      style={styles.backdrop}>
       <AnimationProvider>
         <MissileProvider>
           <EliminationProvider>
@@ -44,6 +52,14 @@ const Game = ({route}: GameProps): JSX.Element => {
               <DPad />
               <Arena />
               <ButtonSet />
+              <View style={styles.resetButton}>
+                <Button
+                  onPress={() => {
+                    setUniqueKey(Date.now());
+                  }}
+                  title="Reset"
+                />
+              </View>
             </View>
           </EliminationProvider>
         </MissileProvider>

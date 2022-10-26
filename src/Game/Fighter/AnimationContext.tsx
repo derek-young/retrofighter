@@ -43,14 +43,11 @@ type AnimationContextValue = {
 
 const noop = () => {};
 
-const leftAnimValue = new Animated.Value(playerStartLeft);
-const topAnimValue = new Animated.Value(playerStartTop);
-
 const defaultValue: AnimationContextValue = {
   facing: defaultPlayerFacing,
   hasPlayerMoved: false,
-  leftAnim: leftAnimValue,
-  topAnim: topAnimValue,
+  leftAnim: new Animated.Value(playerStartLeft),
+  topAnim: new Animated.Value(playerStartTop),
   leftRef: {current: playerStartLeft},
   topRef: {current: playerStartTop},
   onDownPress: noop,
@@ -69,8 +66,8 @@ export const AnimationProvider = ({children}: {children: React.ReactNode}) => {
   const [hasPlayerMoved, setHasPlayerMoved] = useState(false);
   const [facing, setFacing] = useState<Facing>(defaultPlayerFacing);
   const facingRef = useRef(facing);
-  const topAnim = useRef(topAnimValue).current;
-  const leftAnim = useRef(leftAnimValue).current;
+  const leftAnim = useRef(new Animated.Value(playerStartLeft)).current;
+  const topAnim = useRef(new Animated.Value(playerStartTop)).current;
   const topRef = useRef(playerStartTop);
   const leftRef = useRef(playerStartLeft);
   const nextRowRef = useRef(getNextAlley(playerStartTop, facing));
@@ -92,9 +89,9 @@ export const AnimationProvider = ({children}: {children: React.ReactNode}) => {
   );
 
   useEffect(() => {
-    topAnimValue.addListener(topUpdaterRef.current);
-    leftAnimValue.addListener(leftUpdaterRef.current);
-  }, []);
+    leftAnim.addListener(leftUpdaterRef.current);
+    topAnim.addListener(topUpdaterRef.current);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const resetAnimationContext = useCallback(() => {
     leftAnim.setValue(playerStartLeft);

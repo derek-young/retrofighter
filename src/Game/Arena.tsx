@@ -55,12 +55,21 @@ const Seperator = (props: SeperatorProps) => (
   </View>
 );
 
+const startingEnemies = [
+  DualFighter,
+  DualFighter,
+  EnemyUAV,
+  EnemyUAV,
+  EnemyUAV,
+];
+
 const Arena = (): JSX.Element => {
   return (
     <View style={styles.arena}>
       <View>
-        <DualFighter startingLeft={33.7} />
-        <EnemyUAV />
+        {startingEnemies.map((Enemy, i) => (
+          <Enemy key={i} startingLeft={33.7 * (i + 1)} />
+        ))}
       </View>
       <Fighter />
       {new Array(numColumns - 1)
