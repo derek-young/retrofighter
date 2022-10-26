@@ -16,6 +16,8 @@ import {useAnimationContext} from './Fighter/AnimationContext';
 import {useEliminationContext} from './Fighter/EliminationContext';
 import {useMissileContext} from './Fighter/MissileContext';
 
+const buttonSize = 56;
+
 const styles = StyleSheet.create({
   buttonSet: {
     flexBasis: '25%',
@@ -36,9 +38,9 @@ const styles = StyleSheet.create({
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    height: 48,
-    width: 48,
-    borderRadius: 24,
+    height: buttonSize,
+    width: buttonSize,
+    borderRadius: buttonSize / 2,
     margin: 12,
     shadowColor: 'black',
     shadowOffset: {width: 2, height: 2},
@@ -49,7 +51,7 @@ const styles = StyleSheet.create({
   buttonBackground: {
     bottom: 0,
     left: 0,
-    width: 48,
+    width: buttonSize,
     position: 'absolute',
     zIndex: -1,
     backgroundColor: Colors.RED,
@@ -73,7 +75,7 @@ const ActionButton = ({
   onPress,
   onRecharge,
 }: ActionButtonProps): JSX.Element => {
-  const heightAnim = useRef(new Animated.Value(48)).current;
+  const heightAnim = useRef(new Animated.Value(buttonSize)).current;
 
   useEffect(() => {
     if (disabled) {
@@ -82,7 +84,7 @@ const ActionButton = ({
       Animated.timing(heightAnim, {
         duration: missileDuration,
         easing: Easing.linear,
-        toValue: 48,
+        toValue: buttonSize,
         useNativeDriver: false,
       }).start(onRecharge);
     }

@@ -2,7 +2,7 @@ import {Dimensions} from 'react-native';
 
 import {Facing} from './types';
 
-export const leftRightPadding = 56;
+export const leftRightPadding = 48;
 
 export const craftSize = 20;
 export const missileSize = craftSize * 0.6;
