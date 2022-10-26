@@ -59,8 +59,8 @@ const Arena = (): JSX.Element => {
   return (
     <View style={styles.arena}>
       <View>
-        <EnemyUAV startingLeft={33.7} />
-        <DualFighter />
+        <DualFighter startingLeft={33.7} />
+        <EnemyUAV />
       </View>
       <Fighter />
       {new Array(numColumns - 1)

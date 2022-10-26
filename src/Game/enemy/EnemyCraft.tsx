@@ -10,6 +10,7 @@ import useMissileImpactDetector from './useMissileImpactDetector';
 import useEnemyCraftAnimation from './useEnemyCraftAnimation';
 
 export interface EnemyCraftProps {
+  craftSpeedWhenLockedOn?: number;
   defaultFacing?: CraftProps['facing'];
   Icon: React.FC<SvgProps>;
   startingTop?: number;
@@ -17,6 +18,7 @@ export interface EnemyCraftProps {
 }
 
 const EnemyCraft = ({
+  craftSpeedWhenLockedOn,
   defaultFacing = 'S',
   Icon,
   startingTop = 0,
@@ -29,6 +31,7 @@ const EnemyCraft = ({
     useState(false);
 
   const {facing, initialize, leftAnim, topAnim} = useEnemyCraftAnimation({
+    craftSpeedWhenLockedOn,
     defaultFacing,
     hasEliminationAnimationEnded,
     startingLeft,

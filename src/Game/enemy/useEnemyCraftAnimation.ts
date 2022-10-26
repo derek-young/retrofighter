@@ -15,6 +15,7 @@ import {
 import usePlayerTracking from './usePlayerTracking';
 
 type CraftAnimationProps = {
+  craftSpeedWhenLockedOn?: number;
   defaultFacing: Facing;
   hasEliminationAnimationEnded: boolean;
   startingTop: number;
@@ -22,6 +23,7 @@ type CraftAnimationProps = {
 };
 
 function useEnemyCraftAnimation({
+  craftSpeedWhenLockedOn,
   defaultFacing,
   hasEliminationAnimationEnded,
   startingLeft,
@@ -184,6 +186,9 @@ function useEnemyCraftAnimation({
     animateCraft({
       callback: animate,
       animation,
+      craftSpeed: isPlayerInLineOfSightRef.current
+        ? craftSpeedWhenLockedOn
+        : undefined,
       pixelsToMove,
       toValue,
     });

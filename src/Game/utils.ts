@@ -6,15 +6,17 @@ import {craftPixelsPerSecond, totalWidth} from './gameConstants';
 export function animateCraft({
   animation,
   callback = () => {},
+  craftSpeed = craftPixelsPerSecond,
   pixelsToMove,
   toValue,
 }: {
   animation: Animated.Value;
   callback?: (value: {finished: boolean}) => void;
+  craftSpeed?: number;
   pixelsToMove: number;
   toValue: number;
 }) {
-  const durationMs = (pixelsToMove / craftPixelsPerSecond) * 1000;
+  const durationMs = (pixelsToMove / craftSpeed) * 1000;
 
   Animated.timing(animation, {
     toValue,
