@@ -20,6 +20,7 @@ const defaultValue: MissileContextValue = [
     missilePosition: leftMissilePosition,
     onFireMissile: noop,
     onMissileImpact: noop,
+    resetMissileState: noop,
   },
 ];
 
@@ -48,6 +49,14 @@ export const MissileProvider = ({children}: {children: React.ReactNode}) => {
     () => setHasRightMissileImpacted(true),
     [],
   );
+  const resetLeftMissileState = useCallback(() => {
+    setHasLeftMissileFired(false);
+    setHasLeftMissileImpacted(false);
+  }, []);
+  const resetRightMissileState = useCallback(() => {
+    setHasRightMissileFired(false);
+    setHasRightMissileImpacted(false);
+  }, []);
 
   return (
     <MissileContext.Provider
@@ -60,6 +69,7 @@ export const MissileProvider = ({children}: {children: React.ReactNode}) => {
           missilePosition: leftMissilePosition,
           onFireMissile: onFireLeftMissile,
           onMissileImpact: onLeftMissileImpact,
+          resetMissileState: resetLeftMissileState,
         },
         {
           hasMissileFired: hasRightMissileFired,
@@ -68,6 +78,7 @@ export const MissileProvider = ({children}: {children: React.ReactNode}) => {
           missilePosition: rightMissilePosition,
           onFireMissile: onFireRightMissile,
           onMissileImpact: onRightMissileImpact,
+          resetMissileState: resetRightMissileState,
         },
       ]}
     />

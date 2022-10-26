@@ -23,6 +23,7 @@ export interface MissileProps extends Omit<MissileIconProps, 'Icon'> {
   missilePosition: MissilePosition;
   onFireMissile: () => void;
   onMissileImpact: () => void;
+  resetMissileState: () => void;
 }
 
 export interface MissileAnimationProps {

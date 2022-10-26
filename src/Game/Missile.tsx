@@ -4,8 +4,8 @@ import {Animated, Easing, StyleSheet} from 'react-native';
 import {
   craftSize,
   maxScreenSize,
+  missileDuration,
   missileSize,
-  missileSpeed,
 } from 'Game/gameConstants';
 
 import {MissileAnimationProps, MissileIconProps} from './types';
@@ -22,6 +22,8 @@ const styles = StyleSheet.create({
   },
 });
 
+const missileTopStart = missileSize / 2;
+
 const MissileIcon = ({
   hasMissileFired,
   hasMissileImpacted,
@@ -29,7 +31,7 @@ const MissileIcon = ({
   missileAnim,
 }: MissileIconProps) => {
   const [hasFireAnimationEnded, setHasFireAnimationEnded] = useState(false);
-  const [missileTop, setMissileTop] = useState(missileSize / 2);
+  const [missileTop, setMissileTop] = useState(missileTopStart);
 
   useEffect(() => {
     missileAnim.addListener(({value}: {value: number}) => setMissileTop(value));
@@ -38,11 +40,14 @@ const MissileIcon = ({
   useEffect(() => {
     if (hasMissileFired) {
       Animated.timing(missileAnim, {
-        duration: (maxScreenSize / missileSpeed) * 1000,
+        duration: missileDuration,
         easing: Easing.linear,
         toValue: maxScreenSize * -1,
         useNativeDriver: true,
       }).start(() => setHasFireAnimationEnded(true));
+    } else {
+      missileAnim.setValue(missileTopStart);
+      setHasFireAnimationEnded(false);
     }
   }, [hasMissileFired, missileAnim]);
 
@@ -84,6 +89,10 @@ const Missile = ({
       setLeftValue(playerLeftAnim._value);
       // @ts-ignore
       setTopValue(playerTopAnim._value);
+    } else {
+      craftRotationRef.current = null;
+      setLeftValue(null);
+      setTopValue(null);
     }
   }, [missileProps.hasMissileFired]); // eslint-disable-line react-hooks/exhaustive-deps
 

@@ -45,6 +45,7 @@ function useEnemyCraftAnimation({
   );
   const isEliminatedRef = useRef(false);
   const isPlayerInLineOfSightRef = useRef(false);
+  const isPlayerInLineOfSightPrevRef = useRef(false);
 
   const isPlayerInLineOfSight =
     hasPlayerMoved &&
@@ -76,7 +77,9 @@ function useEnemyCraftAnimation({
     if (isPlayerInLineOfSight) {
       leftAnim.stopAnimation();
       topAnim.stopAnimation();
-    } else {
+
+      isPlayerInLineOfSightPrevRef.current = true;
+    } else if (isPlayerInLineOfSightPrevRef.current) {
       detectedPlayerFacingRef.current = playerFacingRef.current;
       detectedPlayerPositionRef.current = {
         left: playerLeftRef.current,
@@ -84,6 +87,7 @@ function useEnemyCraftAnimation({
       };
       leftAnim.stopAnimation();
       topAnim.stopAnimation();
+      isPlayerInLineOfSightPrevRef.current = false;
     }
   }, [isPlayerInLineOfSight]); // eslint-disable-line react-hooks/exhaustive-deps
 

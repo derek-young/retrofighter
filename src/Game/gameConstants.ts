@@ -19,6 +19,7 @@ export const maxScreenSize = Math.max(
   Dimensions.get('window').width,
   Dimensions.get('window').height,
 );
+export const missileDuration = (maxScreenSize / missileSpeed) * 1000;
 export const seperatorWidth = (arenaSize - numColumns * alleyWidth) / 11;
 export const maxTop = arenaSize - 22;
 export const minTop = 0;
