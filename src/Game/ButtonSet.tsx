@@ -11,8 +11,10 @@ import {
 import Colors from 'types/colors';
 import {missileDuration} from 'Game/gameConstants';
 
-import {useMissileContext} from './Fighter/MissileContext';
 import LifeIndicator from './LifeIndicator';
+import {useAnimationContext} from './Fighter/AnimationContext';
+import {useEliminationContext} from './Fighter/EliminationContext';
+import {useMissileContext} from './Fighter/MissileContext';
 
 const styles = StyleSheet.create({
   buttonSet: {
@@ -98,26 +100,38 @@ const ActionButton = ({
 };
 
 const ButtonSet = (): JSX.Element => {
+  const {hasPlayerMoved, setHasPlayerMoved} = useAnimationContext();
+  const {remainingLives} = useEliminationContext();
   const [leftMissile, rightMissile] = useMissileContext();
 
   return (
     <View style={styles.buttonSet}>
       <View style={{...styles.section, ...styles.top}}>
-        <LifeIndicator />
-        <LifeIndicator />
-        <LifeIndicator />
+        {new Array(remainingLives).fill(0).map((_, i) => (
+          <LifeIndicator key={i} />
+        ))}
       </View>
       <View style={{...styles.section, ...styles.middle}}>
         <ActionButton
           disabled={leftMissile.hasMissileFired}
           onRecharge={leftMissile.resetMissileState}
-          onPress={leftMissile.onFireMissile}>
+          onPress={() => {
+            if (!hasPlayerMoved) {
+              setHasPlayerMoved(true);
+            }
+            leftMissile.onFireMissile();
+          }}>
           A
         </ActionButton>
         <ActionButton
           disabled={rightMissile.hasMissileFired}
           onRecharge={rightMissile.resetMissileState}
-          onPress={rightMissile.onFireMissile}>
+          onPress={() => {
+            if (!hasPlayerMoved) {
+              setHasPlayerMoved(true);
+            }
+            rightMissile.onFireMissile();
+          }}>
           B
         </ActionButton>
       </View>

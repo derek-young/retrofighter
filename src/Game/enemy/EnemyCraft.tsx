@@ -60,7 +60,7 @@ const EnemyCraft = ({
   useEffect(() => {
     if (hasPlayerMoved && !hasInitialized) {
       initialize();
-      setHasInitialized(false);
+      setHasInitialized(true);
     }
   }, [hasInitialized, hasPlayerMoved, initialize]);
 

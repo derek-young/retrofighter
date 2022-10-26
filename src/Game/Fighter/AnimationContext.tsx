@@ -38,6 +38,7 @@ type AnimationContextValue = {
   onLeftPress: () => void;
   onRightPress: () => void;
   resetAnimationContext: () => void;
+  setHasPlayerMoved: (hasPlayerMoved: boolean) => void;
 };
 
 const noop = () => {};
@@ -57,6 +58,7 @@ const defaultValue: AnimationContextValue = {
   onLeftPress: noop,
   onRightPress: noop,
   resetAnimationContext: noop,
+  setHasPlayerMoved: noop,
 };
 
 const AnimationContext = React.createContext(defaultValue);
@@ -67,13 +69,10 @@ export const AnimationProvider = ({children}: {children: React.ReactNode}) => {
   const [hasPlayerMoved, setHasPlayerMoved] = useState(false);
   const [facing, setFacing] = useState<Facing>(defaultPlayerFacing);
   const facingRef = useRef(facing);
-
   const topAnim = useRef(topAnimValue).current;
   const leftAnim = useRef(leftAnimValue).current;
-
   const topRef = useRef(playerStartTop);
   const leftRef = useRef(playerStartLeft);
-
   const nextRowRef = useRef(getNextAlley(playerStartTop, facing));
   const nextColRef = useRef(getNextAlley(playerStartLeft, facing));
 
@@ -229,6 +228,7 @@ export const AnimationProvider = ({children}: {children: React.ReactNode}) => {
         onLeftPress,
         onRightPress,
         resetAnimationContext,
+        setHasPlayerMoved,
       }}
     />
   );

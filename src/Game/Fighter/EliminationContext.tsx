@@ -7,7 +7,9 @@ type EliminationContextValue = {
   hasEliminationAnimationEnded: boolean;
   isEliminated: boolean;
   onEliminationEnd: () => void;
+  remainingLives: number;
   resetEliminationContext: () => void;
+  shouldRenderPlayer: boolean;
 };
 
 const noop = () => {};
@@ -17,7 +19,9 @@ const defaultValue: EliminationContextValue = {
   hasEliminationAnimationEnded: false,
   isEliminated: false,
   onEliminationEnd: noop,
+  remainingLives: 3,
   resetEliminationContext: noop,
+  shouldRenderPlayer: false,
 };
 
 const EliminationContext = React.createContext(defaultValue);
@@ -33,20 +37,28 @@ export const EliminationProvider = ({
   const [isEliminated, setIsEliminated] = useState(false);
   const [hasEliminationAnimationEnded, setHasEliminationAnimationEnded] =
     useState(false);
+  const [remainingLives, setRemainingLives] = useState(3);
 
   const handleIsPlayerEliminated = useCallback(() => {
     setIsEliminated(true);
   }, []);
 
-  const onEliminationEnd = useCallback(() => {
-    setHasEliminationAnimationEnded(true);
-    resetAnimationContext();
-  }, [resetAnimationContext]);
-
   const resetEliminationContext = useCallback(() => {
     setIsEliminated(false);
     setHasEliminationAnimationEnded(false);
   }, []);
+
+  const onEliminationEnd = useCallback(() => {
+    setHasEliminationAnimationEnded(true);
+
+    if (remainingLives > 0) {
+      setTimeout(() => {
+        setRemainingLives(l => l - 1);
+        resetAnimationContext();
+        resetEliminationContext();
+      }, 1000);
+    }
+  }, [remainingLives, resetAnimationContext, resetEliminationContext]);
 
   return (
     <EliminationContext.Provider
@@ -56,7 +68,9 @@ export const EliminationProvider = ({
         hasEliminationAnimationEnded,
         isEliminated,
         onEliminationEnd,
+        remainingLives,
         resetEliminationContext,
+        shouldRenderPlayer: !(isEliminated && hasEliminationAnimationEnded),
       }}
     />
   );

@@ -20,7 +20,7 @@ const styles = StyleSheet.create({
 });
 
 const Fighter = (): null | JSX.Element => {
-  const {facing, leftAnim, topAnim} = useAnimationContext();
+  const {facing, hasPlayerMoved, leftAnim, topAnim} = useAnimationContext();
   const {hasEliminationAnimationEnded, isEliminated, onEliminationEnd} =
     useEliminationContext();
   const [leftMissileProps, rightMissileProps] = useMissileContext();
@@ -33,11 +33,13 @@ const Fighter = (): null | JSX.Element => {
   const onRotationChange = ({value}: {value: number}) =>
     setCraftRotation(Math.round(value));
 
+  const craftColor = hasPlayerMoved ? Colors.GREEN : `${Colors.GREEN}80`;
+
   return (
     <>
       <Craft
         Icon={FighterIcon}
-        fill={Colors.GREEN}
+        fill={craftColor}
         facing={facing}
         isEliminated={isEliminated}
         onEliminationEnd={onEliminationEnd}
@@ -46,6 +48,7 @@ const Fighter = (): null | JSX.Element => {
         rotationListener={onRotationChange}
       />
       <FighterMissile
+        craftColor={craftColor}
         craftRotation={craftRotation}
         iconStyle={styles.missileLeft}
         playerLeftAnim={leftAnim}
@@ -53,6 +56,7 @@ const Fighter = (): null | JSX.Element => {
         missileProps={leftMissileProps}
       />
       <FighterMissile
+        craftColor={craftColor}
         craftRotation={craftRotation}
         iconStyle={styles.missileRight}
         playerLeftAnim={leftAnim}

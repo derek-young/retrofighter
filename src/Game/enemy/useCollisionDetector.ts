@@ -31,14 +31,6 @@ function doAreasIntersect(
   });
 }
 
-type MissileImpactChecker = (
-  position: {
-    missileLeft: number;
-    missileTop: number;
-  },
-  onMissileImpact: () => void,
-) => void;
-
 interface CollisionDetectorProps {
   hasPlayerMoved: boolean;
   isEliminated: boolean;
@@ -59,18 +51,25 @@ function useCollisionDetector({
   setIsEliminated,
 }: CollisionDetectorProps) {
   const {leftRef: playerLeftRef, topRef: playerTopRef} = useAnimationContext();
-  const {handleIsPlayerEliminated} = useEliminationContext();
+  const {handleIsPlayerEliminated, isEliminated: isPlayerEliminated} =
+    useEliminationContext();
   const leftRef = useRef<number>(startingLeft);
   const topRef = useRef<number>(startingTop);
   const checkCraftOverlapRef = useRef(() => {});
   const hasPlayerMovedRef = useRef(hasPlayerMoved);
   const isEliminatedRef = useRef(isEliminated);
+  const isPlayerEliminatedRef = useRef(isPlayerEliminated);
 
   hasPlayerMovedRef.current = hasPlayerMoved;
   isEliminatedRef.current = isEliminated;
+  isPlayerEliminatedRef.current = isPlayerEliminated;
 
   const checkCraftOverlap = useCallback(() => {
-    if (isEliminatedRef.current || !hasPlayerMovedRef.current) {
+    if (
+      !hasPlayerMovedRef.current ||
+      isEliminatedRef.current ||
+      isPlayerEliminatedRef.current
+    ) {
       return;
     }
 
