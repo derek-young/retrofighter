@@ -21,12 +21,12 @@ const styles = StyleSheet.create({
 
 const Fighter = (): null | JSX.Element => {
   const {facing, hasPlayerMoved, leftAnim, topAnim} = useAnimationContext();
-  const {hasEliminationAnimationEnded, isEliminated, onEliminationEnd} =
+  const {hasEliminationAnimationEnded, isPlayerEliminated, onEliminationEnd} =
     useEliminationContext();
   const [leftMissileProps, rightMissileProps] = useMissileContext();
   const [craftRotation, setCraftRotation] = useState(0);
 
-  if (isEliminated && hasEliminationAnimationEnded) {
+  if (isPlayerEliminated && hasEliminationAnimationEnded) {
     return null;
   }
 
@@ -41,7 +41,7 @@ const Fighter = (): null | JSX.Element => {
         Icon={FighterIcon}
         fill={craftColor}
         facing={facing}
-        isEliminated={isEliminated}
+        isEliminated={isPlayerEliminated}
         onEliminationEnd={onEliminationEnd}
         left={leftAnim}
         top={topAnim}

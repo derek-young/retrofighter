@@ -51,7 +51,7 @@ function useCollisionDetector({
   setIsEliminated,
 }: CollisionDetectorProps) {
   const {leftRef: playerLeftRef, topRef: playerTopRef} = useAnimationContext();
-  const {handleIsPlayerEliminated, isEliminated: isPlayerEliminated} =
+  const {handleIsPlayerEliminated, isPlayerEliminated} =
     useEliminationContext();
   const leftRef = useRef<number>(startingLeft);
   const topRef = useRef<number>(startingTop);

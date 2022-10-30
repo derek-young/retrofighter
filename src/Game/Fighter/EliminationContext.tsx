@@ -5,7 +5,7 @@ import {useAnimationContext} from './AnimationContext';
 type EliminationContextValue = {
   handleIsPlayerEliminated: () => void;
   hasEliminationAnimationEnded: boolean;
-  isEliminated: boolean;
+  isPlayerEliminated: boolean;
   onEliminationEnd: () => void;
   remainingLives: number;
   resetEliminationContext: () => void;
@@ -17,7 +17,7 @@ const noop = () => {};
 const defaultValue: EliminationContextValue = {
   handleIsPlayerEliminated: noop,
   hasEliminationAnimationEnded: false,
-  isEliminated: false,
+  isPlayerEliminated: false,
   onEliminationEnd: noop,
   remainingLives: 3,
   resetEliminationContext: noop,
@@ -34,17 +34,17 @@ export const EliminationProvider = ({
   children: React.ReactNode;
 }) => {
   const {resetAnimationContext} = useAnimationContext();
-  const [isEliminated, setIsEliminated] = useState(false);
+  const [isPlayerEliminated, setIsPlayerEliminated] = useState(false);
   const [hasEliminationAnimationEnded, setHasEliminationAnimationEnded] =
     useState(false);
   const [remainingLives, setRemainingLives] = useState(3);
 
   const handleIsPlayerEliminated = useCallback(() => {
-    setIsEliminated(true);
+    setIsPlayerEliminated(true);
   }, []);
 
   const resetEliminationContext = useCallback(() => {
-    setIsEliminated(false);
+    setIsPlayerEliminated(false);
     setHasEliminationAnimationEnded(false);
   }, []);
 
@@ -66,11 +66,13 @@ export const EliminationProvider = ({
       value={{
         handleIsPlayerEliminated,
         hasEliminationAnimationEnded,
-        isEliminated,
+        isPlayerEliminated,
         onEliminationEnd,
         remainingLives,
         resetEliminationContext,
-        shouldRenderPlayer: !(isEliminated && hasEliminationAnimationEnded),
+        shouldRenderPlayer: !(
+          isPlayerEliminated && hasEliminationAnimationEnded
+        ),
       }}
     />
   );

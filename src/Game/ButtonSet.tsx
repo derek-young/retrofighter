@@ -126,7 +126,7 @@ const ActionButton = ({
 
 const ButtonSet = (): JSX.Element => {
   const {hasPlayerMoved, setHasPlayerMoved} = useAnimationContext();
-  const {isEliminated, remainingLives} = useEliminationContext();
+  const {isPlayerEliminated, remainingLives} = useEliminationContext();
   const [leftMissile, rightMissile] = useMissileContext();
 
   return (
@@ -138,8 +138,8 @@ const ButtonSet = (): JSX.Element => {
       </View>
       <View style={{...styles.section, ...styles.middle}}>
         <ActionButton
-          disabled={leftMissile.hasMissileFired || isEliminated}
-          isEliminated={isEliminated}
+          disabled={leftMissile.hasMissileFired || isPlayerEliminated}
+          isEliminated={isPlayerEliminated}
           onRecharge={leftMissile.resetMissileState}
           onPress={() => {
             if (!hasPlayerMoved) {
@@ -150,8 +150,8 @@ const ButtonSet = (): JSX.Element => {
           A
         </ActionButton>
         <ActionButton
-          disabled={rightMissile.hasMissileFired || isEliminated}
-          isEliminated={isEliminated}
+          disabled={rightMissile.hasMissileFired || isPlayerEliminated}
+          isEliminated={isPlayerEliminated}
           onRecharge={rightMissile.resetMissileState}
           onPress={() => {
             if (!hasPlayerMoved) {
