@@ -3,11 +3,11 @@ import {StyleSheet} from 'react-native';
 
 import Colors from 'types/colors';
 import FighterIcon from 'icons/spaceship.svg';
-import {useEliminationContext} from 'Game/Fighter/EliminationContext';
 
 import Craft from '../Craft';
 import FighterMissile from './FighterMissile';
 import {useAnimationContext} from './AnimationContext';
+import {useEliminationContext} from './EliminationContext';
 import {useMissileContext} from './MissileContext';
 
 const styles = StyleSheet.create({

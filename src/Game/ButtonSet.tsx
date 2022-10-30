@@ -48,6 +48,9 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     backgroundColor: Colors.GREY,
   },
+  buttonDisabled: {
+    opacity: 0.8,
+  },
   buttonBackground: {
     bottom: 0,
     left: 0,
@@ -65,6 +68,7 @@ const styles = StyleSheet.create({
 type ActionButtonProps = {
   children: string;
   disabled: boolean;
+  isEliminated: boolean;
   onPress: () => void;
   onRecharge: () => void;
 };
@@ -72,10 +76,18 @@ type ActionButtonProps = {
 const ActionButton = ({
   children,
   disabled,
+  isEliminated,
   onPress,
   onRecharge,
 }: ActionButtonProps): JSX.Element => {
   const heightAnim = useRef(new Animated.Value(buttonSize)).current;
+
+  useEffect(() => {
+    if (isEliminated) {
+      heightAnim.stopAnimation();
+      heightAnim.setValue(buttonSize);
+    }
+  }, [heightAnim, isEliminated]);
 
   useEffect(() => {
     if (disabled) {
@@ -90,6 +102,17 @@ const ActionButton = ({
     }
   }, [disabled, heightAnim, onRecharge]);
 
+  if (disabled) {
+    return (
+      <View style={{...styles.actionButton, ...styles.buttonDisabled}}>
+        <Text style={styles.buttonText}>{children}</Text>
+        <Animated.View
+          style={{...styles.buttonBackground, height: heightAnim}}
+        />
+      </View>
+    );
+  }
+
   return (
     <TouchableOpacity
       disabled={disabled}
@@ -103,7 +126,7 @@ const ActionButton = ({
 
 const ButtonSet = (): JSX.Element => {
   const {hasPlayerMoved, setHasPlayerMoved} = useAnimationContext();
-  const {remainingLives} = useEliminationContext();
+  const {isEliminated, remainingLives} = useEliminationContext();
   const [leftMissile, rightMissile] = useMissileContext();
 
   return (
@@ -115,7 +138,8 @@ const ButtonSet = (): JSX.Element => {
       </View>
       <View style={{...styles.section, ...styles.middle}}>
         <ActionButton
-          disabled={leftMissile.hasMissileFired}
+          disabled={leftMissile.hasMissileFired || isEliminated}
+          isEliminated={isEliminated}
           onRecharge={leftMissile.resetMissileState}
           onPress={() => {
             if (!hasPlayerMoved) {
@@ -126,7 +150,8 @@ const ButtonSet = (): JSX.Element => {
           A
         </ActionButton>
         <ActionButton
-          disabled={rightMissile.hasMissileFired}
+          disabled={rightMissile.hasMissileFired || isEliminated}
+          isEliminated={isEliminated}
           onRecharge={rightMissile.resetMissileState}
           onPress={() => {
             if (!hasPlayerMoved) {

@@ -57,10 +57,10 @@ function getNextRotationSet(facing: Facing) {
 }
 
 const SHADOW_POS = {
-  ['N']: {top: 4, left: 2},
-  ['E']: {top: -4, left: 2},
-  ['S']: {top: -4, left: -2},
-  ['W']: {top: 4, left: -2},
+  ['N']: {top: 3, left: 2},
+  ['E']: {top: -3, left: 2},
+  ['S']: {top: -3, left: -2},
+  ['W']: {top: 3, left: -2},
 };
 
 export type CraftProps = {
@@ -128,7 +128,7 @@ const Craft = ({
 
     Animated.timing(rotationAnim, {
       toValue: nextRotation,
-      duration: 200,
+      duration: 150,
       useNativeDriver: true,
     }).start(() => {
       // Normalize values on animation finish

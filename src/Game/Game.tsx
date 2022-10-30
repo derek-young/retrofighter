@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {Button, ImageBackground, StyleSheet, View} from 'react-native';
+import {Button, ImageBackground, StyleSheet, Text, View} from 'react-native';
 import {RouteProp} from '@react-navigation/native';
 
 import {RootStackParamList} from 'types/app';
@@ -31,6 +31,11 @@ const styles = StyleSheet.create({
     position: 'absolute',
     left: 20,
   },
+  version: {
+    position: 'absolute',
+    left: 30,
+    top: 30,
+  },
 });
 
 const Game = ({route}: GameProps): null | JSX.Element => {
@@ -57,6 +62,9 @@ const Game = ({route}: GameProps): null | JSX.Element => {
                   }}
                   title="Reset"
                 />
+              </View>
+              <View style={styles.version}>
+                <Text style={{color: 'red'}}>v.1.0.0</Text>
               </View>
             </View>
           </EliminationProvider>
