@@ -22,7 +22,7 @@ const FighterMissile = ({
           fill={craftColor}
           height={missileSize}
           width={missileSize}
-          style={{...style, ...iconStyle}}
+          style={{...style, ...iconStyle, transform: [{rotate: '-45deg'}]}}
         />
       )}
       {...rest}

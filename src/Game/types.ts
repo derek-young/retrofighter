@@ -7,7 +7,7 @@ export type MissilePositionCallback = (position: {
   top: number;
 }) => void;
 
-export interface MissilePosition {
+interface MissilePositionProps {
   addListener: (callback: MissilePositionCallback) => void;
   getListeners: () => MissilePositionCallback[];
 }
@@ -17,10 +17,11 @@ export interface MissileIconProps {
   hasMissileImpacted: boolean;
   Icon: React.ElementType;
   missileAnim: Animated.Value;
+  startingTop?: number;
 }
 
 export interface MissileProps extends Omit<MissileIconProps, 'Icon'> {
-  missilePosition: MissilePosition;
+  missilePosition: MissilePositionProps;
   onFireMissile: () => void;
   onMissileImpact: () => void;
   resetMissileState: () => void;
@@ -29,7 +30,7 @@ export interface MissileProps extends Omit<MissileIconProps, 'Icon'> {
 export interface MissileAnimationProps {
   craftRotation: number;
   Icon: React.ElementType;
-  playerLeftAnim: Animated.Value;
-  playerTopAnim: Animated.Value;
+  leftAnim: Animated.Value;
+  topAnim: Animated.Value;
   missileProps: MissileProps;
 }

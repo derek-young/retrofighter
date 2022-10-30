@@ -1,68 +1,29 @@
-import React, {useEffect, useState} from 'react';
+import React from 'react';
 import {SvgProps} from 'react-native-svg';
 
 import Colors from 'types/colors';
-import Craft, {CraftProps} from 'Game/Craft';
-import {useAnimationContext} from 'Game/Fighter/AnimationContext';
+import Craft from 'Game/Craft';
 
-import useCollisionDetector from './useCollisionDetector';
-import useMissileImpactDetector from './useMissileImpactDetector';
-import useEnemyCraftAnimation from './useEnemyCraftAnimation';
+import {useEnemyCraftContext} from './EnemyCraftContext';
 
-export interface EnemyCraftProps {
-  craftSpeedWhenLockedOn?: number;
-  defaultFacing?: CraftProps['facing'];
+interface EnemyCraftProps {
+  craftColor?: string;
   Icon: React.FC<SvgProps>;
-  startingTop?: number;
-  startingLeft?: number;
 }
 
 const EnemyCraft = ({
-  craftSpeedWhenLockedOn,
-  defaultFacing = 'S',
+  craftColor = Colors.RED,
   Icon,
-  startingTop = 0,
-  startingLeft = 0,
 }: EnemyCraftProps): null | JSX.Element => {
-  const {hasPlayerMoved} = useAnimationContext();
-  const [hasInitialized, setHasInitialized] = useState(false);
-  const [isEliminated, setIsEliminated] = useState(false);
-  const [hasEliminationAnimationEnded, setHasEliminationAnimationEnded] =
-    useState(false);
-
-  const {facing, initialize, leftAnim, topAnim} = useEnemyCraftAnimation({
-    craftSpeedWhenLockedOn,
-    defaultFacing,
+  const {
+    facing,
+    isEliminated,
+    leftAnim,
+    topAnim,
     hasEliminationAnimationEnded,
-    startingLeft,
-    startingTop,
-  });
-
-  useMissileImpactDetector({
-    isEliminated,
-    leftAnim,
-    topAnim,
-    startingLeft,
-    startingTop,
-    setIsEliminated,
-  });
-
-  useCollisionDetector({
-    hasPlayerMoved,
-    isEliminated,
-    leftAnim,
-    topAnim,
-    startingLeft,
-    startingTop,
-    setIsEliminated,
-  });
-
-  useEffect(() => {
-    if (hasPlayerMoved && !hasInitialized) {
-      initialize();
-      setHasInitialized(true);
-    }
-  }, [hasInitialized, hasPlayerMoved, initialize]);
+    setHasEliminationAnimationEnded,
+    onRotationChange,
+  } = useEnemyCraftContext();
 
   if (hasEliminationAnimationEnded) {
     return null;
@@ -73,10 +34,11 @@ const EnemyCraft = ({
       Icon={Icon}
       isEliminated={isEliminated}
       facing={facing}
-      fill={Colors.RED}
+      fill={craftColor}
       left={leftAnim}
       top={topAnim}
       onEliminationEnd={() => setHasEliminationAnimationEnded(true)}
+      rotationListener={onRotationChange}
     />
   );
 };

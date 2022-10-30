@@ -1,21 +1,17 @@
 import React from 'react';
 
 import EnemyUAVIcon from 'icons/enemy-alt.svg';
-import {craftPixelsPerSecond} from 'Game/gameConstants';
 
-import EnemyCraft, {EnemyCraftProps} from './EnemyCraft';
+import EnemyCraft from './EnemyCraft';
+import {EnemyCraftContextProviderProps} from './EnemyCraftContext';
 
-interface EnemyUAVProps
-  extends Omit<EnemyCraftProps, 'craftSpeedWhenLockedOn' | 'Icon'> {}
+interface EnemyUAVProps {
+  startingLeft: EnemyCraftContextProviderProps['startingLeft'];
+  startingTop: EnemyCraftContextProviderProps['startingTop'];
+}
 
-const EnemyUAV = (props: EnemyUAVProps): JSX.Element => {
-  return (
-    <EnemyCraft
-      craftSpeedWhenLockedOn={craftPixelsPerSecond * 1.3}
-      Icon={EnemyUAVIcon}
-      {...props}
-    />
-  );
+const EnemyUAV = (): JSX.Element => {
+  return <EnemyCraft Icon={EnemyUAVIcon} />;
 };
 
 export default EnemyUAV;

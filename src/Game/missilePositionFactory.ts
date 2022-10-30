@@ -1,13 +1,15 @@
-import {MissilePosition, MissilePositionCallback} from './types';
+import {MissilePositionCallback} from './types';
 
-const missilePositionFactory = (): MissilePosition => {
-  const listeners: MissilePositionCallback[] = [];
+class MissilePosition {
+  listeners: MissilePositionCallback[] = [];
 
-  return {
-    addListener: (listener: MissilePositionCallback) =>
-      listeners.push(listener),
-    getListeners: () => listeners,
-  };
-};
+  addListener(listener: MissilePositionCallback): void {
+    this.listeners.push(listener);
+  }
 
-export default missilePositionFactory;
+  getListeners(): MissilePositionCallback[] {
+    return this.listeners;
+  }
+}
+
+export default MissilePosition;

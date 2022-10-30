@@ -24,7 +24,7 @@ const styles = StyleSheet.create({
   },
 });
 
-const DEFAULT_FACING_ROTATION: Record<Facing, number> = {
+export const DEFAULT_FACING_ROTATION: Record<Facing, number> = {
   ['N']: 0,
   ['E']: 90,
   ['S']: 180,

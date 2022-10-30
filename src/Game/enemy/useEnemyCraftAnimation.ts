@@ -201,6 +201,7 @@ function useEnemyCraftAnimation({
     leftAnim,
     topAnim,
     initialize,
+    isPlayerInLineOfSight,
   };
 }
 

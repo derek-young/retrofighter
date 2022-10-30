@@ -2,7 +2,9 @@ import React from 'react';
 import {StyleSheet, View} from 'react-native';
 import Colors from 'types/colors';
 
+import {craftPixelsPerSecond} from 'Game/gameConstants';
 import {DualFighter, EnemyUAV} from './enemy';
+import {EnemyCraftContextProvider} from './enemy/EnemyCraftContext';
 import Fighter from './Fighter';
 
 import {
@@ -59,6 +61,8 @@ const Seperator = (props: SeperatorProps) => (
 const startingEnemies = [
   DualFighter,
   DualFighter,
+  DualFighter,
+  DualFighter,
   EnemyUAV,
   EnemyUAV,
   EnemyUAV,
@@ -68,9 +72,20 @@ const Arena = (): JSX.Element => {
   return (
     <View style={styles.arena}>
       <View>
-        {startingEnemies.map((Enemy, i) => (
-          <Enemy key={i} startingLeft={totalWidth * (i + 1)} />
-        ))}
+        {startingEnemies.map((Enemy, i) => {
+          const isUAV = i > 3;
+
+          return (
+            <EnemyCraftContextProvider
+              key={i}
+              craftSpeedWhenLockedOn={
+                isUAV ? craftPixelsPerSecond * 1.3 : undefined
+              }
+              startingLeft={totalWidth * (i + 1)}>
+              <Enemy />
+            </EnemyCraftContextProvider>
+          );
+        })}
       </View>
       <Fighter />
       {new Array(numColumns - 1)

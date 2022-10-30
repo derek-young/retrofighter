@@ -13,7 +13,6 @@ import {MissileAnimationProps, MissileIconProps} from './types';
 const styles = StyleSheet.create({
   missile: {
     position: 'absolute',
-    transform: [{rotate: '-45deg'}],
   },
   missileContainer: {
     position: 'absolute',
@@ -22,16 +21,15 @@ const styles = StyleSheet.create({
   },
 });
 
-const missileTopStart = missileSize / 2;
-
 const MissileIcon = ({
   hasMissileFired,
   hasMissileImpacted,
   Icon,
   missileAnim,
+  startingTop = missileSize / 2,
 }: MissileIconProps) => {
   const [hasFireAnimationEnded, setHasFireAnimationEnded] = useState(false);
-  const [missileTop, setMissileTop] = useState(missileTopStart);
+  const [missileTop, setMissileTop] = useState(startingTop);
 
   useEffect(() => {
     missileAnim.addListener(({value}: {value: number}) => setMissileTop(value));
@@ -46,16 +44,16 @@ const MissileIcon = ({
         useNativeDriver: true,
       }).start(() => setHasFireAnimationEnded(true));
     } else {
-      missileAnim.setValue(missileTopStart);
+      missileAnim.setValue(startingTop);
       setHasFireAnimationEnded(false);
     }
-  }, [hasMissileFired, missileAnim]);
+  }, [hasMissileFired, missileAnim, startingTop]);
 
   useEffect(() => {
     if (hasMissileImpacted) {
-      missileAnim.stopAnimation();
+      missileAnim.setValue(startingTop);
     }
-  }, [hasMissileImpacted, missileAnim]);
+  }, [hasMissileImpacted, missileAnim, startingTop]);
 
   if (hasFireAnimationEnded) {
     return null;
@@ -67,8 +65,8 @@ const MissileIcon = ({
 const Missile = ({
   craftRotation,
   Icon,
-  playerLeftAnim,
-  playerTopAnim,
+  leftAnim,
+  topAnim,
   missileProps,
 }: MissileAnimationProps) => {
   const [leftValue, setLeftValue] = useState(null);
@@ -76,8 +74,8 @@ const Missile = ({
   const craftRotationRef = useRef<null | number>(null);
   const leftValueRef = useRef(0);
   const topValueRef = useRef(0);
-  const left = leftValue ?? playerLeftAnim;
-  const top = topValue ?? playerTopAnim;
+  const left = leftValue ?? leftAnim;
+  const top = topValue ?? topAnim;
 
   leftValueRef.current = leftValue ?? 0;
   topValueRef.current = topValue ?? 0;
@@ -86,9 +84,9 @@ const Missile = ({
     if (missileProps.hasMissileFired) {
       craftRotationRef.current = craftRotation;
       // @ts-ignore
-      setLeftValue(playerLeftAnim._value);
+      setLeftValue(leftAnim._value);
       // @ts-ignore
-      setTopValue(playerTopAnim._value);
+      setTopValue(topAnim._value);
     } else {
       craftRotationRef.current = null;
       setLeftValue(null);
@@ -122,7 +120,7 @@ const Missile = ({
         listener({left: missileLeft, top: missileTop});
       });
     });
-  });
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <Animated.View

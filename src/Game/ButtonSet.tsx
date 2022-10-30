@@ -68,6 +68,7 @@ const styles = StyleSheet.create({
 type ActionButtonProps = {
   children: string;
   disabled: boolean;
+  hasMissileFired: boolean;
   isEliminated: boolean;
   onPress: () => void;
   onRecharge: () => void;
@@ -76,6 +77,7 @@ type ActionButtonProps = {
 const ActionButton = ({
   children,
   disabled,
+  hasMissileFired,
   isEliminated,
   onPress,
   onRecharge,
@@ -90,7 +92,7 @@ const ActionButton = ({
   }, [heightAnim, isEliminated]);
 
   useEffect(() => {
-    if (disabled) {
+    if (hasMissileFired) {
       heightAnim.setValue(0);
 
       Animated.timing(heightAnim, {
@@ -100,7 +102,7 @@ const ActionButton = ({
         useNativeDriver: false,
       }).start(onRecharge);
     }
-  }, [disabled, heightAnim, onRecharge]);
+  }, [hasMissileFired, heightAnim, onRecharge]);
 
   if (disabled) {
     return (
@@ -139,6 +141,7 @@ const ButtonSet = (): JSX.Element => {
       <View style={{...styles.section, ...styles.middle}}>
         <ActionButton
           disabled={leftMissile.hasMissileFired || isPlayerEliminated}
+          hasMissileFired={leftMissile.hasMissileFired}
           isEliminated={isPlayerEliminated}
           onRecharge={leftMissile.resetMissileState}
           onPress={() => {
@@ -151,6 +154,7 @@ const ButtonSet = (): JSX.Element => {
         </ActionButton>
         <ActionButton
           disabled={rightMissile.hasMissileFired || isPlayerEliminated}
+          hasMissileFired={rightMissile.hasMissileFired}
           isEliminated={isPlayerEliminated}
           onRecharge={rightMissile.resetMissileState}
           onPress={() => {

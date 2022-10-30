@@ -51,16 +51,16 @@ const Fighter = (): null | JSX.Element => {
         craftColor={craftColor}
         craftRotation={craftRotation}
         iconStyle={styles.missileLeft}
-        playerLeftAnim={leftAnim}
-        playerTopAnim={topAnim}
+        leftAnim={leftAnim}
+        topAnim={topAnim}
         missileProps={leftMissileProps}
       />
       <FighterMissile
         craftColor={craftColor}
         craftRotation={craftRotation}
         iconStyle={styles.missileRight}
-        playerLeftAnim={leftAnim}
-        playerTopAnim={topAnim}
+        leftAnim={leftAnim}
+        topAnim={topAnim}
         missileProps={rightMissileProps}
       />
     </>

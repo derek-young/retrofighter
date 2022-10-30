@@ -3,14 +3,14 @@ import {Animated} from 'react-native';
 
 import {missileSize} from 'Game/gameConstants';
 import {MissileProps} from 'Game/types';
-import missilePositionFactory from 'Game/missilePositionFactory';
+import MissilePosition from 'Game/missilePositionFactory';
 
 type MissileContextValue = MissileProps[];
 
 const noop = () => {};
 
-const leftMissilePosition = missilePositionFactory();
-const rightMissilePosition = missilePositionFactory();
+const leftMissilePosition = new MissilePosition();
+const rightMissilePosition = new MissilePosition();
 
 const defaultValue: MissileContextValue = [
   {
