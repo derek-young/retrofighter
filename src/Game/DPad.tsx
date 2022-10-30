@@ -1,10 +1,13 @@
-import React, {useState} from 'react';
-import {StyleSheet, TouchableOpacity, View, ViewStyle} from 'react-native';
+import React, {useRef} from 'react';
+import {StyleSheet, View} from 'react-native';
 
 import Colors from 'types/colors';
+import ChevronRight from 'icons/right-chevron.svg';
+import ChevronRightNarrow from 'icons/right-chevron-narrow.svg';
 
 import {useAnimationContext} from './Fighter/AnimationContext';
-import {leftRightPadding} from './gameConstants';
+
+const buttonSize = 40;
 
 const styles = StyleSheet.create({
   dPad: {
@@ -19,107 +22,105 @@ const styles = StyleSheet.create({
   directional: {
     display: 'flex',
     alignItems: 'center',
-    backgroundColor: Colors.GREY,
-    borderTopLeftRadius: 4,
-    borderTopRightRadius: 4,
+    justifyContent: 'center',
+    width: buttonSize,
+    height: buttonSize,
+    shadowColor: 'black',
+    shadowOffset: {width: -2, height: 0},
+    shadowOpacity: 0.4,
   },
-  arrow: {
-    height: 0,
-    width: 0,
-    borderLeftColor: 'transparent',
-    borderRightColor: 'transparent',
-    borderTopColor: 'transparent',
-    borderBottomColor: Colors.PURPLE,
+  largeChevron: {
     position: 'absolute',
-    top: 0,
+    height: buttonSize,
+    width: buttonSize,
+    left: 16,
+  },
+  mediumChevron: {
+    position: 'absolute',
+    height: 24,
+    width: 24,
+  },
+  smallChevron: {
+    position: 'absolute',
+    height: 16,
+    width: 16,
+    right: 24,
   },
 });
 
-type ArrowProps = {
-  buttonWidth: number;
-};
-
-const Arrow = ({buttonWidth}: ArrowProps): JSX.Element => {
-  const arrowStyles = {
-    ...styles.arrow,
-    borderWidth: buttonWidth / 4,
-  } as ViewStyle;
-
-  return <View style={arrowStyles} />;
-};
-
-type EmptyProps = {
-  buttonWidth: null | number;
-};
-
-const Empty = ({buttonWidth}: EmptyProps): null | JSX.Element =>
-  buttonWidth === null ? null : (
-    <View style={{width: buttonWidth, height: buttonWidth}} />
-  );
+const Empty = (): null | JSX.Element => <View style={styles.directional} />;
 
 type ButtonRotation = 0 | 90 | 180 | 270;
 
 type DirectionalProps = {
-  buttonWidth: null | number;
-  onPress: () => void;
   rotation: ButtonRotation;
 };
 
-const Directional = ({
-  buttonWidth,
-  onPress,
-  rotation,
-}: DirectionalProps): null | JSX.Element =>
-  buttonWidth === null ? null : (
-    <TouchableOpacity
-      onPress={onPress}
-      style={{
-        ...styles.directional,
-        width: buttonWidth,
-        height: buttonWidth,
-        transform: [{rotate: `${rotation}deg`}],
-      }}>
-      <Arrow buttonWidth={buttonWidth} />
-    </TouchableOpacity>
-  );
+const Directional = ({rotation}: DirectionalProps): JSX.Element => (
+  <View
+    style={{
+      ...styles.directional,
+      transform: [{rotate: `${rotation}deg`}],
+    }}>
+    <View style={styles.largeChevron}>
+      <ChevronRight fill={Colors.GREY} />
+    </View>
+    <View style={styles.mediumChevron}>
+      <ChevronRightNarrow fill={Colors.GREY} />
+    </View>
+    <View style={styles.smallChevron}>
+      <ChevronRightNarrow fill={Colors.GREY} />
+    </View>
+  </View>
+);
 
 const DPad = (): JSX.Element => {
+  const xRef = useRef(0);
+  const yRef = useRef(0);
   const {onDownPress, onUpPress, onLeftPress, onRightPress} =
     useAnimationContext();
-  const [buttonWidth, setButtonWidth] = useState<null | number>(null);
 
   return (
     <View
-      onLayout={e => {
-        const {width} = e.nativeEvent.layout;
-        setButtonWidth((width - leftRightPadding) / 3);
+      onTouchStart={e => {
+        xRef.current = e.nativeEvent.pageX;
+        yRef.current = e.nativeEvent.pageY;
       }}
-      style={{...styles.dPad, paddingRight: leftRightPadding}}>
+      onTouchEnd={e => {
+        const xDiff = e.nativeEvent.pageX - xRef.current;
+        const yDiff = e.nativeEvent.pageY - yRef.current;
+
+        if (Math.abs(xDiff) > Math.abs(yDiff)) {
+          if (xDiff > 0) {
+            onRightPress();
+          }
+          if (xDiff < 0) {
+            onLeftPress();
+          }
+        } else {
+          if (yDiff > 0) {
+            onDownPress();
+          }
+          if (yDiff < 0) {
+            onUpPress();
+          }
+        }
+      }}
+      style={styles.dPad}>
       <View style={styles.container}>
-        <Empty buttonWidth={buttonWidth} />
-        <Directional
-          buttonWidth={buttonWidth}
-          onPress={onUpPress}
-          rotation={0}
-        />
-        <Empty buttonWidth={buttonWidth} />
-        <Directional
-          buttonWidth={buttonWidth}
-          onPress={onLeftPress}
-          rotation={270}
-        />
-        <Empty buttonWidth={buttonWidth} />
-        <Directional
-          buttonWidth={buttonWidth}
-          onPress={onRightPress}
-          rotation={90}
-        />
-        <Empty buttonWidth={buttonWidth} />
-        <Directional
-          buttonWidth={buttonWidth}
-          onPress={onDownPress}
-          rotation={180}
-        />
+        <Empty />
+        <Empty />
+        <Directional rotation={270} />
+        <Empty />
+        <Empty />
+        <Empty />
+        <Directional rotation={180} />
+        <Empty />
+        <Directional rotation={0} />
+        <Empty />
+        <Empty />
+        <Empty />
+        <Directional rotation={90} />
       </View>
     </View>
   );

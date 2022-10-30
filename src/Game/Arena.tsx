@@ -10,6 +10,7 @@ import {
   arenaSize,
   numColumns,
   seperatorWidth,
+  totalWidth,
 } from './gameConstants';
 
 const styles = StyleSheet.create({
@@ -68,7 +69,7 @@ const Arena = (): JSX.Element => {
     <View style={styles.arena}>
       <View>
         {startingEnemies.map((Enemy, i) => (
-          <Enemy key={i} startingLeft={33.7 * (i + 1)} />
+          <Enemy key={i} startingLeft={totalWidth * (i + 1)} />
         ))}
       </View>
       <Fighter />

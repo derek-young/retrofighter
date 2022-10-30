@@ -11,7 +11,6 @@ import DPad from './DPad';
 import {AnimationProvider} from './Fighter/AnimationContext';
 import {EliminationProvider} from './Fighter/EliminationContext';
 import {MissileProvider} from './Fighter/MissileContext';
-import {leftRightPadding} from './gameConstants';
 
 type GameRouteParam = RouteProp<RootStackParamList, 'Game'>;
 
@@ -23,8 +22,7 @@ const styles = StyleSheet.create({
   game: {
     flex: 1,
     flexDirection: 'row',
-    paddingLeft: leftRightPadding,
-    paddingRight: leftRightPadding,
+    justifyContent: 'center',
   },
   backdrop: {
     flex: 1,

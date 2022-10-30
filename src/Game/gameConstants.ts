@@ -2,12 +2,10 @@ import {Dimensions} from 'react-native';
 
 import {Facing} from './types';
 
-export const leftRightPadding = 48;
-
 export const craftSize = 20;
+export const seperatorWidth = 16;
 export const missileSize = craftSize * 0.6;
-export const alleyWidth = craftSize + 2; // Column height/width
-export const numColumns = 12;
+export const numColumns = 10;
 export const craftPixelsPerSecond = 60; // Craft speed
 export const missileSpeed = craftPixelsPerSecond * 2;
 
@@ -20,7 +18,8 @@ export const maxScreenSize = Math.max(
   Dimensions.get('window').height,
 );
 export const missileDuration = (maxScreenSize / missileSpeed) * 1000;
-export const seperatorWidth = (arenaSize - numColumns * alleyWidth) / 11;
+export const alleyWidth =
+  (arenaSize - (numColumns - 1) * seperatorWidth) / numColumns;
 export const maxTop = arenaSize - 22;
 export const minTop = 0;
 export const maxLeft = arenaSize - 22;
