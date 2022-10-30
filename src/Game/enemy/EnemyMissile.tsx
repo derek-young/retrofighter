@@ -3,7 +3,7 @@ import {Animated} from 'react-native';
 
 import Colors from 'types/colors';
 import {DEFAULT_FACING_ROTATION} from 'Game/Craft';
-import {missileSize} from 'Game/gameConstants';
+import {missileDuration, missileSize} from 'Game/gameConstants';
 import MissilePosition from 'Game/missilePositionFactory';
 import Missile from 'Game/Missile';
 import EnemyMissileIcon from 'icons/skull.svg';
@@ -16,19 +16,30 @@ interface EnemyMissileProps {
   craftColor?: string;
 }
 
-const EnemyMissile = ({craftColor = Colors.RED}: EnemyMissileProps) => {
-  const {craftRotation, facing, isPlayerInLineOfSight, leftAnim, topAnim} =
-    useEnemyCraftContext();
+const EnemyMissile = ({
+  craftColor = Colors.RED,
+}: EnemyMissileProps): null | JSX.Element => {
+  const {
+    craftRotation,
+    facing,
+    isEliminated,
+    isPlayerInLineOfSight,
+    leftAnim,
+    topAnim,
+  } = useEnemyCraftContext();
   const [hasMissileFired, setHasMissileFired] = useState(false);
   const [hasMissileImpacted, setHasMissileImpacted] = useState(false);
   const missileAnim = useRef(new Animated.Value(6)).current;
 
-  const onFireMissile = useCallback(() => setHasMissileFired(true), []);
-  const onMissileImpact = useCallback(() => setHasMissileImpacted(true), []);
   const resetMissileState = useCallback(() => {
     setHasMissileFired(false);
     setHasMissileImpacted(false);
   }, []);
+  const onFireMissile = useCallback(() => {
+    setHasMissileFired(true);
+    setTimeout(() => resetMissileState(), missileDuration);
+  }, [resetMissileState]);
+  const onMissileImpact = useCallback(() => setHasMissileImpacted(true), []);
 
   useEffect(() => {
     if (
@@ -38,6 +49,10 @@ const EnemyMissile = ({craftColor = Colors.RED}: EnemyMissileProps) => {
       onFireMissile();
     }
   }, [craftRotation, facing, isPlayerInLineOfSight, onFireMissile]);
+
+  if (isEliminated && !hasMissileFired) {
+    return null;
+  }
 
   return (
     <Missile
