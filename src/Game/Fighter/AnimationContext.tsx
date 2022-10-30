@@ -9,7 +9,6 @@ import React, {
 import {Animated} from 'react-native';
 
 import {
-  alleyWidth,
   defaultPlayerFacing,
   maxLeft,
   minLeft,
@@ -17,7 +16,7 @@ import {
   minTop,
   playerStartLeft,
   playerStartTop,
-  seperatorWidth,
+  totalWidth,
 } from '../gameConstants';
 import {Facing} from '../types';
 import {animateCraft, getNextAlley} from '../utils';
@@ -102,8 +101,7 @@ export const AnimationProvider = ({children}: {children: React.ReactNode}) => {
 
   const interceptVerticalAnimation = useCallback(
     (callback: () => void) => {
-      const nextRowPosition =
-        nextRowRef.current * (alleyWidth + seperatorWidth) + 1;
+      const nextRowPosition = nextRowRef.current * totalWidth + 1;
 
       animateCraft({
         animation: topAnim,
@@ -117,8 +115,7 @@ export const AnimationProvider = ({children}: {children: React.ReactNode}) => {
 
   const interceptHorizontalAnimation = useCallback(
     (callback: () => void) => {
-      const nextColPosition =
-        nextColRef.current * (alleyWidth + seperatorWidth) + 1;
+      const nextColPosition = nextColRef.current * totalWidth + 1;
 
       animateCraft({
         animation: leftAnim,

@@ -1,7 +1,7 @@
 import {Animated, Easing} from 'react-native';
 
 import {Facing} from './types';
-import {craftPixelsPerSecond, totalWidth} from './gameConstants';
+import {craftPixelsPerSecond, numColumns, totalWidth} from './gameConstants';
 
 export function animateCraft({
   animation,
@@ -38,8 +38,8 @@ export function getNextAlley(position: number, direction: Facing) {
   const nextAlley = position / totalWidth;
 
   if (direction === 'N' || direction === 'W') {
-    return Math.floor(nextAlley);
+    return Math.min(numColumns - 1, Math.floor(nextAlley));
   }
 
-  return Math.ceil(nextAlley);
+  return Math.min(numColumns - 1, Math.ceil(nextAlley));
 }
