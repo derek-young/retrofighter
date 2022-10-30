@@ -77,12 +77,22 @@ const Directional = ({rotation}: DirectionalProps): JSX.Element => (
 const DPad = (): JSX.Element => {
   const xRef = useRef(0);
   const yRef = useRef(0);
-  const {onDownPress, onUpPress, onLeftPress, onRightPress} =
-    useAnimationContext();
+  const {
+    hasPlayerMoved,
+    setHasPlayerMoved,
+    onDownPress,
+    onUpPress,
+    onLeftPress,
+    onRightPress,
+  } = useAnimationContext();
 
   return (
     <View
       onTouchStart={e => {
+        if (!hasPlayerMoved) {
+          setHasPlayerMoved(true);
+        }
+
         xRef.current = e.nativeEvent.pageX;
         yRef.current = e.nativeEvent.pageY;
       }}

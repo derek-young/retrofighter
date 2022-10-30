@@ -103,89 +103,91 @@ export const AnimationProvider = ({children}: {children: React.ReactNode}) => {
     (callback: () => void) => {
       const nextRowPosition = nextRowRef.current * totalWidth + 1;
 
+      leftAnim.stopAnimation();
+
       animateCraft({
         animation: topAnim,
-        callback,
+        callback: ({finished}) => {
+          if (finished) {
+            callback();
+          }
+        },
         pixelsToMove: Math.abs(nextRowPosition - topRef.current) + 1,
         toValue: nextRowPosition,
       });
     },
-    [topAnim],
+    [leftAnim, topAnim],
   );
 
   const interceptHorizontalAnimation = useCallback(
     (callback: () => void) => {
       const nextColPosition = nextColRef.current * totalWidth + 1;
 
+      topAnim.stopAnimation();
+
       animateCraft({
         animation: leftAnim,
-        callback,
+        callback: ({finished}) => {
+          if (finished) {
+            callback();
+          }
+        },
         pixelsToMove: Math.abs(nextColPosition - leftRef.current),
         toValue: nextColPosition,
       });
     },
-    [leftAnim],
+    [leftAnim, topAnim],
   );
 
   const onVerticalMove = useCallback(
     (onMove: () => void) => {
-      if (!hasPlayerMoved) {
-        setHasPlayerMoved(true);
-      }
       if (facingRef.current === 'E' || facingRef.current === 'W') {
         interceptHorizontalAnimation(onMove);
       } else {
         onMove();
       }
     },
-    [hasPlayerMoved, interceptHorizontalAnimation],
+    [interceptHorizontalAnimation],
   );
 
   const onHorizontalMove = useCallback(
     (onMove: () => void) => {
-      if (!hasPlayerMoved) {
-        setHasPlayerMoved(true);
-      }
       if (facingRef.current === 'N' || facingRef.current === 'S') {
         interceptVerticalAnimation(onMove);
       } else {
         onMove();
       }
     },
-    [hasPlayerMoved, interceptVerticalAnimation],
+    [interceptVerticalAnimation],
   );
 
   const onMoveDown = useCallback(() => {
     const pixelsToMove = maxTop - topRef.current;
 
-    leftAnim.stopAnimation();
     animateCraft({animation: topAnim, pixelsToMove, toValue: maxTop});
     setFacing('S');
-  }, [leftAnim, topAnim]);
+  }, [topAnim]);
 
   const onMoveUp = useCallback(() => {
     const pixelsToMove = topRef.current;
 
-    leftAnim.stopAnimation();
     animateCraft({animation: topAnim, pixelsToMove, toValue: minTop});
     setFacing('N');
-  }, [leftAnim, topAnim]);
+  }, [topAnim]);
 
   const onMoveLeft = useCallback(() => {
     const pixelsToMove = leftRef.current;
 
-    topAnim.stopAnimation();
     animateCraft({animation: leftAnim, pixelsToMove, toValue: minLeft});
     setFacing('W');
-  }, [leftAnim, topAnim]);
+  }, [leftAnim]);
 
   const onMoveRight = useCallback(() => {
     const pixelsToMove = maxLeft - leftRef.current;
 
-    topAnim.stopAnimation();
     animateCraft({animation: leftAnim, pixelsToMove, toValue: maxLeft});
     setFacing('E');
-  }, [leftAnim, topAnim]);
+  }, [leftAnim]);
 
   const onDownPress = useCallback(
     () => onVerticalMove(onMoveDown),
