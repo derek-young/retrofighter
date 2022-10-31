@@ -49,8 +49,8 @@ const Game = ({route}: GameProps): null | JSX.Element => {
       source={backgroundImage}
       style={styles.backdrop}>
       <AnimationProvider>
-        <MissileProvider>
-          <EliminationProvider>
+        <EliminationProvider>
+          <MissileProvider>
             <View style={styles.game}>
               <DPad />
               <Arena />
@@ -67,8 +67,8 @@ const Game = ({route}: GameProps): null | JSX.Element => {
                 <Text style={{color: 'red'}}>v.1.1</Text>
               </View>
             </View>
-          </EliminationProvider>
-        </MissileProvider>
+          </MissileProvider>
+        </EliminationProvider>
       </AnimationProvider>
     </ImageBackground>
   );

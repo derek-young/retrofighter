@@ -95,6 +95,14 @@ const Missile = ({
   }, [missileProps.hasMissileFired]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
+    if (missileProps.hasMissileImpacted) {
+      craftRotationRef.current = null;
+      setLeftValue(null);
+      setTopValue(null);
+    }
+  }, [missileProps.hasMissileImpacted]);
+
+  useEffect(() => {
     missileProps.missileAnim.addListener(({value}: {value: number}) => {
       const listeners = missileProps.missilePosition.getListeners();
 
@@ -120,6 +128,8 @@ const Missile = ({
         listener({left: missileLeft, top: missileTop});
       });
     });
+
+    return () => missileProps.missileAnim.removeAllListeners();
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (

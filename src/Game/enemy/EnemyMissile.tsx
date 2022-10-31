@@ -10,8 +10,6 @@ import EnemyMissileIcon from 'icons/skull.svg';
 
 import {useEnemyCraftContext} from './EnemyCraftContext';
 
-const missilePosition = new MissilePosition();
-
 interface EnemyMissileProps {
   craftColor?: string;
 }
@@ -30,6 +28,7 @@ const EnemyMissile = ({
   const [hasMissileFired, setHasMissileFired] = useState(false);
   const [hasMissileImpacted, setHasMissileImpacted] = useState(false);
   const missileAnim = useRef(new Animated.Value(6)).current;
+  const missilePosition = useRef(new MissilePosition()).current;
 
   const resetMissileState = useCallback(() => {
     setHasMissileFired(false);

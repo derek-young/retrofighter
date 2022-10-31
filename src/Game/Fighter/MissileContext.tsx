@@ -9,15 +9,12 @@ type MissileContextValue = MissileProps[];
 
 const noop = () => {};
 
-const leftMissilePosition = new MissilePosition();
-const rightMissilePosition = new MissilePosition();
-
 const defaultValue: MissileContextValue = [
   {
     hasMissileFired: false,
     hasMissileImpacted: false,
     missileAnim: new Animated.Value(missileSize / 2),
-    missilePosition: leftMissilePosition,
+    missilePosition: new MissilePosition(),
     onFireMissile: noop,
     onMissileImpact: noop,
     resetMissileState: noop,
@@ -35,6 +32,8 @@ export const MissileProvider = ({children}: {children: React.ReactNode}) => {
   const [hasRightMissileImpacted, setHasRightMissileImpacted] = useState(false);
   const leftMissileAnim = useRef(new Animated.Value(missileSize / 2)).current;
   const rightMissileAnim = useRef(new Animated.Value(missileSize / 2)).current;
+  const leftMissilePosition = useRef(new MissilePosition()).current;
+  const rightMissilePosition = useRef(new MissilePosition()).current;
 
   const onFireLeftMissile = useCallback(() => setHasLeftMissileFired(true), []);
   const onFireRightMissile = useCallback(

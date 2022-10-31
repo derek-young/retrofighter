@@ -4,6 +4,7 @@ import Colors from 'types/colors';
 
 import {DualFighter, EnemyUAV} from './enemy';
 import Fighter from './Fighter';
+import {useEliminationContext} from './Fighter/EliminationContext';
 
 import {
   alleyWidth,
@@ -67,6 +68,8 @@ const startingEnemies = [
 ];
 
 const Arena = (): JSX.Element => {
+  const {remainingLives} = useEliminationContext();
+
   return (
     <View style={styles.arena}>
       <View>
@@ -74,7 +77,7 @@ const Arena = (): JSX.Element => {
           <Enemy key={i} startingLeft={totalWidth * (i + 1)} />
         ))}
       </View>
-      <Fighter />
+      <Fighter key={remainingLives} />
       {new Array(numColumns - 1)
         .fill(0)
         .map((y, i) =>
