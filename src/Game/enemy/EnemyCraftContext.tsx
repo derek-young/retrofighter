@@ -3,6 +3,7 @@ import {Animated} from 'react-native';
 
 import {Facing} from 'Game/types';
 import {useAnimationContext} from 'Game/Fighter/AnimationContext';
+import {useMissileContext} from 'Game/Fighter/MissileContext';
 
 import useCollisionDetector from './useCollisionDetector';
 import useMissileImpactDetector from './useMissileImpactDetector';
@@ -58,6 +59,7 @@ export const EnemyCraftContextProvider = ({
   startingLeft = 0,
 }: EnemyCraftContextProviderProps) => {
   const {hasPlayerMoved} = useAnimationContext();
+  const playerMissiles = useMissileContext();
   const [hasInitialized, setHasInitialized] = useState(false);
   const [isEliminated, setIsEliminated] = useState(false);
   const [hasEliminationAnimationEnded, setHasEliminationAnimationEnded] =
@@ -82,6 +84,7 @@ export const EnemyCraftContextProvider = ({
     isEliminated,
     leftAnim,
     topAnim,
+    missiles: playerMissiles,
     startingLeft,
     startingTop,
     setIsEliminated,

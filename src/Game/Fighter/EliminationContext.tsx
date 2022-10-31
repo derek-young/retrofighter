@@ -3,7 +3,7 @@ import React, {useCallback, useContext, useState} from 'react';
 import {useAnimationContext} from './AnimationContext';
 
 type EliminationContextValue = {
-  handleIsPlayerEliminated: () => void;
+  onIsPlayerEliminated: () => void;
   hasEliminationAnimationEnded: boolean;
   isPlayerEliminated: boolean;
   onEliminationEnd: () => void;
@@ -15,7 +15,7 @@ type EliminationContextValue = {
 const noop = () => {};
 
 const defaultValue: EliminationContextValue = {
-  handleIsPlayerEliminated: noop,
+  onIsPlayerEliminated: noop,
   hasEliminationAnimationEnded: false,
   isPlayerEliminated: false,
   onEliminationEnd: noop,
@@ -39,7 +39,7 @@ export const EliminationProvider = ({
     useState(false);
   const [remainingLives, setRemainingLives] = useState(3);
 
-  const handleIsPlayerEliminated = useCallback(() => {
+  const onIsPlayerEliminated = useCallback(() => {
     setIsPlayerEliminated(true);
   }, []);
 
@@ -64,7 +64,7 @@ export const EliminationProvider = ({
     <EliminationContext.Provider
       children={children}
       value={{
-        handleIsPlayerEliminated,
+        onIsPlayerEliminated,
         hasEliminationAnimationEnded,
         isPlayerEliminated,
         onEliminationEnd,

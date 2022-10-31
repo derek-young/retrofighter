@@ -29,13 +29,6 @@ function controlledAnimation({
     playerLeft,
   );
 
-  console.log({
-    name: 'Controlled Amination',
-    nextFacing,
-    nextAlleyPosition,
-    alley: nextAlleyPosition / totalWidth,
-  });
-
   return {
     nextFacing,
     toValue: nextAlleyPosition,

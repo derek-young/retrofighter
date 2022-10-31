@@ -51,8 +51,7 @@ function useCollisionDetector({
   setIsEliminated,
 }: CollisionDetectorProps) {
   const {leftRef: playerLeftRef, topRef: playerTopRef} = useAnimationContext();
-  const {handleIsPlayerEliminated, isPlayerEliminated} =
-    useEliminationContext();
+  const {onIsPlayerEliminated, isPlayerEliminated} = useEliminationContext();
   const leftRef = useRef<number>(startingLeft);
   const topRef = useRef<number>(startingTop);
   const checkCraftOverlapRef = useRef(() => {});
@@ -80,10 +79,10 @@ function useCollisionDetector({
       playerLeftRef.current,
     );
     if (hasOverlap) {
-      handleIsPlayerEliminated();
+      onIsPlayerEliminated();
       setIsEliminated(true);
     }
-  }, [handleIsPlayerEliminated, playerLeftRef, playerTopRef, setIsEliminated]);
+  }, [onIsPlayerEliminated, playerLeftRef, playerTopRef, setIsEliminated]);
 
   checkCraftOverlapRef.current = checkCraftOverlap;
 

@@ -86,14 +86,6 @@ function randomAnimation({
 
   const nextAlleyPosition = getRandomAlleyPosition(nextFacing, top, left);
 
-  console.log({
-    name: 'Random Amination',
-    detectedFacing,
-    nextFacing,
-    nextAlleyPosition,
-    alley: nextAlleyPosition / totalWidth,
-  });
-
   return {
     nextFacing,
     toValue: nextAlleyPosition,

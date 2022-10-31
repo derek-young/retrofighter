@@ -65,6 +65,7 @@ const startingEnemies = [
   EnemyUAV,
   EnemyUAV,
   EnemyUAV,
+  EnemyUAV,
 ];
 
 const Arena = (): JSX.Element => {

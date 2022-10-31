@@ -138,11 +138,6 @@ function useEnemyCraftAnimation({
         toValue: nextPosition,
       };
 
-      console.log({
-        name: 'Direct',
-        ...nextAnimation,
-      });
-
       detectedPlayerPositionRef.current = null;
     } else if (detectedPlayerFacingRef.current) {
       console.log('moving to last player detected facing');

@@ -1,7 +1,7 @@
 import {useCallback, useEffect, useRef} from 'react';
 import {Animated} from 'react-native';
 
-import {useMissileContext} from 'Game/Fighter/MissileContext';
+import {MissileProps} from 'Game/types';
 import {craftSize} from 'Game/gameConstants';
 
 type MissileImpactChecker = (
@@ -16,6 +16,7 @@ interface MissileImpactDetectorProps {
   isEliminated: boolean;
   leftAnim: Animated.Value;
   topAnim: Animated.Value;
+  missiles: MissileProps[];
   startingLeft: number;
   startingTop: number;
   setIsEliminated: (isEliminated: boolean) => void;
@@ -25,11 +26,11 @@ function useMissileImpactDetector({
   isEliminated,
   leftAnim,
   topAnim,
+  missiles,
   startingLeft,
   startingTop,
   setIsEliminated,
 }: MissileImpactDetectorProps) {
-  const playerMissiles = useMissileContext();
   const leftRef = useRef<number>(startingLeft);
   const topRef = useRef<number>(startingTop);
   const checkMissileImpactRef = useRef<null | MissileImpactChecker>(null);
@@ -40,6 +41,12 @@ function useMissileImpactDetector({
   const checkMissileImpact = useCallback<MissileImpactChecker>(
     (position, onMissileImpact) => {
       const {missileLeft, missileTop} = position;
+
+      // console.log('checking if missile has impacted');
+      // console.log('missileLeft', missileLeft);
+      // console.log('missileTop', missileTop);
+      // console.log('playerLeft', leftRef.current);
+      // console.log('playerTop', topRef.current);
 
       if (
         missileLeft >= leftRef.current &&
@@ -64,7 +71,7 @@ function useMissileImpactDetector({
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
-    playerMissiles.forEach(({missilePosition, onMissileImpact}) => {
+    missiles.forEach(({missilePosition, onMissileImpact}) => {
       missilePosition.addListener(({left, top}) => {
         if (isEliminatedRef.current) {
           return;
