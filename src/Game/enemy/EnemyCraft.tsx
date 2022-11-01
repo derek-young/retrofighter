@@ -20,14 +20,9 @@ const EnemyCraft = ({
     isEliminated,
     leftAnim,
     topAnim,
-    hasEliminationAnimationEnded,
-    setHasEliminationAnimationEnded,
+    onEliminationAnimationEnd,
     onRotationChange,
   } = useEnemyCraftContext();
-
-  if (hasEliminationAnimationEnded) {
-    return null;
-  }
 
   return (
     <Craft
@@ -37,7 +32,7 @@ const EnemyCraft = ({
       fill={craftColor}
       left={leftAnim}
       top={topAnim}
-      onEliminationEnd={() => setHasEliminationAnimationEnded(true)}
+      onEliminationEnd={onEliminationAnimationEnd}
       rotationListener={onRotationChange}
     />
   );

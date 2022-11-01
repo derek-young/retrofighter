@@ -7,6 +7,9 @@ import {EnemyCraftContextProvider} from './EnemyCraftContext';
 import EnemyCraft from './EnemyCraft';
 
 interface EnemyUAVProps {
+  isEliminated: boolean;
+  onEliminationAnimationEnd: () => void;
+  onIsEliminated: () => void;
   startingLeft?: number;
   startingTop?: number;
 }

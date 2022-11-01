@@ -2,8 +2,8 @@ import React from 'react';
 import {StyleSheet, View} from 'react-native';
 import Colors from 'types/colors';
 
-import {DualFighter, EnemyUAV} from './enemy';
 import Fighter from './Fighter';
+import {useEnemyFactoryContext} from './enemy/EnemyFactoryContext';
 import {useEliminationContext} from './Fighter/EliminationContext';
 
 import {
@@ -57,26 +57,24 @@ const Seperator = (props: SeperatorProps) => (
   </View>
 );
 
-const startingEnemies = [
-  DualFighter,
-  DualFighter,
-  DualFighter,
-  DualFighter,
-  EnemyUAV,
-  EnemyUAV,
-  EnemyUAV,
-  EnemyUAV,
-];
-
 const Arena = (): JSX.Element => {
+  const enemies = useEnemyFactoryContext();
   const {remainingLives} = useEliminationContext();
 
   return (
     <View style={styles.arena}>
       <View>
-        {startingEnemies.map((Enemy, i) => (
-          <Enemy key={i} startingLeft={totalWidth * (i + 1)} />
-        ))}
+        {enemies.map(
+          ({key, Enemy, hasEliminationAnimationEnded, ...rest}, i) => {
+            if (rest.isEliminated && hasEliminationAnimationEnded) {
+              return null;
+            }
+
+            return (
+              <Enemy key={key} startingLeft={totalWidth * (i + 1)} {...rest} />
+            );
+          },
+        )}
       </View>
       <Fighter key={remainingLives} />
       {new Array(numColumns - 1)

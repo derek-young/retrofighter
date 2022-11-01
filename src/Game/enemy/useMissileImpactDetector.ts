@@ -13,40 +13,34 @@ type MissileImpactChecker = (
 ) => void;
 
 interface MissileImpactDetectorProps {
-  isEliminated: boolean;
+  isTargetable?: boolean;
   leftAnim: Animated.Value;
   topAnim: Animated.Value;
   missiles: MissileProps[];
   startingLeft: number;
   startingTop: number;
-  setIsEliminated: (isEliminated: boolean) => void;
+  onIsEliminated: () => void;
 }
 
 function useMissileImpactDetector({
-  isEliminated,
+  isTargetable = true,
   leftAnim,
   topAnim,
   missiles,
   startingLeft,
   startingTop,
-  setIsEliminated,
+  onIsEliminated,
 }: MissileImpactDetectorProps) {
   const leftRef = useRef<number>(startingLeft);
   const topRef = useRef<number>(startingTop);
   const checkMissileImpactRef = useRef<null | MissileImpactChecker>(null);
-  const isEliminatedRef = useRef(isEliminated);
+  const isTargetableRef = useRef(isTargetable);
 
-  isEliminatedRef.current = isEliminated;
+  isTargetableRef.current = isTargetable;
 
   const checkMissileImpact = useCallback<MissileImpactChecker>(
     (position, onMissileImpact) => {
       const {missileLeft, missileTop} = position;
-
-      // console.log('checking if missile has impacted');
-      // console.log('missileLeft', missileLeft);
-      // console.log('missileTop', missileTop);
-      // console.log('playerLeft', leftRef.current);
-      // console.log('playerTop', topRef.current);
 
       if (
         missileLeft >= leftRef.current &&
@@ -54,11 +48,11 @@ function useMissileImpactDetector({
         missileTop >= topRef.current &&
         missileTop <= topRef.current + craftSize
       ) {
-        setIsEliminated(true);
+        onIsEliminated();
         onMissileImpact();
       }
     },
-    [setIsEliminated],
+    [onIsEliminated],
   );
 
   checkMissileImpactRef.current = checkMissileImpact;
@@ -73,7 +67,7 @@ function useMissileImpactDetector({
   useEffect(() => {
     missiles.forEach(({missilePosition, onMissileImpact}) => {
       missilePosition.addListener(({left, top}) => {
-        if (isEliminatedRef.current) {
+        if (!isTargetableRef.current) {
           return;
         }
 

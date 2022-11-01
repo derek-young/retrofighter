@@ -17,7 +17,7 @@ import usePlayerTracking from './usePlayerTracking';
 type CraftAnimationProps = {
   craftSpeedWhenLockedOn?: number;
   defaultFacing: Facing;
-  hasEliminationAnimationEnded: boolean;
+  isEliminated: boolean;
   startingTop: number;
   startingLeft: number;
 };
@@ -25,7 +25,7 @@ type CraftAnimationProps = {
 function useEnemyCraftAnimation({
   craftSpeedWhenLockedOn,
   defaultFacing,
-  hasEliminationAnimationEnded,
+  isEliminated,
   startingLeft,
   startingTop,
 }: CraftAnimationProps) {
@@ -60,20 +60,18 @@ function useEnemyCraftAnimation({
     );
 
   facingRef.current = facing;
-  isEliminatedRef.current = hasEliminationAnimationEnded;
+  isEliminatedRef.current = isEliminated;
   isPlayerInLineOfSightRef.current = isPlayerInLineOfSight;
 
   useEffect(() => {
     leftAnim.addListener(({value}) => (leftRef.current = value));
     topAnim.addListener(({value}) => (topRef.current = value));
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  useEffect(() => {
-    if (hasEliminationAnimationEnded) {
-      leftAnim.stopAnimation();
-      topAnim.stopAnimation();
-    }
-  }, [hasEliminationAnimationEnded]); // eslint-disable-line react-hooks/exhaustive-deps
+    () => {
+      leftAnim.removeAllListeners();
+      topAnim.removeAllListeners();
+    };
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     if (isPlayerInLineOfSight) {

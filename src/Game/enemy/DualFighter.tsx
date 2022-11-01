@@ -7,6 +7,9 @@ import EnemyCraft from './EnemyCraft';
 import EnemyMissile from './EnemyMissile';
 
 interface DualFighterProps {
+  isEliminated: boolean;
+  onEliminationAnimationEnd: () => void;
+  onIsEliminated: () => void;
   startingLeft?: number;
   startingTop?: number;
 }

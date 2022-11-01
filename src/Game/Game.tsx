@@ -11,6 +11,7 @@ import DPad from './DPad';
 import {AnimationProvider} from './Fighter/AnimationContext';
 import {EliminationProvider} from './Fighter/EliminationContext';
 import {MissileProvider} from './Fighter/MissileContext';
+import {EnemyFactoryProvider} from './enemy/EnemyFactoryContext';
 
 type GameRouteParam = RouteProp<RootStackParamList, 'Game'>;
 
@@ -40,8 +41,7 @@ const styles = StyleSheet.create({
 
 const Game = ({route}: GameProps): null | JSX.Element => {
   const [uniqueKey, setUniqueKey] = useState(Date.now());
-  const epic = route?.params?.epic;
-  console.log('epic', epic);
+  const epic = route?.params?.epic ?? 1;
 
   return (
     <ImageBackground
@@ -51,22 +51,24 @@ const Game = ({route}: GameProps): null | JSX.Element => {
       <AnimationProvider>
         <EliminationProvider>
           <MissileProvider>
-            <View style={styles.game}>
-              <DPad />
-              <Arena />
-              <ButtonSet />
-              <View style={styles.resetButton}>
-                <Button
-                  onPress={() => {
-                    setUniqueKey(Date.now());
-                  }}
-                  title="Reset"
-                />
+            <EnemyFactoryProvider epic={epic}>
+              <View style={styles.game}>
+                <DPad />
+                <Arena />
+                <ButtonSet />
+                <View style={styles.resetButton}>
+                  <Button
+                    onPress={() => {
+                      setUniqueKey(Date.now());
+                    }}
+                    title="Reset"
+                  />
+                </View>
+                <View style={styles.version}>
+                  <Text style={{color: 'red'}}>v.1.2</Text>
+                </View>
               </View>
-              <View style={styles.version}>
-                <Text style={{color: 'red'}}>v.1.1</Text>
-              </View>
-            </View>
+            </EnemyFactoryProvider>
           </MissileProvider>
         </EliminationProvider>
       </AnimationProvider>

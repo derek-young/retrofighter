@@ -3,6 +3,7 @@ import {Animated} from 'react-native';
 
 import Colors from 'types/colors';
 import {DEFAULT_FACING_ROTATION} from 'Game/Craft';
+import {MissileProps} from 'Game/types';
 import {
   missileDuration,
   missileSize,
@@ -22,28 +23,29 @@ interface EnemyMissileProps {
   craftColor?: string;
 }
 
+const enemyMissileStartingTop = 6;
+
 const EnemyMissile = ({
   craftColor = Colors.RED,
 }: EnemyMissileProps): null | JSX.Element => {
-  const {leftAnim: playerLeftAnim, topAnim: playerTopAnim} =
-    useAnimationContext();
-  const {isPlayerEliminated, onIsPlayerEliminated} = useEliminationContext();
   const {
-    craftRotation,
-    facing,
-    isEliminated,
-    isPlayerInLineOfSight,
-    leftAnim,
-    topAnim,
-  } = useEnemyCraftContext();
+    hasPlayerMoved,
+    leftAnim: playerLeftAnim,
+    topAnim: playerTopAnim,
+  } = useAnimationContext();
+  const {isPlayerEliminated, onIsPlayerEliminated} = useEliminationContext();
+  const {craftRotation, facing, isPlayerInLineOfSight, leftAnim, topAnim} =
+    useEnemyCraftContext();
   const [hasMissileFired, setHasMissileFired] = useState(false);
   const [hasMissileImpacted, setHasMissileImpacted] = useState(false);
-  const missileAnim = useRef(new Animated.Value(6)).current;
+  const missileAnim = useRef(
+    new Animated.Value(enemyMissileStartingTop),
+  ).current;
   const missilePosition = useRef(new MissilePosition()).current;
   const readyToFire = !hasMissileFired && !hasMissileImpacted;
 
   const resetMissileState = useCallback(() => {
-    missileAnim.setValue(6);
+    missileAnim.setValue(enemyMissileStartingTop);
     setHasMissileImpacted(false);
     setHasMissileFired(false);
   }, [missileAnim]);
@@ -56,7 +58,7 @@ const EnemyMissile = ({
   }, [readyToFire, resetMissileState]);
   const onMissileImpact = useCallback(() => setHasMissileImpacted(true), []);
 
-  const missileProps = {
+  const missileProps: MissileProps = {
     hasMissileFired,
     hasMissileImpacted,
     missileAnim,
@@ -64,17 +66,17 @@ const EnemyMissile = ({
     onFireMissile,
     onMissileImpact,
     resetMissileState,
-    startingTop: 6,
+    startingTop: enemyMissileStartingTop,
   };
 
   useMissileImpactDetector({
-    isEliminated: isPlayerEliminated,
+    isTargetable: !isPlayerEliminated && hasPlayerMoved,
     leftAnim: playerLeftAnim,
     topAnim: playerTopAnim,
     missiles: [missileProps],
     startingLeft: playerStartLeft,
     startingTop: playerStartTop,
-    setIsEliminated: onIsPlayerEliminated,
+    onIsEliminated: onIsPlayerEliminated,
   });
 
   useEffect(() => {
@@ -93,9 +95,7 @@ const EnemyMissile = ({
     readyToFire,
   ]);
 
-  if (isEliminated && !hasMissileFired) {
-    return null;
-  }
+  useEffect(() => () => missileAnim.removeAllListeners(), [missileAnim]);
 
   return (
     <Missile

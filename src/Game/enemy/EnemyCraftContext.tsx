@@ -13,14 +13,11 @@ interface EnemyCraftContextValue {
   craftRotation: number;
   setCraftRotation: (craftRotation: number) => void;
   facing: Facing;
-  hasEliminationAnimationEnded: boolean;
-  setHasEliminationAnimationEnded: (
-    hasEliminationAnimationEnded: boolean,
-  ) => void;
   isEliminated: boolean;
   isPlayerInLineOfSight: boolean;
   leftAnim: Animated.Value;
   topAnim: Animated.Value;
+  onEliminationAnimationEnd: () => void;
   onRotationChange: (p: {value: number}) => void;
 }
 
@@ -30,12 +27,11 @@ const defaultValue: EnemyCraftContextValue = {
   craftRotation: 0,
   setCraftRotation: noop,
   facing: 'S',
-  hasEliminationAnimationEnded: false,
-  setHasEliminationAnimationEnded: noop,
   isEliminated: false,
   isPlayerInLineOfSight: false,
   leftAnim: new Animated.Value(0),
   topAnim: new Animated.Value(0),
+  onEliminationAnimationEnd: noop,
   onRotationChange: noop,
 };
 
@@ -43,6 +39,9 @@ export interface EnemyCraftContextProviderProps {
   children: React.ReactNode;
   craftSpeedWhenLockedOn?: number;
   defaultFacing?: Facing;
+  isEliminated: boolean;
+  onEliminationAnimationEnd: () => void;
+  onIsEliminated: () => void;
   startingTop?: number;
   startingLeft?: number;
 }
@@ -55,15 +54,15 @@ export const EnemyCraftContextProvider = ({
   children,
   craftSpeedWhenLockedOn,
   defaultFacing = 'S',
+  isEliminated,
+  onEliminationAnimationEnd,
+  onIsEliminated,
   startingTop = 0,
   startingLeft = 0,
 }: EnemyCraftContextProviderProps) => {
   const {hasPlayerMoved} = useAnimationContext();
   const playerMissiles = useMissileContext();
   const [hasInitialized, setHasInitialized] = useState(false);
-  const [isEliminated, setIsEliminated] = useState(false);
-  const [hasEliminationAnimationEnded, setHasEliminationAnimationEnded] =
-    useState(false);
   const [craftRotation, setCraftRotation] = useState(0);
 
   const onRotationChange = useCallback(
@@ -75,29 +74,28 @@ export const EnemyCraftContextProvider = ({
     useEnemyCraftAnimation({
       craftSpeedWhenLockedOn,
       defaultFacing,
-      hasEliminationAnimationEnded,
+      isEliminated,
       startingLeft,
       startingTop,
     });
 
   useMissileImpactDetector({
-    isEliminated,
+    isTargetable: !isEliminated,
     leftAnim,
     topAnim,
     missiles: playerMissiles,
     startingLeft,
     startingTop,
-    setIsEliminated,
+    onIsEliminated,
   });
 
   useCollisionDetector({
-    hasPlayerMoved,
     isEliminated,
     leftAnim,
     topAnim,
     startingLeft,
     startingTop,
-    setIsEliminated,
+    onIsEliminated,
   });
 
   useEffect(() => {
@@ -114,12 +112,11 @@ export const EnemyCraftContextProvider = ({
         craftRotation,
         setCraftRotation,
         facing,
-        hasEliminationAnimationEnded,
-        setHasEliminationAnimationEnded,
         isEliminated,
         isPlayerInLineOfSight,
         leftAnim,
         topAnim,
+        onEliminationAnimationEnd,
         onRotationChange,
       }}
     />

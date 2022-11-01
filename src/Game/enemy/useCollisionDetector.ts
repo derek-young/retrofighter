@@ -32,25 +32,27 @@ function doAreasIntersect(
 }
 
 interface CollisionDetectorProps {
-  hasPlayerMoved: boolean;
   isEliminated: boolean;
   leftAnim: Animated.Value;
   topAnim: Animated.Value;
   startingLeft: number;
   startingTop: number;
-  setIsEliminated: (isEliminated: boolean) => void;
+  onIsEliminated: () => void;
 }
 
 function useCollisionDetector({
-  hasPlayerMoved,
   isEliminated,
   leftAnim,
   topAnim,
   startingLeft,
   startingTop,
-  setIsEliminated,
+  onIsEliminated,
 }: CollisionDetectorProps) {
-  const {leftRef: playerLeftRef, topRef: playerTopRef} = useAnimationContext();
+  const {
+    hasPlayerMoved,
+    leftRef: playerLeftRef,
+    topRef: playerTopRef,
+  } = useAnimationContext();
   const {onIsPlayerEliminated, isPlayerEliminated} = useEliminationContext();
   const leftRef = useRef<number>(startingLeft);
   const topRef = useRef<number>(startingTop);
@@ -80,9 +82,9 @@ function useCollisionDetector({
     );
     if (hasOverlap) {
       onIsPlayerEliminated();
-      setIsEliminated(true);
+      onIsEliminated();
     }
-  }, [onIsPlayerEliminated, playerLeftRef, playerTopRef, setIsEliminated]);
+  }, [onIsEliminated, onIsPlayerEliminated, playerLeftRef, playerTopRef]);
 
   checkCraftOverlapRef.current = checkCraftOverlap;
 
@@ -95,6 +97,11 @@ function useCollisionDetector({
       topRef.current = value;
       checkCraftOverlapRef.current();
     });
+
+    return () => {
+      leftAnim.removeAllListeners();
+      topAnim.removeAllListeners();
+    };
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 }
 
