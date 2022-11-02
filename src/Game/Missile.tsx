@@ -67,13 +67,15 @@ const Missile = ({
   Icon,
   leftAnim,
   topAnim,
+  leftOffset = 0,
+  topOffset = 0,
   missileProps,
 }: MissileAnimationProps) => {
   const [leftValue, setLeftValue] = useState(null);
   const [topValue, setTopValue] = useState(null);
   const craftRotationRef = useRef<null | number>(null);
-  const leftValueRef = useRef(0);
-  const topValueRef = useRef(0);
+  const leftValueRef = useRef(leftOffset);
+  const topValueRef = useRef(topOffset);
   const left = leftValue ?? leftAnim;
   const top = topValue ?? topAnim;
 
@@ -107,8 +109,8 @@ const Missile = ({
       const listeners = missileProps.missilePosition.getListeners();
 
       listeners.forEach(listener => {
-        let missileLeft = leftValueRef.current;
-        let missileTop = topValueRef.current;
+        let missileLeft = leftValueRef.current + leftOffset;
+        let missileTop = topValueRef.current + topOffset;
 
         switch (craftRotationRef.current) {
           case 0:

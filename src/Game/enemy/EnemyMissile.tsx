@@ -23,7 +23,8 @@ interface EnemyMissileProps {
   craftColor?: string;
 }
 
-const enemyMissileStartingTop = 6;
+const enemyMissileStartingTop = 12;
+const leftOffset = 4;
 
 const EnemyMissile = ({
   craftColor = Colors.RED,
@@ -105,11 +106,12 @@ const EnemyMissile = ({
           fill={craftColor}
           height={missileSize}
           width={missileSize}
-          style={{...style, left: 4}}
+          style={{...style, left: leftOffset}}
         />
       )}
       leftAnim={leftAnim}
       topAnim={topAnim}
+      leftOffset={leftOffset + 4}
       missileProps={missileProps}
     />
   );

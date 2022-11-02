@@ -32,5 +32,7 @@ export interface MissileAnimationProps {
   Icon: React.ElementType;
   leftAnim: Animated.Value;
   topAnim: Animated.Value;
+  leftOffset?: number;
+  topOffset?: number;
   missileProps: MissileProps;
 }

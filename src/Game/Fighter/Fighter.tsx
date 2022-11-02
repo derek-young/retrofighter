@@ -53,6 +53,7 @@ const Fighter = (): null | JSX.Element => {
         iconStyle={styles.missileLeft}
         leftAnim={leftAnim}
         topAnim={topAnim}
+        leftOffset={4}
         missileProps={leftMissileProps}
       />
       <FighterMissile
@@ -61,6 +62,7 @@ const Fighter = (): null | JSX.Element => {
         iconStyle={styles.missileRight}
         leftAnim={leftAnim}
         topAnim={topAnim}
+        leftOffset={18}
         missileProps={rightMissileProps}
       />
     </>

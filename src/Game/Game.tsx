@@ -65,7 +65,7 @@ const Game = ({route}: GameProps): null | JSX.Element => {
                   />
                 </View>
                 <View style={styles.version}>
-                  <Text style={{color: 'red'}}>v.1.2</Text>
+                  <Text style={{color: 'red'}}>v.1.3</Text>
                 </View>
               </View>
             </EnemyFactoryProvider>
