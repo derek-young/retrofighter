@@ -74,7 +74,7 @@ const EnemyMissile = ({
     isTargetable: !isPlayerEliminated && hasPlayerMoved,
     leftAnim: playerLeftAnim,
     topAnim: playerTopAnim,
-    missiles: [missileProps],
+    missile: missileProps,
     startingLeft: playerStartLeft,
     startingTop: playerStartTop,
     onIsEliminated: onIsPlayerEliminated,
@@ -101,6 +101,7 @@ const EnemyMissile = ({
   return (
     <Missile
       craftRotation={craftRotation}
+      facing={facing}
       Icon={({style}) => (
         <EnemyMissileIcon
           fill={craftColor}
@@ -111,8 +112,8 @@ const EnemyMissile = ({
       )}
       leftAnim={leftAnim}
       topAnim={topAnim}
-      leftOffset={leftOffset + 4}
       missileProps={missileProps}
+      positionOffset={leftOffset + 4}
     />
   );
 };

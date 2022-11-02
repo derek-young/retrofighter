@@ -83,7 +83,17 @@ export const EnemyCraftContextProvider = ({
     isTargetable: !isEliminated,
     leftAnim,
     topAnim,
-    missiles: playerMissiles,
+    missile: playerMissiles[0],
+    startingLeft,
+    startingTop,
+    onIsEliminated,
+  });
+
+  useMissileImpactDetector({
+    isTargetable: !isEliminated,
+    leftAnim,
+    topAnim,
+    missile: playerMissiles[1],
     startingLeft,
     startingTop,
     onIsEliminated,

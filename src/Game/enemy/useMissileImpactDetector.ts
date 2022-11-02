@@ -16,7 +16,7 @@ interface MissileImpactDetectorProps {
   isTargetable?: boolean;
   leftAnim: Animated.Value;
   topAnim: Animated.Value;
-  missiles: MissileProps[];
+  missile: MissileProps;
   startingLeft: number;
   startingTop: number;
   onIsEliminated: () => void;
@@ -26,7 +26,7 @@ function useMissileImpactDetector({
   isTargetable = true,
   leftAnim,
   topAnim,
-  missiles,
+  missile,
   startingLeft,
   startingTop,
   onIsEliminated,
@@ -34,13 +34,21 @@ function useMissileImpactDetector({
   const leftRef = useRef<number>(startingLeft);
   const topRef = useRef<number>(startingTop);
   const checkMissileImpactRef = useRef<null | MissileImpactChecker>(null);
+  const hasFiredRef = useRef(missile.hasMissileFired);
+  const hasImpactedRef = useRef(missile.hasMissileImpacted);
   const isTargetableRef = useRef(isTargetable);
 
+  hasFiredRef.current = missile.hasMissileFired;
+  hasImpactedRef.current = missile.hasMissileImpacted;
   isTargetableRef.current = isTargetable;
 
   const checkMissileImpact = useCallback<MissileImpactChecker>(
     (position, onMissileImpact) => {
       const {missileLeft, missileTop} = position;
+
+      if (!hasFiredRef.current || hasImpactedRef.current) {
+        return;
+      }
 
       if (
         missileLeft >= leftRef.current &&
@@ -65,19 +73,19 @@ function useMissileImpactDetector({
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
-    missiles.forEach(({missilePosition, onMissileImpact}) => {
-      missilePosition.addListener(({left, top}) => {
-        if (!isTargetableRef.current) {
-          return;
-        }
+    const {missilePosition, onMissileImpact} = missile;
 
-        if (checkMissileImpactRef.current) {
-          checkMissileImpactRef.current(
-            {missileLeft: left, missileTop: top},
-            onMissileImpact,
-          );
-        }
-      });
+    missilePosition.addListener(({left, top}) => {
+      if (!isTargetableRef.current) {
+        return;
+      }
+
+      if (checkMissileImpactRef.current) {
+        checkMissileImpactRef.current(
+          {missileLeft: left, missileTop: top},
+          onMissileImpact,
+        );
+      }
     });
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 }

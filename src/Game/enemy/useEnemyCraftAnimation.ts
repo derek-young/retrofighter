@@ -13,6 +13,7 @@ import {
   getShouldTrackToPlayerPosition,
 } from './animation';
 import usePlayerTracking from './usePlayerTracking';
+import {useEliminationContext} from 'Game/Fighter/EliminationContext';
 
 type CraftAnimationProps = {
   craftSpeedWhenLockedOn?: number;
@@ -30,6 +31,7 @@ function useEnemyCraftAnimation({
   startingTop,
 }: CraftAnimationProps) {
   const {facing: playerFacing, hasPlayerMoved} = useAnimationContext();
+  const {isPlayerEliminated} = useEliminationContext();
   const {playerLeft, playerTop} = usePlayerTracking();
 
   const [facing, setFacing] = useState<Facing>(defaultFacing);
@@ -50,6 +52,7 @@ function useEnemyCraftAnimation({
   const isPlayerInLineOfSightPrevRef = useRef(false);
 
   const isPlayerInLineOfSight =
+    !isPlayerEliminated &&
     hasPlayerMoved &&
     getIsPlayerInLineOfSight(
       facing,

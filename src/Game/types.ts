@@ -29,10 +29,10 @@ export interface MissileProps extends Omit<MissileIconProps, 'Icon'> {
 
 export interface MissileAnimationProps {
   craftRotation: number;
+  facing: Facing;
   Icon: React.ElementType;
   leftAnim: Animated.Value;
   topAnim: Animated.Value;
-  leftOffset?: number;
-  topOffset?: number;
   missileProps: MissileProps;
+  positionOffset?: number;
 }

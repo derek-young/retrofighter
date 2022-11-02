@@ -8,7 +8,8 @@ import {
   missileSize,
 } from 'Game/gameConstants';
 
-import {MissileAnimationProps, MissileIconProps} from './types';
+import {DEFAULT_FACING_ROTATION} from './Craft';
+import {Facing, MissileAnimationProps, MissileIconProps} from './types';
 
 const styles = StyleSheet.create({
   missile: {
@@ -64,33 +65,37 @@ const MissileIcon = ({
 
 const Missile = ({
   craftRotation,
+  facing,
   Icon,
   leftAnim,
   topAnim,
-  leftOffset = 0,
-  topOffset = 0,
   missileProps,
+  positionOffset = 0,
 }: MissileAnimationProps) => {
   const [leftValue, setLeftValue] = useState(null);
   const [topValue, setTopValue] = useState(null);
-  const craftRotationRef = useRef<null | number>(null);
-  const leftValueRef = useRef(leftOffset);
-  const topValueRef = useRef(topOffset);
+  const facingRef = useRef<null | Facing>(null);
+  const leftValueRef = useRef(0);
+  const topValueRef = useRef(0);
   const left = leftValue ?? leftAnim;
   const top = topValue ?? topAnim;
+  const rotation =
+    facingRef.current !== null
+      ? DEFAULT_FACING_ROTATION[facingRef.current]
+      : craftRotation;
 
   leftValueRef.current = leftValue ?? 0;
   topValueRef.current = topValue ?? 0;
 
   useEffect(() => {
     if (missileProps.hasMissileFired) {
-      craftRotationRef.current = craftRotation;
+      facingRef.current = facing;
       // @ts-ignore
       setLeftValue(leftAnim._value);
       // @ts-ignore
       setTopValue(topAnim._value);
     } else {
-      craftRotationRef.current = null;
+      facingRef.current = null;
       setLeftValue(null);
       setTopValue(null);
     }
@@ -98,7 +103,7 @@ const Missile = ({
 
   useEffect(() => {
     if (missileProps.hasMissileImpacted) {
-      craftRotationRef.current = null;
+      facingRef.current = null;
       setLeftValue(null);
       setTopValue(null);
     }
@@ -109,21 +114,25 @@ const Missile = ({
       const listeners = missileProps.missilePosition.getListeners();
 
       listeners.forEach(listener => {
-        let missileLeft = leftValueRef.current + leftOffset;
-        let missileTop = topValueRef.current + topOffset;
+        let missileLeft = leftValueRef.current;
+        let missileTop = topValueRef.current;
 
-        switch (craftRotationRef.current) {
-          case 0:
-            missileTop = topValueRef.current + value;
+        switch (facingRef.current) {
+          case 'N':
+            missileLeft += positionOffset;
+            missileTop += value;
             break;
-          case 90:
-            missileLeft = leftValueRef.current - value;
+          case 'E':
+            missileLeft -= value;
+            missileTop += positionOffset;
             break;
-          case 180:
-            missileTop = topValueRef.current - value;
+          case 'S':
+            missileLeft += positionOffset;
+            missileTop -= value;
             break;
-          case -90:
-            missileLeft = leftValueRef.current + value;
+          case 'W':
+            missileLeft += value;
+            missileTop += positionOffset;
             break;
         }
 
@@ -140,9 +149,7 @@ const Missile = ({
         ...styles.missileContainer,
         left,
         top,
-        transform: [
-          {rotate: `${craftRotationRef.current ?? craftRotation}deg`},
-        ],
+        transform: [{rotate: `${rotation}deg`}],
       }}>
       <MissileIcon Icon={Icon} {...missileProps} />
     </Animated.View>
