@@ -20,7 +20,7 @@ const buttonSize = 56;
 
 const styles = StyleSheet.create({
   buttonSet: {
-    flexBasis: '25%',
+    flex: 1,
   },
   section: {
     flex: 1,

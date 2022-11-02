@@ -17,6 +17,7 @@ import {
 const styles = StyleSheet.create({
   arena: {
     width: arenaSize,
+    height: arenaSize,
     backgroundColor: `${Colors.PINK}40`,
   },
   seperator: {

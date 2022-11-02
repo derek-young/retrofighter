@@ -11,20 +11,21 @@ const buttonSize = 40;
 
 const styles = StyleSheet.create({
   dPad: {
-    flexBasis: '25%',
+    flex: 1,
     justifyContent: 'center',
   },
   container: {
     display: 'flex',
     flexDirection: 'row',
-    flexWrap: 'wrap',
+    justifyContent: 'center',
+    transform: [{rotate: '45deg'}],
   },
   directional: {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    width: buttonSize,
-    height: buttonSize,
+    width: buttonSize * 2,
+    height: buttonSize * 2,
     shadowColor: 'black',
     shadowOffset: {width: -2, height: 0},
     shadowOpacity: 0.4,
@@ -33,24 +34,23 @@ const styles = StyleSheet.create({
     position: 'absolute',
     height: buttonSize,
     width: buttonSize,
-    left: 16,
+    left: 8,
   },
   mediumChevron: {
     position: 'absolute',
     height: 24,
     width: 24,
+    left: 2,
   },
   smallChevron: {
     position: 'absolute',
     height: 16,
     width: 16,
-    right: 24,
+    left: -4,
   },
 });
 
-const Empty = (): null | JSX.Element => <View style={styles.directional} />;
-
-type ButtonRotation = 0 | 90 | 180 | 270;
+type ButtonRotation = 45 | 135 | 225 | 315;
 
 type DirectionalProps = {
   rotation: ButtonRotation;
@@ -118,19 +118,14 @@ const DPad = (): JSX.Element => {
       }}
       style={styles.dPad}>
       <View style={styles.container}>
-        <Empty />
-        <Empty />
-        <Directional rotation={270} />
-        <Empty />
-        <Empty />
-        <Empty />
-        <Directional rotation={180} />
-        <Empty />
-        <Directional rotation={0} />
-        <Empty />
-        <Empty />
-        <Empty />
-        <Directional rotation={90} />
+        <View>
+          <Directional rotation={225} />
+          <Directional rotation={135} />
+        </View>
+        <View>
+          <Directional rotation={315} />
+          <Directional rotation={45} />
+        </View>
       </View>
     </View>
   );
