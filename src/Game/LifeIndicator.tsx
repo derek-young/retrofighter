@@ -4,7 +4,7 @@ import {StyleSheet, View} from 'react-native';
 import Colors from 'types/colors';
 import FighterIcon from 'icons/spaceship.svg';
 
-import {craftSize} from './gameConstants';
+import {craftSize} from './constants';
 
 const styles = StyleSheet.create({
   iconContainer: {

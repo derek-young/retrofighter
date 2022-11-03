@@ -1,6 +1,6 @@
 import {isVerticalFacing} from 'Game/utils';
 import {Facing} from 'Game/types';
-import {totalWidth} from 'Game/gameConstants';
+import {totalWidth} from 'Game/constants';
 
 import {AnimationProps} from './enemyAnimation';
 

@@ -6,7 +6,7 @@ import {
   maxScreenSize,
   missileDuration,
   missileSize,
-} from 'Game/gameConstants';
+} from 'Game/constants';
 
 import {DEFAULT_FACING_ROTATION} from './Craft';
 import {Facing, MissileAnimationProps, MissileIconProps} from './types';

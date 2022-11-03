@@ -1,4 +1,4 @@
-import {arenaSize, craftSize} from 'Game/gameConstants';
+import {arenaSize, craftSize} from 'Game/constants';
 import randomAnimation from './randomAnimation';
 
 describe(randomAnimation.name, () => {

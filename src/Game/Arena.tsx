@@ -12,7 +12,7 @@ import {
   numColumns,
   seperatorWidth,
   totalWidth,
-} from './gameConstants';
+} from './constants';
 
 const styles = StyleSheet.create({
   arena: {

@@ -3,7 +3,7 @@ import {Animated} from 'react-native';
 
 import {useAnimationContext} from 'Game/Fighter/AnimationContext';
 import {useEliminationContext} from 'Game/Fighter/EliminationContext';
-import {craftSize} from 'Game/gameConstants';
+import {craftSize} from 'Game/constants';
 
 function getArea(top: number, left: number) {
   return [

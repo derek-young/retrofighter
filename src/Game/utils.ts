@@ -1,7 +1,7 @@
 import {Animated, Easing} from 'react-native';
 
 import {Facing} from './types';
-import {craftPixelsPerSecond, numColumns, totalWidth} from './gameConstants';
+import {craftPixelsPerSecond, numColumns, totalWidth} from './constants';
 
 export function animateCraft({
   animation,

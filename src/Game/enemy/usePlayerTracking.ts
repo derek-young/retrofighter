@@ -1,7 +1,7 @@
 import {useEffect, useState} from 'react';
 
 import {useAnimationContext} from 'Game/Fighter/AnimationContext';
-import {playerStartLeft, playerStartTop} from 'Game/gameConstants';
+import {playerStartLeft, playerStartTop} from 'Game/constants';
 
 function usePlayerTracking() {
   const {leftAnim, topAnim} = useAnimationContext();

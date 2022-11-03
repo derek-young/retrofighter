@@ -1,4 +1,4 @@
-import {arenaSize, craftSize, numColumns} from 'Game/gameConstants';
+import {arenaSize, craftSize, numColumns} from 'Game/constants';
 import {getNextAlley} from './utils';
 import {Facing} from './types';
 

@@ -6,7 +6,7 @@ import {
   maxLeft,
   minLeft,
   totalWidth,
-} from 'Game/gameConstants';
+} from 'Game/constants';
 
 import {AnimationProps} from './enemyAnimation';
 

@@ -9,7 +9,7 @@ import {
   missileSize,
   playerStartLeft,
   playerStartTop,
-} from 'Game/gameConstants';
+} from 'Game/constants';
 import MissilePosition from 'Game/missilePositionFactory';
 import Missile from 'Game/Missile';
 import EnemyMissileIcon from 'icons/skull.svg';

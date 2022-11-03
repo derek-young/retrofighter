@@ -1,7 +1,7 @@
 import React from 'react';
 
 import EnemyUAVIcon from 'icons/enemy-alt.svg';
-import {craftPixelsPerSecond} from 'Game/gameConstants';
+import {craftPixelsPerSecond} from 'Game/constants';
 
 import {EnemyCraftContextProvider} from './EnemyCraftContext';
 import EnemyCraft from './EnemyCraft';

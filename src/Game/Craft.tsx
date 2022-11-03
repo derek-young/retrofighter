@@ -3,7 +3,7 @@ import {Animated, StyleSheet} from 'react-native';
 
 import ExposionIcon from 'icons/supernova.svg';
 
-import {craftSize} from './gameConstants';
+import {craftSize} from './constants';
 import {Facing} from './types';
 
 const styles = StyleSheet.create({

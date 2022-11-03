@@ -1,6 +1,6 @@
 import React from 'react';
 
-import {missileSize} from 'Game/gameConstants';
+import {missileSize} from 'Game/constants';
 import Missile from 'Game/Missile';
 import MissileIcon from 'icons/missile.svg';
 import {MissileAnimationProps} from 'Game/types';

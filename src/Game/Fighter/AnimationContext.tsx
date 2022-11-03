@@ -17,7 +17,7 @@ import {
   playerStartLeft,
   playerStartTop,
   totalWidth,
-} from '../gameConstants';
+} from '../constants';
 import {Facing} from '../types';
 import {animateCraft, getNextAlley} from '../utils';
 

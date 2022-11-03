@@ -1,7 +1,7 @@
 import React, {useCallback, useContext, useRef, useState} from 'react';
 import {Animated} from 'react-native';
 
-import {missileSize} from 'Game/gameConstants';
+import {missileSize} from 'Game/constants';
 import {MissileProps} from 'Game/types';
 import MissilePosition from 'Game/missilePositionFactory';
 

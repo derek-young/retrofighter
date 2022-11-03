@@ -2,7 +2,7 @@ import {useCallback, useEffect, useRef} from 'react';
 import {Animated} from 'react-native';
 
 import {MissileProps} from 'Game/types';
-import {craftSize} from 'Game/gameConstants';
+import {craftSize} from 'Game/constants';
 
 type MissileImpactChecker = (
   position: {

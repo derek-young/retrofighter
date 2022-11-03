@@ -18,14 +18,22 @@ const styles = StyleSheet.create({
     display: 'flex',
     flexDirection: 'row',
     justifyContent: 'center',
+    alignItems: 'center',
     transform: [{rotate: '45deg'}],
+  },
+  swipeableArea: {
+    position: 'absolute',
+    backgroundColor: '#00000040',
+    width: buttonSize * 4,
+    height: buttonSize * 4,
+    borderRadius: buttonSize * 2,
   },
   directional: {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    width: buttonSize * 2,
-    height: buttonSize * 2,
+    width: buttonSize * 3,
+    height: buttonSize * 3,
     shadowColor: 'black',
     shadowOffset: {width: -2, height: 0},
     shadowOpacity: 0.4,
@@ -118,6 +126,7 @@ const DPad = (): JSX.Element => {
       }}
       style={styles.dPad}>
       <View style={styles.container}>
+        <View style={styles.swipeableArea} />
         <View>
           <Directional rotation={225} />
           <Directional rotation={135} />

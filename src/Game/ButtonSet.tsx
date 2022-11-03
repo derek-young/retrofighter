@@ -9,7 +9,7 @@ import {
 } from 'react-native';
 
 import Colors from 'types/colors';
-import {missileDuration} from 'Game/gameConstants';
+import {missileDuration} from 'Game/constants';
 
 import LifeIndicator from './LifeIndicator';
 import {useAnimationContext} from './Fighter/AnimationContext';

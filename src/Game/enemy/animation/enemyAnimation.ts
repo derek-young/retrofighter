@@ -1,6 +1,6 @@
 import {getNextAlley, isVerticalFacing} from 'Game/utils';
 import {Facing} from 'Game/types';
-import {alleyWidth} from 'Game/gameConstants';
+import {alleyWidth} from 'Game/constants';
 
 export interface AnimationProps {
   nextFacing: Facing;
