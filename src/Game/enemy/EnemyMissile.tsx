@@ -5,6 +5,7 @@ import Colors from 'types/colors';
 import {DEFAULT_FACING_ROTATION} from 'Game/Craft';
 import {MissileProps} from 'Game/types';
 import {
+  alleyWidth,
   missileDuration,
   missileSize,
   playerStartLeft,
@@ -113,7 +114,7 @@ const EnemyMissile = ({
       leftAnim={leftAnim}
       topAnim={topAnim}
       missileProps={missileProps}
-      positionOffset={leftOffset + 4}
+      positionOffset={alleyWidth / 2}
     />
   );
 };

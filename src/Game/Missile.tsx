@@ -2,6 +2,7 @@ import React, {useEffect, useRef, useState} from 'react';
 import {Animated, Easing, StyleSheet} from 'react-native';
 
 import {
+  alleyWidth,
   craftSize,
   maxScreenSize,
   missileDuration,
@@ -19,6 +20,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     height: craftSize,
     width: craftSize,
+    zIndex: -1,
   },
 });
 
@@ -127,12 +129,12 @@ const Missile = ({
             missileTop += positionOffset;
             break;
           case 'S':
-            missileLeft += positionOffset;
+            missileLeft += alleyWidth - positionOffset;
             missileTop -= value;
             break;
           case 'W':
             missileLeft += value;
-            missileTop += positionOffset;
+            missileTop += alleyWidth - positionOffset;
             break;
         }
 

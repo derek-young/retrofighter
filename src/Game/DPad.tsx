@@ -1,11 +1,12 @@
-import React, {useRef} from 'react';
-import {StyleSheet, View} from 'react-native';
+import React, {useRef, useState} from 'react';
+import {Pressable, StyleSheet, View} from 'react-native';
 
 import Colors from 'types/colors';
 import ChevronRight from 'icons/right-chevron.svg';
 import ChevronRightNarrow from 'icons/right-chevron-narrow.svg';
 
 import {useAnimationContext} from './Fighter/AnimationContext';
+import {Facing} from './types';
 
 const buttonSize = 40;
 
@@ -61,26 +62,42 @@ const styles = StyleSheet.create({
 type ButtonRotation = 45 | 135 | 225 | 315;
 
 type DirectionalProps = {
+  facing: Facing;
   rotation: ButtonRotation;
 };
 
-const Directional = ({rotation}: DirectionalProps): JSX.Element => (
-  <View
-    style={{
-      ...styles.directional,
-      transform: [{rotate: `${rotation}deg`}],
-    }}>
-    <View style={styles.largeChevron}>
-      <ChevronRight fill={Colors.GREY} />
+const Directional = ({facing, rotation}: DirectionalProps): JSX.Element => {
+  const {setThrusterEngagedFacing} = useAnimationContext();
+  const [isPressed, setIsPressed] = useState(false);
+
+  return (
+    <View
+      style={{
+        ...styles.directional,
+        transform: [{rotate: `${rotation}deg`}],
+      }}>
+      <Pressable
+        onLongPress={() => {
+          setIsPressed(true);
+          setThrusterEngagedFacing(facing);
+        }}
+        onPressOut={() => {
+          setIsPressed(false);
+          setThrusterEngagedFacing(null);
+        }}
+        // eslint-disable-next-line react-native/no-inline-styles
+        style={{...styles.largeChevron, opacity: isPressed ? 0.4 : 1}}>
+        <ChevronRight fill={Colors.GREY} />
+      </Pressable>
+      <View style={styles.mediumChevron}>
+        <ChevronRightNarrow fill={Colors.GREY} />
+      </View>
+      <View style={styles.smallChevron}>
+        <ChevronRightNarrow fill={Colors.GREY} />
+      </View>
     </View>
-    <View style={styles.mediumChevron}>
-      <ChevronRightNarrow fill={Colors.GREY} />
-    </View>
-    <View style={styles.smallChevron}>
-      <ChevronRightNarrow fill={Colors.GREY} />
-    </View>
-  </View>
-);
+  );
+};
 
 const DPad = (): JSX.Element => {
   const xRef = useRef(0);
@@ -128,12 +145,12 @@ const DPad = (): JSX.Element => {
       <View style={styles.container}>
         <View style={styles.swipeableArea} />
         <View>
-          <Directional rotation={225} />
-          <Directional rotation={135} />
+          <Directional facing="N" rotation={225} />
+          <Directional facing="W" rotation={135} />
         </View>
         <View>
-          <Directional rotation={315} />
-          <Directional rotation={45} />
+          <Directional facing="E" rotation={315} />
+          <Directional facing="S" rotation={45} />
         </View>
       </View>
     </View>

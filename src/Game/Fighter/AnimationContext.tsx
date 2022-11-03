@@ -9,6 +9,7 @@ import React, {
 import {Animated} from 'react-native';
 
 import {
+  craftPixelsPerSecond,
   defaultPlayerFacing,
   maxLeft,
   minLeft,
@@ -38,6 +39,7 @@ type AnimationContextValue = {
   onRightPress: () => void;
   resetAnimationContext: () => void;
   setHasPlayerMoved: (hasPlayerMoved: boolean) => void;
+  setThrusterEngagedFacing: (facing: null | Facing) => void;
 };
 
 const noop = () => {};
@@ -55,6 +57,7 @@ const defaultValue: AnimationContextValue = {
   onRightPress: noop,
   resetAnimationContext: noop,
   setHasPlayerMoved: noop,
+  setThrusterEngagedFacing: noop,
 };
 
 const AnimationContext = React.createContext(defaultValue);
@@ -62,6 +65,8 @@ const AnimationContext = React.createContext(defaultValue);
 export const useAnimationContext = () => useContext(AnimationContext);
 
 export const AnimationProvider = ({children}: {children: React.ReactNode}) => {
+  const [thrustersEngagedFacing, setThrusterEngagedFacing] =
+    useState<null | Facing>(null);
   const [hasPlayerMoved, setHasPlayerMoved] = useState(false);
   const [facing, setFacing] = useState<Facing>(defaultPlayerFacing);
   const facingRef = useRef(facing);
@@ -71,7 +76,12 @@ export const AnimationProvider = ({children}: {children: React.ReactNode}) => {
   const leftRef = useRef(playerStartLeft);
   const nextRowRef = useRef(getNextAlley(playerStartTop, facing));
   const nextColRef = useRef(getNextAlley(playerStartLeft, facing));
+  const craftSpeedRef = useRef(craftPixelsPerSecond);
 
+  craftSpeedRef.current =
+    thrustersEngagedFacing === null
+      ? craftPixelsPerSecond
+      : craftPixelsPerSecond * 1.5;
   facingRef.current = facing;
 
   const topUpdaterRef = useRef<(props: UpdaterProps) => void>(
@@ -112,6 +122,7 @@ export const AnimationProvider = ({children}: {children: React.ReactNode}) => {
             callback();
           }
         },
+        craftSpeed: craftSpeedRef.current,
         pixelsToMove: Math.abs(nextRowPosition - topRef.current) + 1,
         toValue: nextRowPosition,
       });
@@ -132,6 +143,7 @@ export const AnimationProvider = ({children}: {children: React.ReactNode}) => {
             callback();
           }
         },
+        craftSpeed: craftSpeedRef.current,
         pixelsToMove: Math.abs(nextColPosition - leftRef.current),
         toValue: nextColPosition,
       });
@@ -164,28 +176,48 @@ export const AnimationProvider = ({children}: {children: React.ReactNode}) => {
   const onMoveDown = useCallback(() => {
     const pixelsToMove = maxTop - topRef.current;
 
-    animateCraft({animation: topAnim, pixelsToMove, toValue: maxTop});
+    animateCraft({
+      animation: topAnim,
+      craftSpeed: craftSpeedRef.current,
+      pixelsToMove,
+      toValue: maxTop,
+    });
     setFacing('S');
   }, [topAnim]);
 
   const onMoveUp = useCallback(() => {
     const pixelsToMove = topRef.current;
 
-    animateCraft({animation: topAnim, pixelsToMove, toValue: minTop});
+    animateCraft({
+      animation: topAnim,
+      craftSpeed: craftSpeedRef.current,
+      pixelsToMove,
+      toValue: minTop,
+    });
     setFacing('N');
   }, [topAnim]);
 
   const onMoveLeft = useCallback(() => {
     const pixelsToMove = leftRef.current;
 
-    animateCraft({animation: leftAnim, pixelsToMove, toValue: minLeft});
+    animateCraft({
+      animation: leftAnim,
+      craftSpeed: craftSpeedRef.current,
+      pixelsToMove,
+      toValue: minLeft,
+    });
     setFacing('W');
   }, [leftAnim]);
 
   const onMoveRight = useCallback(() => {
     const pixelsToMove = maxLeft - leftRef.current;
 
-    animateCraft({animation: leftAnim, pixelsToMove, toValue: maxLeft});
+    animateCraft({
+      animation: leftAnim,
+      craftSpeed: craftSpeedRef.current,
+      pixelsToMove,
+      toValue: maxLeft,
+    });
     setFacing('E');
   }, [leftAnim]);
 
@@ -209,12 +241,39 @@ export const AnimationProvider = ({children}: {children: React.ReactNode}) => {
     [onMoveRight, onHorizontalMove],
   );
 
+  useEffect(() => {
+    if (!hasPlayerMoved) {
+      return;
+    }
+
+    const nextFacing =
+      thrustersEngagedFacing === null
+        ? facingRef.current
+        : thrustersEngagedFacing;
+
+    switch (nextFacing) {
+      case 'N':
+        onUpPress();
+        break;
+      case 'S':
+        onDownPress();
+        break;
+      case 'E':
+        onRightPress();
+        break;
+      case 'W':
+        onLeftPress();
+        break;
+    }
+  }, [thrustersEngagedFacing]); // eslint-disable-line react-hooks/exhaustive-deps
+
   return (
     <AnimationContext.Provider
       children={children}
       value={{
         facing,
         hasPlayerMoved,
+        setHasPlayerMoved,
         leftAnim,
         topAnim,
         leftRef,
@@ -224,7 +283,7 @@ export const AnimationProvider = ({children}: {children: React.ReactNode}) => {
         onLeftPress,
         onRightPress,
         resetAnimationContext,
-        setHasPlayerMoved,
+        setThrusterEngagedFacing,
       }}
     />
   );

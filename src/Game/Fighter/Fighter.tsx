@@ -55,7 +55,7 @@ const Fighter = (): null | JSX.Element => {
         leftAnim={leftAnim}
         topAnim={topAnim}
         missileProps={leftMissileProps}
-        positionOffset={4}
+        positionOffset={6.9}
       />
       <FighterMissile
         craftColor={craftColor}
