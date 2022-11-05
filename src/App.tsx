@@ -12,7 +12,7 @@ const App = (): JSX.Element => {
   return (
     <NavigationContainer>
       <Stack.Navigator
-        initialRouteName="Game"
+        initialRouteName="Catalog"
         screenOptions={{headerShown: false}}>
         <Stack.Screen name="Catalog" component={Catalog} />
         <Stack.Screen

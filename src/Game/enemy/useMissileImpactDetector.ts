@@ -42,11 +42,11 @@ function useMissileImpactDetector({
 
   const checkMissileImpact = useCallback<MissileImpactChecker>(
     (position, onMissileImpact) => {
-      const {missileLeft, missileTop} = position;
-
       if (!hasFiredRef.current) {
         return;
       }
+
+      const {missileLeft, missileTop} = position;
 
       if (
         missileLeft >= leftRef.current &&

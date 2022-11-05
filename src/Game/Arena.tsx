@@ -45,7 +45,7 @@ const Seperator = (styleProps: SeperatorProps) => (
         position: 'absolute',
         width: 30,
       }}>
-      {Math.round(props.top)}
+      {Math.round(styleProps.top)}
     </Text>
     <Text
       style={{
@@ -53,7 +53,7 @@ const Seperator = (styleProps: SeperatorProps) => (
         top: 15,
         width: 30,
       }}>
-      {Math.round(props.left)}
+      {Math.round(styleProps.left)}
     </Text> */}
   </View>
 );

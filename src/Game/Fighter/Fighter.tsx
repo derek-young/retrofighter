@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useCallback, useState} from 'react';
 import {StyleSheet} from 'react-native';
 
 import Colors from 'types/colors';
@@ -26,12 +26,14 @@ const Fighter = (): null | JSX.Element => {
   const [leftMissileProps, rightMissileProps] = useMissileContext();
   const [craftRotation, setCraftRotation] = useState(0);
 
+  const onRotationChange = useCallback(
+    ({value}: {value: number}) => setCraftRotation(Math.round(value)),
+    [],
+  );
+
   if (isPlayerEliminated && hasEliminationAnimationEnded) {
     return null;
   }
-
-  const onRotationChange = ({value}: {value: number}) =>
-    setCraftRotation(Math.round(value));
 
   const craftColor = hasPlayerMoved ? Colors.GREEN : `${Colors.GREEN}80`;
 

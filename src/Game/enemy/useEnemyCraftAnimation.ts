@@ -3,7 +3,10 @@ import {Animated} from 'react-native';
 
 import {Facing} from 'Game/types';
 import {animateCraft, isVerticalFacing} from 'Game/utils';
+import {playerStartLeft, playerStartTop, totalWidth} from 'Game/constants';
+import {useGameContext} from 'Game/GameContext';
 import {useAnimationContext} from 'Game/Fighter/AnimationContext';
+import {useEliminationContext} from 'Game/Fighter/EliminationContext';
 
 import {
   controlledAnimation,
@@ -12,9 +15,6 @@ import {
   getIsPlayerInLineOfSight,
   getShouldTrackToPlayerPosition,
 } from './animation';
-import usePlayerTracking from './usePlayerTracking';
-import {useEliminationContext} from 'Game/Fighter/EliminationContext';
-import {useGameContext} from 'Game/GameContext';
 
 type CraftAnimationProps = {
   craftSpeedWhenLockedOn?: number;
@@ -32,25 +32,31 @@ function useEnemyCraftAnimation({
   startingTop,
 }: CraftAnimationProps) {
   const {isPaused} = useGameContext();
-  const {facing: playerFacing, hasPlayerMoved} = useAnimationContext();
+  const {
+    facing: playerFacing,
+    hasPlayerMoved,
+    leftAnim: playerLeftAnim,
+    topAnim: playerTopAnim,
+  } = useAnimationContext();
   const {isPlayerEliminated} = useEliminationContext();
-  const {playerLeft, playerTop} = usePlayerTracking();
 
   const [facing, setFacing] = useState<Facing>(defaultFacing);
   const [hasInitialized, setHasInitialized] = useState(false);
+  const [isPlayerInLineOfSight, setIsPlayerInLineOfSight] = useState(false);
   const facingRef = useRef(facing);
   const leftAnimRef = useRef(new Animated.Value(startingLeft));
   const topAnimRef = useRef(new Animated.Value(startingTop));
   const leftRef = useRef(startingLeft);
   const topRef = useRef(startingTop);
-  const playerLeftRef = useRef(playerLeft);
-  const playerTopRef = useRef(playerTop);
+  const playerLeftRef = useRef(playerStartLeft);
+  const playerTopRef = useRef(playerStartTop);
   const playerFacingRef = useRef(playerFacing);
   const controlledFacingRef = useRef<null | Facing>(null);
   const detectedPlayerFacingRef = useRef<null | Facing>(null);
   const detectedPlayerPositionRef = useRef<null | {top: number; left: number}>(
     null,
   );
+  const hasPlayerMovedRef = useRef(hasPlayerMoved);
   const isEliminatedRef = useRef(false);
   const isPlayerEliminatedRef = useRef(isPlayerEliminated);
   const isPlayerInLineOfSightRef = useRef(false);
@@ -59,32 +65,48 @@ function useEnemyCraftAnimation({
   const isPausedPrevRef = useRef(isPaused);
   const craftSpeedRef = useRef<undefined | number>();
 
-  const isPlayerInLineOfSight =
-    !isPlayerEliminated &&
-    hasPlayerMoved &&
-    getIsPlayerInLineOfSight(
-      facing,
-      topRef.current,
-      leftRef.current,
-      playerTopRef.current,
-      playerLeftRef.current,
-    );
-
   facingRef.current = facing;
+  hasPlayerMovedRef.current = hasPlayerMoved;
   isEliminatedRef.current = isEliminated;
   isPlayerEliminatedRef.current = isPlayerEliminated;
   isPlayerInLineOfSightRef.current = isPlayerInLineOfSight;
   isPausedRef.current = isPaused;
+  playerFacingRef.current = playerFacing;
+
+  const checkIsInLineOfSight = useCallback(() => {
+    const nextIsPlayerInLineOfSight =
+      !isPlayerEliminatedRef.current &&
+      hasPlayerMovedRef.current &&
+      getIsPlayerInLineOfSight(
+        facingRef.current,
+        topRef.current,
+        leftRef.current,
+        playerTopRef.current,
+        playerLeftRef.current,
+      );
+
+    if (nextIsPlayerInLineOfSight !== isPlayerInLineOfSightRef.current) {
+      setIsPlayerInLineOfSight(nextIsPlayerInLineOfSight);
+    }
+  }, []);
 
   useEffect(() => {
-    leftAnimRef.current.addListener(({value}) => (leftRef.current = value));
-    topAnimRef.current.addListener(({value}) => (topRef.current = value));
+    leftAnimRef.current.addListener(({value}) => {
+      leftRef.current = value;
+      checkIsInLineOfSight();
+    });
+    topAnimRef.current.addListener(({value}) => {
+      topRef.current = value;
+      checkIsInLineOfSight();
+    });
+    playerLeftAnim.addListener(({value}) => (playerLeftRef.current = value));
+    playerTopAnim.addListener(({value}) => (playerTopRef.current = value));
 
     () => {
       leftAnimRef.current.removeAllListeners();
       topAnimRef.current.removeAllListeners();
     };
-  }, []);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     if (hasPlayerMoved && !hasInitialized) {
@@ -116,11 +138,6 @@ function useEnemyCraftAnimation({
       animate(craftSpeedWhenLockedOn);
     }
   }, [isPaused, isPlayerEliminated, isPlayerInLineOfSight]); // eslint-disable-line react-hooks/exhaustive-deps
-
-  // Update values after useEffect to preserve previous value
-  playerLeftRef.current = playerLeft;
-  playerTopRef.current = playerTop;
-  playerFacingRef.current = playerFacing;
 
   const animate = useCallback((craftSpeed?: number) => {
     craftSpeedRef.current = craftSpeed;
@@ -164,7 +181,7 @@ function useEnemyCraftAnimation({
 
       nextAnimation = {
         nextFacing: facingRef.current,
-        toValue: nextPosition,
+        toValue: Math.round(nextPosition - (nextPosition % totalWidth)),
       };
 
       controlledFacingRef.current = null;
@@ -211,6 +228,7 @@ function useEnemyCraftAnimation({
     setFacing(nextFacing);
 
     animateCraft({
+      animation,
       callback: ({finished}) => {
         if (isPausedRef.current) {
           controlledFacingRef.current = facingRef.current;
@@ -218,7 +236,6 @@ function useEnemyCraftAnimation({
           animate();
         }
       },
-      animation,
       craftSpeed,
       pixelsToMove,
       toValue,

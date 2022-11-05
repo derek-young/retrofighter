@@ -74,16 +74,17 @@ export type CraftProps = {
   rotationListener?: (props: {value: number}) => void;
 };
 
-const Craft = ({
-  Icon,
-  isEliminated,
-  facing,
-  fill,
-  onEliminationEnd,
-  left,
-  top,
-  rotationListener,
-}: CraftProps): JSX.Element => {
+const Craft = (props: CraftProps): JSX.Element => {
+  const {
+    Icon,
+    isEliminated,
+    facing,
+    fill,
+    onEliminationEnd,
+    left,
+    top,
+    rotationListener,
+  } = props;
   const rotation = DEFAULT_FACING_ROTATION[facing];
   const shadow = SHADOW_POS[facing];
   const rotationAnim = useRef(new Animated.Value(rotation)).current;

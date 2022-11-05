@@ -12,6 +12,7 @@ import Colors from 'types/colors';
 import {missileDuration} from 'Game/constants';
 
 import LifeIndicator from './LifeIndicator';
+import {useGameContext} from './GameContext';
 import {useAnimationContext} from './Fighter/AnimationContext';
 import {useEliminationContext} from './Fighter/EliminationContext';
 import {useMissileContext} from './Fighter/MissileContext';
@@ -73,6 +74,15 @@ type ActionButtonProps = {
   onPress: () => void;
 };
 
+function animateButton(anim: Animated.Value) {
+  Animated.timing(anim, {
+    duration: missileDuration,
+    easing: Easing.linear,
+    toValue: buttonSize,
+    useNativeDriver: false,
+  }).start();
+}
+
 const ActionButton = ({
   children,
   disabled,
@@ -80,6 +90,7 @@ const ActionButton = ({
   isEliminated,
   onPress,
 }: ActionButtonProps): JSX.Element => {
+  const {isPaused} = useGameContext();
   const heightAnim = useRef(new Animated.Value(buttonSize)).current;
 
   useEffect(() => {
@@ -90,15 +101,17 @@ const ActionButton = ({
   }, [heightAnim, isEliminated]);
 
   useEffect(() => {
+    if (isPaused) {
+      heightAnim.stopAnimation();
+    } else {
+      animateButton(heightAnim);
+    }
+  }, [heightAnim, isPaused]);
+
+  useEffect(() => {
     if (hasMissileFired) {
       heightAnim.setValue(0);
-
-      Animated.timing(heightAnim, {
-        duration: missileDuration,
-        easing: Easing.linear,
-        toValue: buttonSize,
-        useNativeDriver: false,
-      }).start();
+      animateButton(heightAnim);
     } else {
       heightAnim.stopAnimation();
       heightAnim.setValue(buttonSize);

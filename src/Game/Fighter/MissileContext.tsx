@@ -1,9 +1,17 @@
-import React, {useCallback, useContext, useRef, useState} from 'react';
+import React, {
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 import {Animated} from 'react-native';
 
 import {missileSize} from 'Game/constants';
 import {MissileProps} from 'Game/types';
 import MissilePosition from 'Game/missilePositionFactory';
+
+import {useEliminationContext} from './EliminationContext';
 
 type MissileContextValue = MissileProps[];
 
@@ -24,12 +32,20 @@ const MissileContext = React.createContext(defaultValue);
 export const useMissileContext = () => useContext(MissileContext);
 
 export const MissileProvider = ({children}: {children: React.ReactNode}) => {
+  const {isPlayerEliminated} = useEliminationContext();
   const [hasLeftMissileFired, setHasLeftMissileFired] = useState(false);
   const [hasRightMissileFired, setHasRightMissileFired] = useState(false);
   const leftMissileAnim = useRef(new Animated.Value(missileSize / 2)).current;
   const rightMissileAnim = useRef(new Animated.Value(missileSize / 2)).current;
   const leftMissilePosition = useRef(new MissilePosition()).current;
   const rightMissilePosition = useRef(new MissilePosition()).current;
+
+  useEffect(() => {
+    if (isPlayerEliminated) {
+      setHasLeftMissileFired(false);
+      setHasRightMissileFired(false);
+    }
+  }, [isPlayerEliminated]);
 
   const onFireLeftMissile = useCallback(() => setHasLeftMissileFired(true), []);
   const onFireRightMissile = useCallback(
