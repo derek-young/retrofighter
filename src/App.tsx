@@ -12,7 +12,6 @@ const App = (): JSX.Element => {
   return (
     <NavigationContainer>
       <Stack.Navigator
-        // initialRouteName="Login"
         initialRouteName="Catalog"
         screenOptions={{headerShown: false}}>
         <Stack.Screen name="Catalog" component={Catalog} />

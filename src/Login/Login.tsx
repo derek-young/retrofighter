@@ -1,10 +1,9 @@
 import React from 'react';
 import {Button, StyleSheet, View} from 'react-native';
 import {useNavigation} from '@react-navigation/native';
-import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 
 import Colors from 'types/colors';
-import {RootStackParamList} from 'types/app';
+import {LoginNavigationProp} from 'types/app';
 import GradientText from 'components/GradientText';
 import IBMText from 'components/IBMText';
 import PressStartText from 'components/PressStartText';
@@ -50,13 +49,8 @@ const styles = StyleSheet.create({
   },
 });
 
-type LoginScreenNavigationProp = NativeStackNavigationProp<
-  RootStackParamList,
-  'Login'
->;
-
 const Login = (): JSX.Element => {
-  const navigation = useNavigation<LoginScreenNavigationProp>();
+  const navigation = useNavigation<LoginNavigationProp>();
 
   return (
     <View style={styles.container}>
@@ -81,7 +75,7 @@ const Login = (): JSX.Element => {
         <IBMText style={styles.basicText}>or</IBMText>
         <PressStartText
           onPress={() => navigation.navigate('Catalog')}
-          style={{...styles.continueText, ...styles.textShadow}}>
+          style={[styles.continueText, styles.textShadow]}>
           Continue
         </PressStartText>
       </View>

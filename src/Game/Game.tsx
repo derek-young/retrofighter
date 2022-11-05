@@ -1,9 +1,11 @@
 import React, {useState} from 'react';
-import {Button, ImageBackground, StyleSheet, Text, View} from 'react-native';
+import {ImageBackground, Pressable, StyleSheet, View} from 'react-native';
 import {RouteProp} from '@react-navigation/native';
 
 import {RootStackParamList} from 'types/app';
+import Colors from 'types/colors';
 import backgroundImage from 'images/backdrop.jpg';
+import IBMText from 'components/IBMText';
 
 import Arena from './Arena';
 import ButtonSet from './ButtonSet';
@@ -12,6 +14,7 @@ import {AnimationProvider} from './Fighter/AnimationContext';
 import {EliminationProvider} from './Fighter/EliminationContext';
 import {MissileProvider} from './Fighter/MissileContext';
 import {EnemyFactoryProvider} from './enemy/EnemyFactoryContext';
+import PauseMenu from './PauseMenu';
 
 type GameRouteParam = RouteProp<RootStackParamList, 'Game'>;
 
@@ -20,59 +23,67 @@ type GameProps = {
 };
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
   game: {
     flex: 1,
     flexDirection: 'row',
     justifyContent: 'center',
   },
-  backdrop: {
-    flex: 1,
-  },
-  resetButton: {
+  pauseButtonContainer: {
     position: 'absolute',
     left: 20,
+    top: 20,
   },
-  version: {
-    position: 'absolute',
-    left: 30,
-    top: 30,
+  pauseButton: {
+    borderRadius: 20,
+    padding: 10,
+    backgroundColor: Colors.LIGHT_PINK,
+    shadowColor: 'black',
+    shadowOffset: {width: 2, height: 2},
+    shadowOpacity: 0.4,
   },
 });
 
 const Game = ({route}: GameProps): null | JSX.Element => {
+  const [isPaused, setIsPaused] = useState(false);
   const [uniqueKey, setUniqueKey] = useState(Date.now());
   const epic = route?.params?.epic ?? 0;
 
   return (
-    <ImageBackground
-      key={uniqueKey}
-      source={backgroundImage}
-      style={styles.backdrop}>
-      <AnimationProvider>
-        <EliminationProvider>
-          <MissileProvider>
-            <EnemyFactoryProvider epic={epic}>
-              <View style={styles.game}>
-                <DPad />
-                <Arena />
-                <ButtonSet />
-                <View style={styles.resetButton}>
-                  <Button
-                    onPress={() => {
-                      setUniqueKey(Date.now());
-                    }}
-                    title="Reset"
-                  />
+    <View style={styles.container}>
+      <ImageBackground
+        key={uniqueKey}
+        source={backgroundImage}
+        style={styles.container}>
+        <AnimationProvider>
+          <EliminationProvider>
+            <MissileProvider>
+              <EnemyFactoryProvider epic={epic}>
+                <View style={styles.game}>
+                  <DPad />
+                  <Arena />
+                  <ButtonSet />
+                  <View style={styles.pauseButtonContainer}>
+                    <Pressable
+                      style={styles.pauseButton}
+                      onPress={() => setIsPaused(true)}>
+                      <IBMText>Pause</IBMText>
+                    </Pressable>
+                  </View>
                 </View>
-                <View style={styles.version}>
-                  <Text style={{color: 'red'}}>v.1.5</Text>
-                </View>
-              </View>
-            </EnemyFactoryProvider>
-          </MissileProvider>
-        </EliminationProvider>
-      </AnimationProvider>
-    </ImageBackground>
+              </EnemyFactoryProvider>
+            </MissileProvider>
+          </EliminationProvider>
+        </AnimationProvider>
+      </ImageBackground>
+      <PauseMenu
+        onClose={() => setIsPaused(false)}
+        onReset={() => setUniqueKey(Date.now())}
+        open={isPaused}
+      />
+    </View>
   );
 };
 

@@ -106,7 +106,7 @@ const ActionButton = ({
 
   if (disabled) {
     return (
-      <View style={{...styles.actionButton, ...styles.buttonDisabled}}>
+      <View style={[styles.actionButton, styles.buttonDisabled]}>
         <Text style={styles.buttonText}>{children}</Text>
         <Animated.View
           style={{...styles.buttonBackground, height: heightAnim}}
@@ -133,12 +133,12 @@ const ButtonSet = (): JSX.Element => {
 
   return (
     <View style={styles.buttonSet}>
-      <View style={{...styles.section, ...styles.top}}>
+      <View style={[styles.section, styles.top]}>
         {new Array(remainingLives).fill(0).map((_, i) => (
           <LifeIndicator key={i} />
         ))}
       </View>
-      <View style={{...styles.section, ...styles.middle}}>
+      <View style={[styles.section, styles.middle]}>
         <ActionButton
           disabled={leftMissile.hasMissileFired || isPlayerEliminated}
           hasMissileFired={leftMissile.hasMissileFired}

@@ -7,13 +7,8 @@ const styles = StyleSheet.create({
   },
 });
 
-const PressStartText = ({style = {}, ...rest}: TextProps): JSX.Element => {
-  return (
-    <Text
-      style={{...styles.appText, ...(style as Record<string, unknown>)}}
-      {...rest}
-    />
-  );
-};
+const PressStartText = ({style = {}, ...rest}: TextProps): JSX.Element => (
+  <Text style={[styles.appText, style]} {...rest} />
+);
 
 export default PressStartText;

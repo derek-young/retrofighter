@@ -56,7 +56,7 @@ const CatalogButton = ({
     <View style={containerStyles}>
       <ButtonComponent
         onPress={onPress}
-        style={{...styles.buttonContainer, ...styles.button}}>
+        style={[styles.buttonContainer, styles.button]}>
         <PressStartText>{children}</PressStartText>
       </ButtonComponent>
     </View>

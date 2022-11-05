@@ -1,9 +1,8 @@
 import React from 'react';
-import {SafeAreaView, StyleSheet} from 'react-native';
+import {SafeAreaView, StyleSheet, Text} from 'react-native';
 import {useNavigation} from '@react-navigation/native';
-import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 
-import {RootStackParamList} from 'types/app';
+import {CatalogNavigationProp} from 'types/app';
 
 import CatalogButton from './CatalogButton';
 
@@ -13,12 +12,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: '#7A04EB',
   },
+  version: {
+    position: 'absolute',
+    left: 30,
+    top: 20,
+    color: 'red',
+  },
 });
-
-type CatalogNavigationProp = NativeStackNavigationProp<
-  RootStackParamList,
-  'Catalog'
->;
 
 const Catalog = (): JSX.Element => {
   const navigation = useNavigation<CatalogNavigationProp>();
@@ -42,6 +42,7 @@ const Catalog = (): JSX.Element => {
       <CatalogButton onPress={() => navigation.navigate('Game', {epic: 4})}>
         Level 5
       </CatalogButton>
+      <Text style={styles.version}>v.1.5</Text>
     </SafeAreaView>
   );
 };

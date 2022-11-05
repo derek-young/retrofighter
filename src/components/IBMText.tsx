@@ -7,13 +7,8 @@ const styles = StyleSheet.create({
   },
 });
 
-const IBMText = ({style = {}, ...rest}: TextProps): JSX.Element => {
-  return (
-    <Text
-      style={{...styles.appText, ...(style as Record<string, unknown>)}}
-      {...rest}
-    />
-  );
-};
+const IBMText = ({style = {}, ...rest}: TextProps): JSX.Element => (
+  <Text style={[styles.appText, style]} {...rest} />
+);
 
 export default IBMText;

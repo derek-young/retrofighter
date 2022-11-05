@@ -37,8 +37,8 @@ type SeperatorProps = {
   height: number;
 };
 
-const Seperator = (props: SeperatorProps) => (
-  <View style={{...styles.seperator, ...props}}>
+const Seperator = (styleProps: SeperatorProps) => (
+  <View style={{...styles.seperator, ...styleProps}}>
     {/* Debugger */}
     {/* <Text
       style={{
