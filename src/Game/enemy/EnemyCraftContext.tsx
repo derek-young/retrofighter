@@ -1,8 +1,7 @@
-import React, {useCallback, useContext, useEffect, useState} from 'react';
+import React, {useCallback, useContext, useState} from 'react';
 import {Animated} from 'react-native';
 
 import {Facing} from 'Game/types';
-import {useAnimationContext} from 'Game/Fighter/AnimationContext';
 import {useMissileContext} from 'Game/Fighter/MissileContext';
 
 import useCollisionDetector from './useCollisionDetector';
@@ -60,9 +59,7 @@ export const EnemyCraftContextProvider = ({
   startingTop = 0,
   startingLeft = 0,
 }: EnemyCraftContextProviderProps) => {
-  const {hasPlayerMoved} = useAnimationContext();
   const playerMissiles = useMissileContext();
-  const [hasInitialized, setHasInitialized] = useState(false);
   const [craftRotation, setCraftRotation] = useState(0);
 
   const onRotationChange = useCallback(
@@ -70,7 +67,7 @@ export const EnemyCraftContextProvider = ({
     [],
   );
 
-  const {facing, initialize, isPlayerInLineOfSight, leftAnim, topAnim} =
+  const {facing, isPlayerInLineOfSight, leftAnim, topAnim} =
     useEnemyCraftAnimation({
       craftSpeedWhenLockedOn,
       defaultFacing,
@@ -107,13 +104,6 @@ export const EnemyCraftContextProvider = ({
     startingTop,
     onIsEliminated,
   });
-
-  useEffect(() => {
-    if (hasPlayerMoved && !hasInitialized) {
-      initialize();
-      setHasInitialized(true);
-    }
-  }, [hasInitialized, hasPlayerMoved, initialize]);
 
   return (
     <EnemyCraftContext.Provider

@@ -71,7 +71,7 @@ const Game = ({route}: GameProps): null | JSX.Element => {
                       <Pressable
                         style={styles.pauseButton}
                         onPress={() => setIsPaused(true)}>
-                        <IBMText>Pause</IBMText>
+                        <IBMText>Game Menu</IBMText>
                       </Pressable>
                     </View>
                   </View>

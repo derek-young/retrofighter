@@ -20,7 +20,7 @@ const EnemyUAV = (): JSX.Element => {
 
 export default (props: EnemyUAVProps) => (
   <EnemyCraftContextProvider
-    craftSpeedWhenLockedOn={craftPixelsPerSecond * 1.3}
+    craftSpeedWhenLockedOn={craftPixelsPerSecond * 1.5}
     {...props}>
     <EnemyUAV />
   </EnemyCraftContextProvider>
