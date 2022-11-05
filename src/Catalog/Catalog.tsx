@@ -14,8 +14,8 @@ const styles = StyleSheet.create({
   },
   version: {
     position: 'absolute',
-    left: 30,
-    top: 20,
+    left: 32,
+    top: 16,
     color: 'red',
   },
 });

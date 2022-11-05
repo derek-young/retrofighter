@@ -71,7 +71,6 @@ type ActionButtonProps = {
   hasMissileFired: boolean;
   isEliminated: boolean;
   onPress: () => void;
-  onRecharge: () => void;
 };
 
 const ActionButton = ({
@@ -80,7 +79,6 @@ const ActionButton = ({
   hasMissileFired,
   isEliminated,
   onPress,
-  onRecharge,
 }: ActionButtonProps): JSX.Element => {
   const heightAnim = useRef(new Animated.Value(buttonSize)).current;
 
@@ -100,9 +98,12 @@ const ActionButton = ({
         easing: Easing.linear,
         toValue: buttonSize,
         useNativeDriver: false,
-      }).start(onRecharge);
+      }).start();
+    } else {
+      heightAnim.stopAnimation();
+      heightAnim.setValue(buttonSize);
     }
-  }, [hasMissileFired, heightAnim, onRecharge]);
+  }, [hasMissileFired, heightAnim]);
 
   if (disabled) {
     return (
@@ -143,7 +144,6 @@ const ButtonSet = (): JSX.Element => {
           disabled={leftMissile.hasMissileFired || isPlayerEliminated}
           hasMissileFired={leftMissile.hasMissileFired}
           isEliminated={isPlayerEliminated}
-          onRecharge={leftMissile.resetMissileState}
           onPress={() => {
             if (!hasPlayerMoved) {
               setHasPlayerMoved(true);
@@ -156,7 +156,6 @@ const ButtonSet = (): JSX.Element => {
           disabled={rightMissile.hasMissileFired || isPlayerEliminated}
           hasMissileFired={rightMissile.hasMissileFired}
           isEliminated={isPlayerEliminated}
-          onRecharge={rightMissile.resetMissileState}
           onPress={() => {
             if (!hasPlayerMoved) {
               setHasPlayerMoved(true);

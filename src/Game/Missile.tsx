@@ -11,6 +11,7 @@ import {
 
 import {DEFAULT_FACING_ROTATION} from './Craft';
 import {Facing, MissileAnimationProps, MissileIconProps} from './types';
+import {useGameContext} from './GameContext';
 
 const styles = StyleSheet.create({
   missile: {
@@ -24,43 +25,62 @@ const styles = StyleSheet.create({
   },
 });
 
+type AnimationCallback = (callbackProps: {finished: boolean}) => void;
+
+interface AnimateMissileProps {
+  callback: AnimationCallback;
+  missileAnim: Animated.Value;
+}
+
+function animateMissile({callback, missileAnim}: AnimateMissileProps) {
+  Animated.timing(missileAnim, {
+    duration: missileDuration,
+    easing: Easing.linear,
+    toValue: maxScreenSize * -1,
+    useNativeDriver: true,
+  }).start(callback);
+}
+
 const MissileIcon = ({
   hasMissileFired,
-  hasMissileImpacted,
   Icon,
   missileAnim,
+  onFireAnimationEnded,
   startingTop = missileSize / 2,
 }: MissileIconProps) => {
-  const [hasFireAnimationEnded, setHasFireAnimationEnded] = useState(false);
+  const {isPaused} = useGameContext();
   const [missileTop, setMissileTop] = useState(startingTop);
+  const missileAnimCallbackRef = useRef<AnimationCallback>(({finished}) => {
+    if (finished) {
+      onFireAnimationEnded();
+    }
+  });
 
   useEffect(() => {
     missileAnim.addListener(({value}: {value: number}) => setMissileTop(value));
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
-    if (hasMissileFired) {
-      Animated.timing(missileAnim, {
-        duration: missileDuration,
-        easing: Easing.linear,
-        toValue: maxScreenSize * -1,
-        useNativeDriver: true,
-      }).start(() => setHasFireAnimationEnded(true));
-    } else {
-      missileAnim.setValue(startingTop);
-      setHasFireAnimationEnded(false);
+    if (isPaused) {
+      missileAnim.stopAnimation();
+    } else if (!isPaused && hasMissileFired) {
+      animateMissile({
+        callback: missileAnimCallbackRef.current,
+        missileAnim,
+      });
     }
-  }, [hasMissileFired, missileAnim, startingTop]);
+  }, [hasMissileFired, isPaused, missileAnim]);
 
   useEffect(() => {
-    if (hasMissileImpacted) {
+    if (hasMissileFired) {
+      animateMissile({
+        callback: missileAnimCallbackRef.current,
+        missileAnim,
+      });
+    } else {
       missileAnim.setValue(startingTop);
     }
-  }, [hasMissileImpacted, missileAnim, startingTop]);
-
-  if (hasFireAnimationEnded) {
-    return null;
-  }
+  }, [hasMissileFired, missileAnim, startingTop]);
 
   return <Icon style={{...styles.missile, top: missileTop}} />;
 };
@@ -104,12 +124,12 @@ const Missile = ({
   }, [missileProps.hasMissileFired]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
-    if (missileProps.hasMissileImpacted) {
+    if (!missileProps.hasMissileFired) {
       facingRef.current = null;
       setLeftValue(null);
       setTopValue(null);
     }
-  }, [missileProps.hasMissileImpacted]);
+  }, [missileProps.hasMissileFired]);
 
   useEffect(() => {
     missileProps.missileAnim.addListener(({value}: {value: number}) => {

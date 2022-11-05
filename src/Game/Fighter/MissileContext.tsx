@@ -12,12 +12,10 @@ const noop = () => {};
 const defaultValue: MissileContextValue = [
   {
     hasMissileFired: false,
-    hasMissileImpacted: false,
     missileAnim: new Animated.Value(missileSize / 2),
     missilePosition: new MissilePosition(),
+    onFireAnimationEnded: noop,
     onFireMissile: noop,
-    onMissileImpact: noop,
-    resetMissileState: noop,
   },
 ];
 
@@ -28,8 +26,6 @@ export const useMissileContext = () => useContext(MissileContext);
 export const MissileProvider = ({children}: {children: React.ReactNode}) => {
   const [hasLeftMissileFired, setHasLeftMissileFired] = useState(false);
   const [hasRightMissileFired, setHasRightMissileFired] = useState(false);
-  const [hasLeftMissileImpacted, setHasLeftMissileImpacted] = useState(false);
-  const [hasRightMissileImpacted, setHasRightMissileImpacted] = useState(false);
   const leftMissileAnim = useRef(new Animated.Value(missileSize / 2)).current;
   const rightMissileAnim = useRef(new Animated.Value(missileSize / 2)).current;
   const leftMissilePosition = useRef(new MissilePosition()).current;
@@ -40,21 +36,13 @@ export const MissileProvider = ({children}: {children: React.ReactNode}) => {
     () => setHasRightMissileFired(true),
     [],
   );
-  const onLeftMissileImpact = useCallback(
-    () => setHasLeftMissileImpacted(true),
-    [],
-  );
-  const onRightMissileImpact = useCallback(
-    () => setHasRightMissileImpacted(true),
-    [],
-  );
-  const resetLeftMissileState = useCallback(() => {
+  const onLeftFireAnimationEnded = useCallback(() => {
+    // setHasLeftFireAnimationEnded(true);
     setHasLeftMissileFired(false);
-    setHasLeftMissileImpacted(false);
   }, []);
-  const resetRightMissileState = useCallback(() => {
+  const onRightFireAnimationEnded = useCallback(() => {
+    // setHasRightFireAnimationEnded(true);
     setHasRightMissileFired(false);
-    setHasRightMissileImpacted(false);
   }, []);
 
   return (
@@ -63,21 +51,17 @@ export const MissileProvider = ({children}: {children: React.ReactNode}) => {
       value={[
         {
           hasMissileFired: hasLeftMissileFired,
-          hasMissileImpacted: hasLeftMissileImpacted,
           missileAnim: leftMissileAnim,
           missilePosition: leftMissilePosition,
+          onFireAnimationEnded: onLeftFireAnimationEnded,
           onFireMissile: onFireLeftMissile,
-          onMissileImpact: onLeftMissileImpact,
-          resetMissileState: resetLeftMissileState,
         },
         {
           hasMissileFired: hasRightMissileFired,
-          hasMissileImpacted: hasRightMissileImpacted,
           missileAnim: rightMissileAnim,
           missilePosition: rightMissilePosition,
+          onFireAnimationEnded: onRightFireAnimationEnded,
           onFireMissile: onFireRightMissile,
-          onMissileImpact: onRightMissileImpact,
-          resetMissileState: resetRightMissileState,
         },
       ]}
     />

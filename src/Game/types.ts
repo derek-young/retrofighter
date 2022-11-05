@@ -14,17 +14,15 @@ interface MissilePositionProps {
 
 export interface MissileIconProps {
   hasMissileFired: boolean;
-  hasMissileImpacted: boolean;
   Icon: React.ElementType;
   missileAnim: Animated.Value;
+  onFireAnimationEnded: () => void;
   startingTop?: number;
 }
 
 export interface MissileProps extends Omit<MissileIconProps, 'Icon'> {
   missilePosition: MissilePositionProps;
   onFireMissile: () => void;
-  onMissileImpact: () => void;
-  resetMissileState: () => void;
 }
 
 export interface MissileAnimationProps {

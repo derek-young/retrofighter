@@ -35,18 +35,16 @@ function useMissileImpactDetector({
   const topRef = useRef<number>(startingTop);
   const checkMissileImpactRef = useRef<null | MissileImpactChecker>(null);
   const hasFiredRef = useRef(missile.hasMissileFired);
-  const hasImpactedRef = useRef(missile.hasMissileImpacted);
   const isTargetableRef = useRef(isTargetable);
 
   hasFiredRef.current = missile.hasMissileFired;
-  hasImpactedRef.current = missile.hasMissileImpacted;
   isTargetableRef.current = isTargetable;
 
   const checkMissileImpact = useCallback<MissileImpactChecker>(
     (position, onMissileImpact) => {
       const {missileLeft, missileTop} = position;
 
-      if (!hasFiredRef.current || hasImpactedRef.current) {
+      if (!hasFiredRef.current) {
         return;
       }
 
@@ -73,7 +71,7 @@ function useMissileImpactDetector({
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
-    const {missilePosition, onMissileImpact} = missile;
+    const {missilePosition, onFireAnimationEnded} = missile;
 
     missilePosition.addListener(({left, top}) => {
       if (!isTargetableRef.current) {
@@ -83,7 +81,7 @@ function useMissileImpactDetector({
       if (checkMissileImpactRef.current) {
         checkMissileImpactRef.current(
           {missileLeft: left, missileTop: top},
-          onMissileImpact,
+          onFireAnimationEnded,
         );
       }
     });

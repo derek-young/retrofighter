@@ -38,35 +38,25 @@ const EnemyMissile = ({
   const {craftRotation, facing, isPlayerInLineOfSight, leftAnim, topAnim} =
     useEnemyCraftContext();
   const [hasMissileFired, setHasMissileFired] = useState(false);
-  const [hasMissileImpacted, setHasMissileImpacted] = useState(false);
   const missileAnim = useRef(
     new Animated.Value(enemyMissileStartingTop),
   ).current;
   const missilePosition = useRef(new MissilePosition()).current;
-  const readyToFire = !hasMissileFired && !hasMissileImpacted;
 
-  const resetMissileState = useCallback(() => {
-    missileAnim.setValue(enemyMissileStartingTop);
-    setHasMissileImpacted(false);
-    setHasMissileFired(false);
-  }, [missileAnim]);
-
+  const onFireAnimationEnded = useCallback(() => setHasMissileFired(false), []);
   const onFireMissile = useCallback(() => {
-    if (readyToFire) {
+    if (!hasMissileFired) {
       setHasMissileFired(true);
-      setTimeout(resetMissileState, missileDuration);
+      setTimeout(onFireAnimationEnded, missileDuration);
     }
-  }, [readyToFire, resetMissileState]);
-  const onMissileImpact = useCallback(() => setHasMissileImpacted(true), []);
+  }, [hasMissileFired, onFireAnimationEnded]);
 
   const missileProps: MissileProps = {
     hasMissileFired,
-    hasMissileImpacted,
     missileAnim,
     missilePosition,
+    onFireAnimationEnded,
     onFireMissile,
-    onMissileImpact,
-    resetMissileState,
     startingTop: enemyMissileStartingTop,
   };
 
@@ -82,7 +72,7 @@ const EnemyMissile = ({
 
   useEffect(() => {
     if (
-      readyToFire &&
+      !hasMissileFired &&
       isPlayerInLineOfSight &&
       DEFAULT_FACING_ROTATION[facing] === craftRotation
     ) {
@@ -91,9 +81,9 @@ const EnemyMissile = ({
   }, [
     craftRotation,
     facing,
+    hasMissileFired,
     isPlayerInLineOfSight,
     onFireMissile,
-    readyToFire,
   ]);
 
   useEffect(() => () => missileAnim.removeAllListeners(), [missileAnim]);

@@ -57,7 +57,10 @@ const PauseMenu = ({
     <Pressable onPress={onClose} style={styles.pauseMenu}>
       <Pressable style={styles.menuItems}>
         <Pressable
-          onPress={onReset}
+          onPress={() => {
+            onReset();
+            onClose();
+          }}
           style={({pressed}) => [
             {opacity: pressed ? 0.3 : 1},
             styles.menuItem,
@@ -65,7 +68,11 @@ const PauseMenu = ({
           <IBMText style={styles.menuText}>Restart Level</IBMText>
         </Pressable>
         <Pressable
-          onPress={() => navigation.navigate('Catalog')}
+          onPress={() => {
+            navigation.navigate('Catalog');
+            onReset();
+            onClose();
+          }}
           style={({pressed}) => [
             {opacity: pressed ? 0.3 : 1},
             styles.menuItem,
