@@ -65,17 +65,19 @@ const Arena = (): JSX.Element => {
   return (
     <View style={styles.arena}>
       <View>
-        {enemies.map(
-          ({key, Enemy, hasEliminationAnimationEnded, ...rest}, i) => {
-            if (rest.isEliminated && hasEliminationAnimationEnded) {
-              return null;
-            }
+        {enemies.map((enemy, i) => {
+          if (enemy === null) {
+            return null;
+          }
 
-            return (
-              <Enemy key={key} startingLeft={totalWidth * (i + 1)} {...rest} />
-            );
-          },
-        )}
+          const {key, Enemy, hasEliminationAnimationEnded, ...rest} = enemy;
+
+          if (rest.isEliminated && hasEliminationAnimationEnded) {
+            return null;
+          }
+
+          return <Enemy key={key} startingLeft={totalWidth * i} {...rest} />;
+        })}
       </View>
       <Fighter key={remainingLives} />
       {new Array(numColumns - 1)

@@ -25,11 +25,22 @@ const Catalog = (): JSX.Element => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <CatalogButton onPress={() => navigation.navigate('Game', {epic: 1})}>
-        Epic 1
+      <CatalogButton onPress={() => navigation.navigate('Game', {epic: 0})}>
+        Level 1
       </CatalogButton>
-      <CatalogButton disabled onPress={() => console.log('epic 2')}>
-        Epic 2
+      <CatalogButton
+        disabled
+        onPress={() => navigation.navigate('Game', {epic: 1})}>
+        Level 2
+      </CatalogButton>
+      <CatalogButton onPress={() => navigation.navigate('Game', {epic: 2})}>
+        Level 3
+      </CatalogButton>
+      <CatalogButton onPress={() => navigation.navigate('Game', {epic: 3})}>
+        Level 4
+      </CatalogButton>
+      <CatalogButton onPress={() => navigation.navigate('Game', {epic: 4})}>
+        Level 5
       </CatalogButton>
     </SafeAreaView>
   );

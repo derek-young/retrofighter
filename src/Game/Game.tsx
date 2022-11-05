@@ -41,7 +41,7 @@ const styles = StyleSheet.create({
 
 const Game = ({route}: GameProps): null | JSX.Element => {
   const [uniqueKey, setUniqueKey] = useState(Date.now());
-  const epic = route?.params?.epic ?? 1;
+  const epic = route?.params?.epic ?? 0;
 
   return (
     <ImageBackground

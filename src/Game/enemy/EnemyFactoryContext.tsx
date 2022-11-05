@@ -12,7 +12,7 @@ interface Enemy {
   onIsEliminated: () => void;
 }
 
-type EnemyFactoryContextValue = Enemy[];
+type EnemyFactoryContextValue = (null | Enemy)[];
 
 const defaultValue: EnemyFactoryContextValue = [
   {
@@ -35,43 +35,75 @@ const EnemyFactoryContext = React.createContext(defaultValue);
 export const useEnemyFactoryContext = () => useContext(EnemyFactoryContext);
 
 const startingEnemies = [
-  DualFighter,
-  DualFighter,
-  DualFighter,
-  DualFighter,
-  EnemyUAV,
-  EnemyUAV,
-  EnemyUAV,
-  EnemyUAV,
+  [null, null, null, EnemyUAV, null, EnemyUAV, null, EnemyUAV],
+  [null, null, null, EnemyUAV, EnemyUAV, DualFighter, EnemyUAV, EnemyUAV],
+  [
+    null,
+    null,
+    EnemyUAV,
+    EnemyUAV,
+    DualFighter,
+    DualFighter,
+    DualFighter,
+    EnemyUAV,
+    EnemyUAV,
+  ],
+  [
+    null,
+    EnemyUAV,
+    EnemyUAV,
+    DualFighter,
+    DualFighter,
+    DualFighter,
+    DualFighter,
+    DualFighter,
+    EnemyUAV,
+    EnemyUAV,
+  ],
+  [
+    DualFighter,
+    DualFighter,
+    DualFighter,
+    DualFighter,
+    DualFighter,
+    DualFighter,
+    DualFighter,
+    DualFighter,
+    DualFighter,
+    DualFighter,
+  ],
 ];
 
 export const EnemyFactoryProvider = ({
   children,
   epic,
 }: EnemyFactoryProviderProps) => {
-  console.log('epic', epic);
   const [eliminatedEnemies, setEliminatedEnemies] = useState<boolean[]>([]);
   const [animationEnded, setAnimationEnded] = useState<boolean[]>([]);
 
   const enemies = useMemo(
     () =>
-      startingEnemies.map((Enemy, i) => ({
-        key: i,
-        Enemy,
-        hasEliminationAnimationEnded: animationEnded[i],
-        onEliminationAnimationEnd: () => {
-          const next = [...animationEnded];
-          next[i] = true;
-          return setAnimationEnded(next);
-        },
-        isEliminated: eliminatedEnemies[i],
-        onIsEliminated: () => {
-          const nextElim = [...eliminatedEnemies];
-          nextElim[i] = true;
-          return setEliminatedEnemies(nextElim);
-        },
-      })),
-    [animationEnded, eliminatedEnemies],
+      startingEnemies[epic].map((Enemy, i) =>
+        Enemy === null
+          ? null
+          : {
+              key: i,
+              Enemy,
+              hasEliminationAnimationEnded: animationEnded[i],
+              onEliminationAnimationEnd: () => {
+                const next = [...animationEnded];
+                next[i] = true;
+                return setAnimationEnded(next);
+              },
+              isEliminated: eliminatedEnemies[i],
+              onIsEliminated: () => {
+                const nextElim = [...eliminatedEnemies];
+                nextElim[i] = true;
+                return setEliminatedEnemies(nextElim);
+              },
+            },
+      ),
+    [animationEnded, eliminatedEnemies, epic],
   );
 
   return <EnemyFactoryContext.Provider children={children} value={enemies} />;

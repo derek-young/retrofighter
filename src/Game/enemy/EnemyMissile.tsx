@@ -1,7 +1,6 @@
 import React, {useCallback, useEffect, useRef, useState} from 'react';
 import {Animated} from 'react-native';
 
-import Colors from 'types/colors';
 import {DEFAULT_FACING_ROTATION} from 'Game/Craft';
 import {MissileProps} from 'Game/types';
 import {
@@ -21,14 +20,14 @@ import {useAnimationContext} from 'Game/Fighter/AnimationContext';
 import {useEliminationContext} from 'Game/Fighter/EliminationContext';
 
 interface EnemyMissileProps {
-  craftColor?: string;
+  missileColor?: string;
 }
 
 const enemyMissileStartingTop = 12;
 const leftOffset = 4;
 
 const EnemyMissile = ({
-  craftColor = Colors.RED,
+  missileColor = '#FF0042',
 }: EnemyMissileProps): null | JSX.Element => {
   const {
     hasPlayerMoved,
@@ -105,7 +104,7 @@ const EnemyMissile = ({
       facing={facing}
       Icon={({style}) => (
         <EnemyMissileIcon
-          fill={craftColor}
+          fill={missileColor}
           height={missileSize}
           width={missileSize}
           style={{...style, left: leftOffset}}

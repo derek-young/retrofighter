@@ -13,7 +13,7 @@ const App = (): JSX.Element => {
     <NavigationContainer>
       <Stack.Navigator
         // initialRouteName="Login"
-        initialRouteName="Game"
+        initialRouteName="Catalog"
         screenOptions={{headerShown: false}}>
         <Stack.Screen name="Catalog" component={Catalog} />
         <Stack.Screen
