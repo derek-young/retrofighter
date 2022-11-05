@@ -1,3 +1,4 @@
+import {useGameContext} from 'Game/GameContext';
 import React, {
   useCallback,
   useContext,
@@ -65,6 +66,7 @@ const AnimationContext = React.createContext(defaultValue);
 export const useAnimationContext = () => useContext(AnimationContext);
 
 export const AnimationProvider = ({children}: {children: React.ReactNode}) => {
+  const {isPaused} = useGameContext();
   const [thrustersEngagedFacing, setThrusterEngagedFacing] =
     useState<null | Facing>(null);
   const [hasPlayerMoved, setHasPlayerMoved] = useState(false);
@@ -77,12 +79,14 @@ export const AnimationProvider = ({children}: {children: React.ReactNode}) => {
   const nextRowRef = useRef(getNextAlley(playerStartTop, facing));
   const nextColRef = useRef(getNextAlley(playerStartLeft, facing));
   const craftSpeedRef = useRef(craftPixelsPerSecond);
+  const isPausedRef = useRef(isPaused);
 
   craftSpeedRef.current =
     thrustersEngagedFacing === null
       ? craftPixelsPerSecond
       : craftPixelsPerSecond * 1.5;
   facingRef.current = facing;
+  isPausedRef.current = isPaused;
 
   const topUpdaterRef = useRef<(props: UpdaterProps) => void>(
     ({value}: UpdaterProps) => {
@@ -101,6 +105,13 @@ export const AnimationProvider = ({children}: {children: React.ReactNode}) => {
     leftAnim.addListener(leftUpdaterRef.current);
     topAnim.addListener(topUpdaterRef.current);
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
+    if (isPaused) {
+      leftAnim.stopAnimation();
+      topAnim.stopAnimation();
+    }
+  }, [isPaused, leftAnim, topAnim]);
 
   const resetAnimationContext = useCallback(() => {
     leftAnim.setValue(playerStartLeft);
@@ -242,7 +253,7 @@ export const AnimationProvider = ({children}: {children: React.ReactNode}) => {
   );
 
   useEffect(() => {
-    if (!hasPlayerMoved) {
+    if (!hasPlayerMoved || isPaused) {
       return;
     }
 
@@ -265,7 +276,7 @@ export const AnimationProvider = ({children}: {children: React.ReactNode}) => {
         onLeftPress();
         break;
     }
-  }, [thrustersEngagedFacing]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [isPaused, thrustersEngagedFacing]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <AnimationContext.Provider

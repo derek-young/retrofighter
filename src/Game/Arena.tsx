@@ -58,43 +58,56 @@ const Seperator = (styleProps: SeperatorProps) => (
   </View>
 );
 
-const Arena = (): JSX.Element => {
+const Seperators = () => (
+  <View>
+    {new Array(numColumns - 1)
+      .fill(0)
+      .map((y, i) =>
+        new Array(numColumns - 1)
+          .fill(0)
+          .map((x, j) => (
+            <Seperator
+              key={i + j}
+              top={alleyWidth * (i + 1) + seperatorWidth * i}
+              left={alleyWidth * (j + 1) + seperatorWidth * j}
+              height={seperatorWidth}
+              width={seperatorWidth}
+            />
+          )),
+      )}
+  </View>
+);
+
+const Enemies = () => {
   const enemies = useEnemyFactoryContext();
+
+  return (
+    <View>
+      {enemies.map((enemy, i) => {
+        if (enemy === null) {
+          return null;
+        }
+
+        const {key, Enemy, hasEliminationAnimationEnded, ...rest} = enemy;
+
+        if (rest.isEliminated && hasEliminationAnimationEnded) {
+          return null;
+        }
+
+        return <Enemy key={key} startingLeft={totalWidth * i} {...rest} />;
+      })}
+    </View>
+  );
+};
+
+const Arena = (): JSX.Element => {
   const {remainingLives} = useEliminationContext();
 
   return (
     <View style={styles.arena}>
-      <View>
-        {enemies.map((enemy, i) => {
-          if (enemy === null) {
-            return null;
-          }
-
-          const {key, Enemy, hasEliminationAnimationEnded, ...rest} = enemy;
-
-          if (rest.isEliminated && hasEliminationAnimationEnded) {
-            return null;
-          }
-
-          return <Enemy key={key} startingLeft={totalWidth * i} {...rest} />;
-        })}
-      </View>
+      <Enemies />
       <Fighter key={remainingLives} />
-      {new Array(numColumns - 1)
-        .fill(0)
-        .map((y, i) =>
-          new Array(numColumns - 1)
-            .fill(0)
-            .map((x, j) => (
-              <Seperator
-                key={i + j}
-                top={alleyWidth * (i + 1) + seperatorWidth * i}
-                left={alleyWidth * (j + 1) + seperatorWidth * j}
-                height={seperatorWidth}
-                width={seperatorWidth}
-              />
-            )),
-        )}
+      <Seperators />
     </View>
   );
 };

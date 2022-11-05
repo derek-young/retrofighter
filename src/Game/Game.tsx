@@ -10,6 +10,7 @@ import IBMText from 'components/IBMText';
 import Arena from './Arena';
 import ButtonSet from './ButtonSet';
 import DPad from './DPad';
+import {GameProvider} from './GameContext';
 import {AnimationProvider} from './Fighter/AnimationContext';
 import {EliminationProvider} from './Fighter/EliminationContext';
 import {MissileProvider} from './Fighter/MissileContext';
@@ -57,26 +58,28 @@ const Game = ({route}: GameProps): null | JSX.Element => {
         key={uniqueKey}
         source={backgroundImage}
         style={styles.container}>
-        <AnimationProvider>
-          <EliminationProvider>
-            <MissileProvider>
-              <EnemyFactoryProvider epic={epic}>
-                <View style={styles.game}>
-                  <DPad />
-                  <Arena />
-                  <ButtonSet />
-                  <View style={styles.pauseButtonContainer}>
-                    <Pressable
-                      style={styles.pauseButton}
-                      onPress={() => setIsPaused(true)}>
-                      <IBMText>Pause</IBMText>
-                    </Pressable>
+        <GameProvider isPaused={isPaused}>
+          <AnimationProvider>
+            <EliminationProvider>
+              <MissileProvider>
+                <EnemyFactoryProvider epic={epic}>
+                  <View style={styles.game}>
+                    <DPad />
+                    <Arena />
+                    <ButtonSet />
+                    <View style={styles.pauseButtonContainer}>
+                      <Pressable
+                        style={styles.pauseButton}
+                        onPress={() => setIsPaused(true)}>
+                        <IBMText>Pause</IBMText>
+                      </Pressable>
+                    </View>
                   </View>
-                </View>
-              </EnemyFactoryProvider>
-            </MissileProvider>
-          </EliminationProvider>
-        </AnimationProvider>
+                </EnemyFactoryProvider>
+              </MissileProvider>
+            </EliminationProvider>
+          </AnimationProvider>
+        </GameProvider>
       </ImageBackground>
       <PauseMenu
         onClose={() => setIsPaused(false)}
