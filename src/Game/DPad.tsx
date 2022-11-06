@@ -71,31 +71,33 @@ const Directional = ({facing, rotation}: DirectionalProps): JSX.Element => {
   const [isPressed, setIsPressed] = useState(false);
 
   return (
-    <View
-      style={{
-        ...styles.directional,
-        transform: [{rotate: `${rotation}deg`}],
-      }}>
-      <Pressable
-        onLongPress={() => {
-          setIsPressed(true);
-          setThrusterEngagedFacing(facing);
-        }}
-        onPressOut={() => {
-          setIsPressed(false);
-          setThrusterEngagedFacing(null);
-        }}
+    <Pressable
+      onLongPress={() => {
+        setIsPressed(true);
+        setThrusterEngagedFacing(facing);
+      }}
+      onPressOut={() => {
+        setIsPressed(false);
+        setThrusterEngagedFacing(null);
+      }}
+      style={[
+        styles.directional,
         // eslint-disable-next-line react-native/no-inline-styles
-        style={{...styles.largeChevron, opacity: isPressed ? 0.4 : 1}}>
+        {
+          opacity: isPressed ? 0.4 : 1,
+          transform: [{rotate: `${rotation}deg`}],
+        },
+      ]}>
+      <View style={styles.largeChevron}>
         <ChevronRight fill={Colors.GREY} />
-      </Pressable>
+      </View>
       <View style={styles.mediumChevron}>
         <ChevronRightNarrow fill={Colors.GREY} />
       </View>
       <View style={styles.smallChevron}>
         <ChevronRightNarrow fill={Colors.GREY} />
       </View>
-    </View>
+    </Pressable>
   );
 };
 
