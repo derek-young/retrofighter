@@ -29,13 +29,14 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF20',
     paddingHorizontal: 16,
     paddingVertical: 12,
-    borderRadius: 8,
+    borderRadius: 12,
   },
   score: {
     color: Colors.PINK,
     fontSize: 32,
     shadowColor: 'black',
     shadowOpacity: 0.6,
+    shadowOffset: {width: 4, height: 4},
   },
   buttonHolder: {
     display: 'flex',
@@ -49,7 +50,7 @@ const styles = StyleSheet.create({
 
 const LevelCompletePopup = ({onReset}: {onReset: () => void}) => {
   const navigation = useNavigation<GameNavigationProp>();
-  const {epic, setRemainingLives} = useGameContext();
+  const {epic, totalScore, setRemainingLives} = useGameContext();
   const enemies = useEnemyFactoryContext();
   const fontAnimation = useRef(new Animated.Value(0));
   const scoreAnimation = useRef(new Animated.Value(0));
@@ -83,18 +84,18 @@ const LevelCompletePopup = ({onReset}: {onReset: () => void}) => {
 
     if (isOpen) {
       Animated.timing(fontAnimation.current, {
-        toValue: 100,
+        toValue: 80,
         duration: 1000,
         useNativeDriver: true,
       }).start();
 
       Animated.timing(scoreAnimation.current, {
-        toValue: 8694,
+        toValue: totalScore,
         duration: 2000,
         useNativeDriver: true,
       }).start(onScoreAnimEnd);
     }
-  }, [isOpen, setRemainingLives]);
+  }, [isOpen, setRemainingLives, totalScore]);
 
   if (!isOpen) {
     return null;
@@ -114,10 +115,10 @@ const LevelCompletePopup = ({onReset}: {onReset: () => void}) => {
               },
             },
           ]}>
-          WINNER
+          VICTORY
         </PressStartText>
         <View style={styles.scoreContainer}>
-          {score > 0 && (
+          {score !== 0 && (
             <PressStartText style={styles.score}>{score}</PressStartText>
           )}
         </View>

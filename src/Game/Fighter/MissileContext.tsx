@@ -32,7 +32,7 @@ const MissileContext = React.createContext(defaultValue);
 export const useMissileContext = () => useContext(MissileContext);
 
 export const MissileProvider = ({children}: {children: React.ReactNode}) => {
-  const {isPlayerEliminated} = useEliminationContext();
+  const {hasEliminationAnimationEnded} = useEliminationContext();
   const [hasLeftMissileFired, setHasLeftMissileFired] = useState(false);
   const [hasRightMissileFired, setHasRightMissileFired] = useState(false);
   const leftMissileAnim = useRef(new Animated.Value(missileSize / 2)).current;
@@ -41,11 +41,11 @@ export const MissileProvider = ({children}: {children: React.ReactNode}) => {
   const rightMissilePosition = useRef(new MissilePosition()).current;
 
   useEffect(() => {
-    if (isPlayerEliminated) {
+    if (hasEliminationAnimationEnded) {
       setHasLeftMissileFired(false);
       setHasRightMissileFired(false);
     }
-  }, [isPlayerEliminated]);
+  }, [hasEliminationAnimationEnded]);
 
   const onFireLeftMissile = useCallback(() => setHasLeftMissileFired(true), []);
   const onFireRightMissile = useCallback(

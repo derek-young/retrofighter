@@ -25,6 +25,7 @@ const styles = StyleSheet.create({
   },
   primaryText: {
     color: 'white',
+    fontWeight: '600',
   },
   secondaryText: {
     color: Colors.DAVY_GREY,

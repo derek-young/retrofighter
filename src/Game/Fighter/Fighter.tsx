@@ -1,4 +1,4 @@
-import React, {useCallback, useState} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import {StyleSheet} from 'react-native';
 
 import Colors from 'types/colors';
@@ -25,13 +25,24 @@ const Fighter = (): null | JSX.Element => {
     useEliminationContext();
   const [leftMissileProps, rightMissileProps] = useMissileContext();
   const [craftRotation, setCraftRotation] = useState(0);
+  const [isAwaitingMissileAnimEnd, setIsAwaitingMissileAnimEnd] =
+    useState(false);
 
   const onRotationChange = useCallback(
     ({value}: {value: number}) => setCraftRotation(Math.round(value)),
     [],
   );
 
-  if (isPlayerEliminated && hasEliminationAnimationEnded) {
+  const hasFiredMissile =
+    leftMissileProps.hasMissileFired || rightMissileProps.hasMissileFired;
+
+  useEffect(() => {
+    if (isAwaitingMissileAnimEnd && !hasFiredMissile) {
+      onEliminationEnd();
+    }
+  }, [hasFiredMissile, isAwaitingMissileAnimEnd, onEliminationEnd]);
+
+  if (hasEliminationAnimationEnded) {
     return null;
   }
 
@@ -44,32 +55,42 @@ const Fighter = (): null | JSX.Element => {
         fill={craftColor}
         facing={facing}
         isEliminated={isPlayerEliminated}
-        onEliminationEnd={onEliminationEnd}
+        onEliminationEnd={() => {
+          if (hasFiredMissile) {
+            setIsAwaitingMissileAnimEnd(true);
+          } else {
+            onEliminationEnd();
+          }
+        }}
         left={leftAnim}
         top={topAnim}
         rotationListener={onRotationChange}
         score={-500}
       />
-      <FighterMissile
-        craftColor={craftColor}
-        craftRotation={craftRotation}
-        facing={facing}
-        iconStyle={styles.missileLeft}
-        leftAnim={leftAnim}
-        topAnim={topAnim}
-        missileProps={leftMissileProps}
-        positionOffset={6.9}
-      />
-      <FighterMissile
-        craftColor={craftColor}
-        craftRotation={craftRotation}
-        facing={facing}
-        iconStyle={styles.missileRight}
-        leftAnim={leftAnim}
-        topAnim={topAnim}
-        missileProps={rightMissileProps}
-        positionOffset={18}
-      />
+      {(!isPlayerEliminated || leftMissileProps.hasMissileFired) && (
+        <FighterMissile
+          craftColor={craftColor}
+          craftRotation={craftRotation}
+          facing={facing}
+          iconStyle={styles.missileLeft}
+          leftAnim={leftAnim}
+          topAnim={topAnim}
+          missileProps={leftMissileProps}
+          positionOffset={6.9}
+        />
+      )}
+      {(!isPlayerEliminated || rightMissileProps.hasMissileFired) && (
+        <FighterMissile
+          craftColor={craftColor}
+          craftRotation={craftRotation}
+          facing={facing}
+          iconStyle={styles.missileRight}
+          leftAnim={leftAnim}
+          topAnim={topAnim}
+          missileProps={rightMissileProps}
+          positionOffset={18}
+        />
+      )}
     </>
   );
 };

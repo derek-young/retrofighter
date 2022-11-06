@@ -7,6 +7,7 @@ import PressStartText from 'components/PressStartText';
 
 import {craftSize} from './constants';
 import {Facing} from './types';
+import {useGameContext} from './GameContext';
 
 const styles = StyleSheet.create({
   iconContainer: {
@@ -100,10 +101,11 @@ const Craft = ({
   rotationListener,
   score,
 }: CraftProps): JSX.Element => {
+  const {setTotalScore} = useGameContext();
   const rotation = DEFAULT_FACING_ROTATION[facing];
   const shadow = SHADOW_POS[facing];
-  const rotationAnim = useRef(new Animated.Value(rotation)).current;
-  const elimAnimation = useRef(new Animated.Value(0)).current;
+  const rotationAnim = useRef(new Animated.Value(rotation));
+  const elimAnimation = useRef(new Animated.Value(0));
   const facingRef = useRef(facing);
   const onEliminationEndRef = useRef(onEliminationEnd);
   const rotationListenerRef = useRef(rotationListener);
@@ -120,47 +122,49 @@ const Craft = ({
     setRotationState(Math.round(value));
 
   useEffect(() => {
-    elimAnimation.addListener(elimValueListener);
-    rotationAnim.addListener(rotationValueListener);
+    elimAnimation.current.addListener(elimValueListener);
+    rotationAnim.current.addListener(rotationValueListener);
 
     if (rotationListenerRef.current) {
-      rotationAnim.addListener(rotationListenerRef.current);
+      rotationAnim.current.addListener(rotationListenerRef.current);
     }
-  }, [elimAnimation, rotationAnim]);
+  }, []);
 
   useEffect(() => {
     if (isEliminated) {
-      Animated.timing(elimAnimation, {
+      setTotalScore(s => s + score);
+
+      Animated.timing(elimAnimation.current, {
         toValue: 50,
         duration: 800,
         useNativeDriver: true,
       }).start(() => {
         onEliminationEndRef.current();
-        elimAnimation.setValue(0);
+        elimAnimation.current.setValue(0);
         setHasEliminationEnded(true);
       });
     }
-  }, [elimAnimation, isEliminated]);
+  }, [elimAnimation, isEliminated, score, setTotalScore]);
 
   useEffect(() => {
     const nextRotation = getNextRotationSet(facingRef.current)[facing];
 
     facingRef.current = facing;
 
-    Animated.timing(rotationAnim, {
+    Animated.timing(rotationAnim.current, {
       toValue: nextRotation,
       duration: 150,
       useNativeDriver: true,
     }).start(() => {
       // Normalize values on animation finish
       if (nextRotation === -180) {
-        rotationAnim.setValue(180);
+        rotationAnim.current.setValue(180);
       }
       if (nextRotation === 270) {
-        rotationAnim.setValue(-90);
+        rotationAnim.current.setValue(-90);
       }
     });
-  }, [facing, rotationAnim]);
+  }, [facing]);
 
   const scoreFontSize = Math.min(16, elimValue);
 

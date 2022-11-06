@@ -42,7 +42,7 @@ const Catalog = (): JSX.Element => {
       <CatalogButton onPress={() => navigation.navigate('Game', {epic: 4})}>
         Level 5
       </CatalogButton>
-      <Text style={styles.version}>v.1.5</Text>
+      <Text style={styles.version}>v.1.6</Text>
     </SafeAreaView>
   );
 };
