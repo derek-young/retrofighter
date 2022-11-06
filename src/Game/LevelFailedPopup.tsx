@@ -35,7 +35,7 @@ const styles = StyleSheet.create({
   },
 });
 
-const LevelCompletePopup = ({onReset}: {onReset: () => void}) => {
+const LevelFailedPopup = ({onReset}: {onReset: () => void}) => {
   const navigation = useNavigation<GameNavigationProp>();
   const {remainingLives, setRemainingLives} = useGameContext();
   const enemies = useEnemyFactoryContext();
@@ -115,4 +115,4 @@ const LevelCompletePopup = ({onReset}: {onReset: () => void}) => {
   );
 };
 
-export default LevelCompletePopup;
+export default LevelFailedPopup;

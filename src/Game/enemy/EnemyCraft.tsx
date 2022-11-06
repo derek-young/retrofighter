@@ -1,10 +1,11 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import {SvgProps} from 'react-native-svg';
 
 import Colors from 'types/colors';
 import Craft from 'Game/Craft';
 
 import {useEnemyCraftContext} from './EnemyCraftContext';
+import {useEnemyMissileContext} from './EnemyMissileContext';
 
 interface EnemyCraftProps {
   craftColor?: string;
@@ -23,6 +24,19 @@ const EnemyCraft = ({
     onEliminationAnimationEnd,
     onRotationChange,
   } = useEnemyCraftContext();
+  const missileProps = useEnemyMissileContext();
+  const [isAwaitingMissileAnimEnd, setIsAwaitingMissileAnimEnd] =
+    useState(false);
+
+  useEffect(() => {
+    if (isAwaitingMissileAnimEnd && !missileProps.hasMissileFired) {
+      onEliminationAnimationEnd();
+    }
+  }, [
+    isAwaitingMissileAnimEnd,
+    missileProps.hasMissileFired,
+    onEliminationAnimationEnd,
+  ]);
 
   return (
     <Craft
@@ -32,7 +46,13 @@ const EnemyCraft = ({
       fill={craftColor}
       left={leftAnim}
       top={topAnim}
-      onEliminationEnd={onEliminationAnimationEnd}
+      onEliminationEnd={() => {
+        if (missileProps.hasMissileFired) {
+          setIsAwaitingMissileAnimEnd(true);
+        } else {
+          onEliminationAnimationEnd();
+        }
+      }}
       rotationListener={onRotationChange}
     />
   );

@@ -16,15 +16,18 @@ const styles = StyleSheet.create({
     borderWidth: 2,
   },
   primary: {
-    backgroundColor: Colors.SKY_BLUE,
-    borderColor: Colors.SKY_BLUE,
+    backgroundColor: Colors.DAVY_GREY,
+    borderColor: Colors.DAVY_GREY,
   },
   secondary: {
     backgroundColor: 'white',
-    borderColor: Colors.SKY_BLUE,
+    borderColor: Colors.DAVY_GREY,
   },
-  text: {
-    color: Colors.MIDNIGHT_BLUE,
+  primaryText: {
+    color: 'white',
+  },
+  secondaryText: {
+    color: Colors.DAVY_GREY,
   },
 });
 
@@ -48,7 +51,10 @@ const Button = ({
       style,
     ]}
     onPress={onPress}>
-    <IBMText style={styles.text}>{children}</IBMText>
+    <IBMText
+      style={variant === 'primary' ? styles.primaryText : styles.secondaryText}>
+      {children}
+    </IBMText>
   </Pressable>
 );
 

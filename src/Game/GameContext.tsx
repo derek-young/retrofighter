@@ -1,4 +1,7 @@
-import React, {useContext, useState} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
+import {useNavigation} from '@react-navigation/native';
+
+import {GameNavigationProp} from 'types/app';
 
 const noop = () => {};
 
@@ -28,8 +31,17 @@ const GameContext = React.createContext(defaultValue);
 export const useGameContext = () => useContext(GameContext);
 
 export const GameProvider = ({children, epic}: GameProviderProps) => {
+  const navigation = useNavigation<GameNavigationProp>();
   const [isPaused, setIsPaused] = useState(false);
   const [remainingLives, setRemainingLives] = useState(1);
+
+  useEffect(() => {
+    const unsubscribe = navigation?.addListener('blur', () =>
+      setRemainingLives(1),
+    );
+
+    return unsubscribe;
+  }, [navigation]);
 
   return (
     <GameContext.Provider

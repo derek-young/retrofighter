@@ -90,9 +90,10 @@ const Craft = (props: CraftProps): JSX.Element => {
   const rotationAnim = useRef(new Animated.Value(rotation)).current;
   const elimAnimation = useRef(new Animated.Value(0)).current;
   const facingRef = useRef(facing);
-  const onEliminationEndRef = useRef<() => void>();
+  const onEliminationEndRef = useRef(onEliminationEnd);
   const rotationListenerRef = useRef(rotationListener);
   const [elimValue, setElimValue] = useState(0);
+  const [hasEliminationEnded, setHasEliminationEnded] = useState(false);
   const [rotationState, setRotationState] = useState(0);
 
   rotationListenerRef.current = rotationListener;
@@ -118,7 +119,11 @@ const Craft = (props: CraftProps): JSX.Element => {
         toValue: 50,
         duration: 400,
         useNativeDriver: true,
-      }).start(onEliminationEndRef.current);
+      }).start(() => {
+        onEliminationEndRef.current();
+        elimAnimation.setValue(0);
+        setHasEliminationEnded(true);
+      });
     }
   }, [elimAnimation, isEliminated]);
 
@@ -152,8 +157,12 @@ const Craft = (props: CraftProps): JSX.Element => {
           left,
         },
       ]}>
-      <Icon fill={fill} />
-      <Icon fill="#00000040" style={{...styles.shadow, ...shadow}} />
+      {hasEliminationEnded ? null : (
+        <>
+          <Icon fill={fill} />
+          <Icon fill="#00000040" style={{...styles.shadow, ...shadow}} />
+        </>
+      )}
       <ExposionIcon
         height={elimValue}
         width={elimValue}
