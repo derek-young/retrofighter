@@ -50,7 +50,7 @@ const GameView = ({onReset}: GameViewProps) => {
         <Button onPress={() => setIsPaused(true)}>Menu</Button>
       </View>
       <PauseMenu onReset={onReset} />
-      <LevelCompletePopup onReset={onReset} />
+      {/* <LevelCompletePopup onReset={onReset} /> */}
       <LevelFailedPopup onReset={onReset} />
     </View>
   );

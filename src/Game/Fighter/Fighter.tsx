@@ -48,6 +48,7 @@ const Fighter = (): null | JSX.Element => {
         left={leftAnim}
         top={topAnim}
         rotationListener={onRotationChange}
+        score={-500}
       />
       <FighterMissile
         craftColor={craftColor}

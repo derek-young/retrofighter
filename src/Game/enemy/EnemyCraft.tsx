@@ -10,11 +10,13 @@ import {useEnemyMissileContext} from './EnemyMissileContext';
 interface EnemyCraftProps {
   craftColor?: string;
   Icon: React.FC<SvgProps>;
+  score: number;
 }
 
 const EnemyCraft = ({
   craftColor = Colors.RED,
   Icon,
+  score,
 }: EnemyCraftProps): null | JSX.Element => {
   const {
     facing,
@@ -54,6 +56,7 @@ const EnemyCraft = ({
         }
       }}
       rotationListener={onRotationChange}
+      score={score}
     />
   );
 };

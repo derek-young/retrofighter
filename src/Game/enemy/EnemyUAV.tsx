@@ -15,7 +15,7 @@ interface EnemyUAVProps {
 }
 
 const EnemyUAV = (): JSX.Element => {
-  return <EnemyCraft Icon={EnemyUAVIcon} />;
+  return <EnemyCraft Icon={EnemyUAVIcon} score={200} />;
 };
 
 export default (props: EnemyUAVProps) => (

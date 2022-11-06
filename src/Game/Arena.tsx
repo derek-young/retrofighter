@@ -104,9 +104,9 @@ const Arena = (): JSX.Element => {
 
   return (
     <View style={styles.arena}>
+      <Seperators />
       <Enemies />
       <Fighter key={remainingLives} />
-      <Seperators />
     </View>
   );
 };

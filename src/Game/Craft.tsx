@@ -1,7 +1,9 @@
 import React, {useEffect, useRef, useState} from 'react';
 import {Animated, StyleSheet} from 'react-native';
 
+import Colors from 'types/colors';
 import ExposionIcon from 'icons/supernova.svg';
+import PressStartText from 'components/PressStartText';
 
 import {craftSize} from './constants';
 import {Facing} from './types';
@@ -22,6 +24,11 @@ const styles = StyleSheet.create({
   elimination: {
     position: 'absolute',
   },
+  score: {
+    position: 'absolute',
+    shadowColor: 'black',
+    shadowOpacity: 0.4,
+  },
 });
 
 export const DEFAULT_FACING_ROTATION: Record<Facing, number> = {
@@ -29,6 +36,13 @@ export const DEFAULT_FACING_ROTATION: Record<Facing, number> = {
   ['E']: 90,
   ['S']: 180,
   ['W']: -90,
+};
+
+const scorePosition: Record<Facing, Record<string, number>> = {
+  ['N']: {top: 24},
+  ['E']: {right: 0},
+  ['S']: {top: 24},
+  ['W']: {left: 0},
 };
 
 const sFacingRotation = {
@@ -72,19 +86,20 @@ export type CraftProps = {
   top: number | Animated.Value;
   left: number | Animated.Value;
   rotationListener?: (props: {value: number}) => void;
+  score: number;
 };
 
-const Craft = (props: CraftProps): JSX.Element => {
-  const {
-    Icon,
-    isEliminated,
-    facing,
-    fill,
-    onEliminationEnd,
-    left,
-    top,
-    rotationListener,
-  } = props;
+const Craft = ({
+  Icon,
+  isEliminated,
+  facing,
+  fill,
+  onEliminationEnd,
+  left,
+  top,
+  rotationListener,
+  score,
+}: CraftProps): JSX.Element => {
   const rotation = DEFAULT_FACING_ROTATION[facing];
   const shadow = SHADOW_POS[facing];
   const rotationAnim = useRef(new Animated.Value(rotation)).current;
@@ -117,7 +132,7 @@ const Craft = (props: CraftProps): JSX.Element => {
     if (isEliminated) {
       Animated.timing(elimAnimation, {
         toValue: 50,
-        duration: 400,
+        duration: 800,
         useNativeDriver: true,
       }).start(() => {
         onEliminationEndRef.current();
@@ -147,6 +162,8 @@ const Craft = (props: CraftProps): JSX.Element => {
     });
   }, [facing, rotationAnim]);
 
+  const scoreFontSize = Math.min(16, elimValue);
+
   return (
     <Animated.View
       style={[
@@ -168,6 +185,20 @@ const Craft = (props: CraftProps): JSX.Element => {
         width={elimValue}
         style={styles.elimination}
       />
+      <PressStartText
+        style={[
+          styles.score,
+          {
+            color: score > 0 ? Colors.GREEN : Colors.RED,
+            fontSize: scoreFontSize,
+            width: scoreFontSize * 4,
+            shadowOffset: {width: scoreFontSize / 8, height: scoreFontSize / 8},
+            transform: [{rotate: `${rotationState * -1}deg`}],
+            ...scorePosition[facing],
+          },
+        ]}>
+        {score > 0 ? `+${score}` : score}
+      </PressStartText>
     </Animated.View>
   );
 };

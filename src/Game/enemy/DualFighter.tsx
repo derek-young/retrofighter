@@ -28,6 +28,7 @@ const DualFighter = (): JSX.Element => {
             {...rest}
           />
         )}
+        score={300}
       />
       <EnemyMissile />
     </>

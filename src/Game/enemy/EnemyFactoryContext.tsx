@@ -36,6 +36,7 @@ const EnemyFactoryContext = React.createContext(defaultValue);
 export const useEnemyFactoryContext = () => useContext(EnemyFactoryContext);
 
 const startingEnemies = [
+  [EnemyUAV],
   [null, null, null, EnemyUAV, null, EnemyUAV, null, EnemyUAV],
   [null, null, null, EnemyUAV, EnemyUAV, DualFighter, EnemyUAV, EnemyUAV],
   [
