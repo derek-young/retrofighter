@@ -10,6 +10,7 @@ import Arena from './Arena';
 import ButtonSet from './ButtonSet';
 import DPad from './DPad';
 import LevelCompletePopup from './LevelCompletePopup';
+import LevelFailedPopup from './LevelFailedPopup';
 import {GameProvider, useGameContext} from './GameContext';
 import {AnimationProvider} from './Fighter/AnimationContext';
 import {EliminationProvider} from './Fighter/EliminationContext';
@@ -38,8 +39,7 @@ interface GameViewProps {
 }
 
 const GameView = ({onReset}: GameViewProps) => {
-  const {setIsPaused, remainingLives} = useGameContext();
-  console.log('remainingLives', remainingLives);
+  const {setIsPaused} = useGameContext();
 
   return (
     <View style={styles.game}>
@@ -51,6 +51,7 @@ const GameView = ({onReset}: GameViewProps) => {
       </View>
       <PauseMenu onReset={onReset} />
       <LevelCompletePopup onReset={onReset} />
+      <LevelFailedPopup onReset={onReset} />
     </View>
   );
 };
@@ -58,8 +59,8 @@ const GameView = ({onReset}: GameViewProps) => {
 type GameRouteParam = RouteProp<RootStackParamList, 'Game'>;
 
 type GameProps = {
+  navigation?: GameNavigationProp;
   route?: GameRouteParam;
-  navigation: GameNavigationProp;
 };
 
 const Game = ({navigation, route}: GameProps): null | JSX.Element => {
@@ -67,7 +68,7 @@ const Game = ({navigation, route}: GameProps): null | JSX.Element => {
   const epic = route?.params?.epic ?? 0;
 
   useEffect(() => {
-    const unsubscribe = navigation.addListener('blur', () => {
+    const unsubscribe = navigation?.addListener('blur', () => {
       setUniqueKey(Date.now());
     });
 

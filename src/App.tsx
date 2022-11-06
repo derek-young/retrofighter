@@ -13,7 +13,7 @@ const App = (): JSX.Element => {
     <NavigationContainer>
       <Stack.Navigator
         initialRouteName="Game"
-        screenOptions={{headerShown: false, unmountOnBlur: true}}>
+        screenOptions={{headerShown: false}}>
         <Stack.Screen name="Catalog" component={Catalog} />
         <Stack.Screen
           name="Game"

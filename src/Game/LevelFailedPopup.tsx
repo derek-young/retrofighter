@@ -20,27 +20,15 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   bannerText: {
-    color: Colors.GREEN,
+    color: Colors.RED,
     shadowColor: 'black',
     shadowOpacity: 0.4,
-  },
-  scoreContainer: {
-    marginVertical: 16,
-    backgroundColor: '#FFFFFF20',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderRadius: 8,
-  },
-  score: {
-    color: Colors.PINK,
-    fontSize: 32,
-    shadowColor: 'black',
-    shadowOpacity: 0.6,
   },
   buttonHolder: {
     display: 'flex',
     flexDirection: 'row',
     minHeight: 38,
+    marginVertical: 16,
   },
   button: {
     marginHorizontal: 8,
@@ -49,13 +37,11 @@ const styles = StyleSheet.create({
 
 const LevelCompletePopup = ({onReset}: {onReset: () => void}) => {
   const navigation = useNavigation<GameNavigationProp>();
-  const {epic, setRemainingLives} = useGameContext();
+  const {remainingLives, setRemainingLives} = useGameContext();
   const enemies = useEnemyFactoryContext();
   const fontAnimation = useRef(new Animated.Value(0));
-  const scoreAnimation = useRef(new Animated.Value(0));
   const [isOpen, setIsOpen] = useState(false);
   const [fontSize, setFontSize] = useState(0);
-  const [score, setScore] = useState(0);
   const [showButtons, setShowButtons] = useState(false);
 
   const areAllEnemiesEliminated = enemies.every(
@@ -63,38 +49,26 @@ const LevelCompletePopup = ({onReset}: {onReset: () => void}) => {
   );
 
   useEffect(() => {
-    if (areAllEnemiesEliminated) {
+    if (!areAllEnemiesEliminated && remainingLives < 0) {
       setTimeout(() => setIsOpen(true), 1000);
     }
-  }, [areAllEnemiesEliminated]);
+  }, [areAllEnemiesEliminated, remainingLives]);
 
   useEffect(() => {
     fontAnimation.current.addListener(({value}) => setFontSize(value));
-    scoreAnimation.current.addListener(({value}) =>
-      setScore(Math.round(value)),
-    );
   }, []);
 
   useEffect(() => {
-    const onScoreAnimEnd = () => {
-      setShowButtons(true);
-      setRemainingLives(l => l + 1);
-    };
+    const onFontAnimEnd = () => setShowButtons(true);
 
     if (isOpen) {
       Animated.timing(fontAnimation.current, {
-        toValue: 100,
+        toValue: 80,
         duration: 1000,
         useNativeDriver: true,
-      }).start();
-
-      Animated.timing(scoreAnimation.current, {
-        toValue: 8694,
-        duration: 2000,
-        useNativeDriver: true,
-      }).start(onScoreAnimEnd);
+      }).start(onFontAnimEnd);
     }
-  }, [isOpen, setRemainingLives]);
+  }, [isOpen]);
 
   if (!isOpen) {
     return null;
@@ -114,13 +88,8 @@ const LevelCompletePopup = ({onReset}: {onReset: () => void}) => {
               },
             },
           ]}>
-          WINNER
+          GAME OVER
         </PressStartText>
-        <View style={styles.scoreContainer}>
-          {score > 0 && (
-            <PressStartText style={styles.score}>{score}</PressStartText>
-          )}
-        </View>
         <View style={styles.buttonHolder}>
           {showButtons && (
             <>
@@ -132,11 +101,11 @@ const LevelCompletePopup = ({onReset}: {onReset: () => void}) => {
               </Button>
               <Button
                 onPress={() => {
-                  navigation.navigate('Game', {epic: epic + 1});
+                  setRemainingLives(1);
                   onReset();
                 }}
                 style={styles.button}>
-                Next Level
+                Retry Level
               </Button>
             </>
           )}
