@@ -47,7 +47,7 @@ const GameView = ({onReset}: GameViewProps) => {
       <Arena />
       <ButtonSet />
       <View style={styles.pauseButtonContainer}>
-        <Button onPress={() => setIsPaused(true)}>Game Menu</Button>
+        <Button onPress={() => setIsPaused(true)}>Menu</Button>
       </View>
       <PauseMenu onReset={onReset} />
       <LevelCompletePopup onReset={onReset} />

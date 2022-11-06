@@ -8,7 +8,8 @@ import IBMText from './IBMText';
 const styles = StyleSheet.create({
   button: {
     borderRadius: 4,
-    padding: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
     shadowColor: 'black',
     shadowOffset: {width: 2, height: 2},
     shadowOpacity: 0.4,

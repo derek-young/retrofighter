@@ -53,7 +53,6 @@ const PauseMenu = ({onReset}: PauseMenuProps): null | JSX.Element => {
         <Pressable
           onPress={() => {
             navigation.navigate('Catalog');
-            onReset();
             onClose();
           }}
           style={({pressed}) => [

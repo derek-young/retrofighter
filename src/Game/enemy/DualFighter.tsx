@@ -3,6 +3,7 @@ import React from 'react';
 import DualFighterIcon from 'icons/enemy-plane.svg';
 
 import {EnemyCraftContextProvider} from './EnemyCraftContext';
+import {EnemyMissileProvider} from './EnemyMissileContext';
 import EnemyCraft from './EnemyCraft';
 import EnemyMissile from './EnemyMissile';
 
@@ -35,6 +36,8 @@ const DualFighter = (): JSX.Element => {
 
 export default (props: DualFighterProps) => (
   <EnemyCraftContextProvider {...props}>
-    <DualFighter />
+    <EnemyMissileProvider>
+      <DualFighter />
+    </EnemyMissileProvider>
   </EnemyCraftContextProvider>
 );
