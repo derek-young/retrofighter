@@ -1,27 +1,21 @@
-import React, {useState} from 'react';
-import {ImageBackground, Pressable, StyleSheet, View} from 'react-native';
+import React, {useEffect, useState} from 'react';
+import {ImageBackground, StyleSheet, View} from 'react-native';
 import {RouteProp} from '@react-navigation/native';
 
-import {RootStackParamList} from 'types/app';
-import Colors from 'types/colors';
+import {GameNavigationProp, RootStackParamList} from 'types/app';
 import backgroundImage from 'images/backdrop.jpg';
-import IBMText from 'components/IBMText';
+import Button from 'components/Button';
 
 import Arena from './Arena';
 import ButtonSet from './ButtonSet';
 import DPad from './DPad';
-import {GameProvider} from './GameContext';
+import LevelCompletePopup from './LevelCompletePopup';
+import {GameProvider, useGameContext} from './GameContext';
 import {AnimationProvider} from './Fighter/AnimationContext';
 import {EliminationProvider} from './Fighter/EliminationContext';
 import {MissileProvider} from './Fighter/MissileContext';
 import {EnemyFactoryProvider} from './enemy/EnemyFactoryContext';
 import PauseMenu from './PauseMenu';
-
-type GameRouteParam = RouteProp<RootStackParamList, 'Game'>;
-
-type GameProps = {
-  route?: GameRouteParam;
-};
 
 const styles = StyleSheet.create({
   container: {
@@ -37,56 +31,68 @@ const styles = StyleSheet.create({
     left: 20,
     top: 20,
   },
-  pauseButton: {
-    borderRadius: 20,
-    padding: 10,
-    backgroundColor: Colors.LIGHT_PINK,
-    shadowColor: 'black',
-    shadowOffset: {width: 2, height: 2},
-    shadowOpacity: 0.4,
-  },
 });
 
-const Game = ({route}: GameProps): null | JSX.Element => {
-  const [isPaused, setIsPaused] = useState(false);
+interface GameViewProps {
+  onReset: () => void;
+}
+
+const GameView = ({onReset}: GameViewProps) => {
+  const {setIsPaused, remainingLives} = useGameContext();
+  console.log('remainingLives', remainingLives);
+
+  return (
+    <View style={styles.game}>
+      <DPad />
+      <Arena />
+      <ButtonSet />
+      <View style={styles.pauseButtonContainer}>
+        <Button onPress={() => setIsPaused(true)}>Game Menu</Button>
+      </View>
+      <PauseMenu onReset={onReset} />
+      <LevelCompletePopup onReset={onReset} />
+    </View>
+  );
+};
+
+type GameRouteParam = RouteProp<RootStackParamList, 'Game'>;
+
+type GameProps = {
+  route?: GameRouteParam;
+  navigation: GameNavigationProp;
+};
+
+const Game = ({navigation, route}: GameProps): null | JSX.Element => {
   const [uniqueKey, setUniqueKey] = useState(Date.now());
   const epic = route?.params?.epic ?? 0;
 
+  useEffect(() => {
+    const unsubscribe = navigation.addListener('blur', () => {
+      setUniqueKey(Date.now());
+    });
+
+    return unsubscribe;
+  }, [navigation]);
+
   return (
-    <View style={styles.container}>
-      <ImageBackground
-        key={uniqueKey}
-        source={backgroundImage}
-        style={styles.container}>
-        <GameProvider isPaused={isPaused}>
+    <GameProvider epic={epic}>
+      <View style={styles.container}>
+        <ImageBackground
+          key={uniqueKey}
+          source={backgroundImage}
+          style={styles.container}>
           <AnimationProvider>
             <EliminationProvider>
               <MissileProvider>
-                <EnemyFactoryProvider epic={epic}>
-                  <View style={styles.game}>
-                    <DPad />
-                    <Arena />
-                    <ButtonSet />
-                    <View style={styles.pauseButtonContainer}>
-                      <Pressable
-                        style={styles.pauseButton}
-                        onPress={() => setIsPaused(true)}>
-                        <IBMText>Game Menu</IBMText>
-                      </Pressable>
-                    </View>
-                  </View>
+                <EnemyFactoryProvider>
+                  <GameView onReset={() => setUniqueKey(Date.now())} />
                 </EnemyFactoryProvider>
               </MissileProvider>
             </EliminationProvider>
           </AnimationProvider>
-        </GameProvider>
-      </ImageBackground>
-      <PauseMenu
-        onClose={() => setIsPaused(false)}
-        onReset={() => setUniqueKey(Date.now())}
-        open={isPaused}
-      />
-    </View>
+        </ImageBackground>
+      </View>
+    </GameProvider>
   );
 };
 

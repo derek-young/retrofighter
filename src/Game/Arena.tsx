@@ -3,9 +3,8 @@ import {StyleSheet, View} from 'react-native';
 import Colors from 'types/colors';
 
 import Fighter from './Fighter';
+import {useGameContext} from './GameContext';
 import {useEnemyFactoryContext} from './enemy/EnemyFactoryContext';
-import {useEliminationContext} from './Fighter/EliminationContext';
-
 import {
   alleyWidth,
   arenaSize,
@@ -101,7 +100,7 @@ const Enemies = () => {
 };
 
 const Arena = (): JSX.Element => {
-  const {remainingLives} = useEliminationContext();
+  const {remainingLives} = useGameContext();
 
   return (
     <View style={styles.arena}>

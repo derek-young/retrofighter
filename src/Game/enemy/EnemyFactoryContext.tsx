@@ -1,5 +1,7 @@
 import React, {useContext, useMemo, useState} from 'react';
 
+import {useGameContext} from 'Game/GameContext';
+
 import DualFighter from './DualFighter';
 import EnemyUAV from './EnemyUAV';
 
@@ -27,7 +29,6 @@ const defaultValue: EnemyFactoryContextValue = [
 
 interface EnemyFactoryProviderProps {
   children: React.ReactNode;
-  epic: number;
 }
 
 const EnemyFactoryContext = React.createContext(defaultValue);
@@ -35,6 +36,7 @@ const EnemyFactoryContext = React.createContext(defaultValue);
 export const useEnemyFactoryContext = () => useContext(EnemyFactoryContext);
 
 const startingEnemies = [
+  [EnemyUAV],
   [null, null, null, EnemyUAV, null, EnemyUAV, null, EnemyUAV],
   [null, null, null, EnemyUAV, EnemyUAV, DualFighter, EnemyUAV, EnemyUAV],
   [
@@ -74,10 +76,8 @@ const startingEnemies = [
   ],
 ];
 
-export const EnemyFactoryProvider = ({
-  children,
-  epic,
-}: EnemyFactoryProviderProps) => {
+export const EnemyFactoryProvider = ({children}: EnemyFactoryProviderProps) => {
+  const {epic} = useGameContext();
   const [eliminatedEnemies, setEliminatedEnemies] = useState<boolean[]>([]);
   const [animationEnded, setAnimationEnded] = useState<boolean[]>([]);
 

@@ -1,5 +1,6 @@
 import React, {useCallback, useContext, useState} from 'react';
 
+import {useGameContext} from 'Game/GameContext';
 import {useAnimationContext} from './AnimationContext';
 
 type EliminationContextValue = {
@@ -7,7 +8,6 @@ type EliminationContextValue = {
   hasEliminationAnimationEnded: boolean;
   isPlayerEliminated: boolean;
   onEliminationEnd: () => void;
-  remainingLives: number;
   resetEliminationContext: () => void;
   shouldRenderPlayer: boolean;
 };
@@ -19,7 +19,6 @@ const defaultValue: EliminationContextValue = {
   hasEliminationAnimationEnded: false,
   isPlayerEliminated: false,
   onEliminationEnd: noop,
-  remainingLives: 3,
   resetEliminationContext: noop,
   shouldRenderPlayer: false,
 };
@@ -28,16 +27,16 @@ const EliminationContext = React.createContext(defaultValue);
 
 export const useEliminationContext = () => useContext(EliminationContext);
 
-export const EliminationProvider = ({
-  children,
-}: {
+interface EliminationProviderProps {
   children: React.ReactNode;
-}) => {
+}
+
+export const EliminationProvider = ({children}: EliminationProviderProps) => {
+  const {remainingLives, setRemainingLives} = useGameContext();
   const {resetAnimationContext} = useAnimationContext();
   const [isPlayerEliminated, setIsPlayerEliminated] = useState(false);
   const [hasEliminationAnimationEnded, setHasEliminationAnimationEnded] =
     useState(false);
-  const [remainingLives, setRemainingLives] = useState(3);
 
   const onIsPlayerEliminated = useCallback(() => {
     setIsPlayerEliminated(true);
@@ -53,12 +52,18 @@ export const EliminationProvider = ({
 
     if (remainingLives > 0) {
       setTimeout(() => {
-        setRemainingLives(l => l - 1);
         resetAnimationContext();
         resetEliminationContext();
       }, 1000);
     }
-  }, [remainingLives, resetAnimationContext, resetEliminationContext]);
+
+    setRemainingLives(l => l - 1);
+  }, [
+    remainingLives,
+    setRemainingLives,
+    resetAnimationContext,
+    resetEliminationContext,
+  ]);
 
   return (
     <EliminationContext.Provider
@@ -68,7 +73,6 @@ export const EliminationProvider = ({
         hasEliminationAnimationEnded,
         isPlayerEliminated,
         onEliminationEnd,
-        remainingLives,
         resetEliminationContext,
         shouldRenderPlayer: !(
           isPlayerEliminated && hasEliminationAnimationEnded

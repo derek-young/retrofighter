@@ -5,8 +5,8 @@ import Colors from 'types/colors';
 import ChevronRight from 'icons/right-chevron.svg';
 import ChevronRightNarrow from 'icons/right-chevron-narrow.svg';
 
-import {useAnimationContext} from './Fighter/AnimationContext';
-import {Facing} from './types';
+import {useAnimationContext} from '../Fighter/AnimationContext';
+import {Facing} from '../types';
 
 const buttonSize = 40;
 

@@ -12,8 +12,8 @@ const App = (): JSX.Element => {
   return (
     <NavigationContainer>
       <Stack.Navigator
-        initialRouteName="Catalog"
-        screenOptions={{headerShown: false}}>
+        initialRouteName="Game"
+        screenOptions={{headerShown: false, unmountOnBlur: true}}>
         <Stack.Screen name="Catalog" component={Catalog} />
         <Stack.Screen
           name="Game"

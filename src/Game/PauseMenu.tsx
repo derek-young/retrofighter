@@ -5,19 +5,10 @@ import {useNavigation} from '@react-navigation/native';
 import {GameNavigationProp} from 'types/app';
 import Colors from 'types/colors';
 import IBMText from 'components/IBMText';
+import Modal from 'components/Modal';
+import {useGameContext} from './GameContext';
 
 const styles = StyleSheet.create({
-  pauseMenu: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    position: 'absolute',
-    backgroundColor: '#00000040',
-    top: 0,
-    bottom: 0,
-    left: 0,
-    right: 0,
-  },
   menuItems: {
     minWidth: 160,
     padding: 16,
@@ -37,24 +28,16 @@ const styles = StyleSheet.create({
 });
 
 interface PauseMenuProps {
-  onClose: () => void;
   onReset: () => void;
-  open: boolean;
 }
 
-const PauseMenu = ({
-  onClose,
-  onReset,
-  open,
-}: PauseMenuProps): null | JSX.Element => {
+const PauseMenu = ({onReset}: PauseMenuProps): null | JSX.Element => {
   const navigation = useNavigation<GameNavigationProp>();
-
-  if (!open) {
-    return null;
-  }
+  const {isPaused, setIsPaused} = useGameContext();
+  const onClose = () => setIsPaused(false);
 
   return (
-    <Pressable onPress={onClose} style={styles.pauseMenu}>
+    <Modal onClose={onClose} open={isPaused}>
       <Pressable style={styles.menuItems}>
         <Pressable
           onPress={() => {
@@ -80,7 +63,7 @@ const PauseMenu = ({
           <IBMText style={styles.menuText}>Exit Level</IBMText>
         </Pressable>
       </Pressable>
-    </Pressable>
+    </Modal>
   );
 };
 

@@ -12,10 +12,11 @@ import Colors from 'types/colors';
 import {missileDuration} from 'Game/constants';
 
 import LifeIndicator from './LifeIndicator';
-import {useGameContext} from './GameContext';
-import {useAnimationContext} from './Fighter/AnimationContext';
-import {useEliminationContext} from './Fighter/EliminationContext';
-import {useMissileContext} from './Fighter/MissileContext';
+
+import {useGameContext} from '../GameContext';
+import {useAnimationContext} from '../Fighter/AnimationContext';
+import {useEliminationContext} from '../Fighter/EliminationContext';
+import {useMissileContext} from '../Fighter/MissileContext';
 
 const buttonSize = 56;
 
@@ -141,16 +142,18 @@ const ActionButton = ({
 };
 
 const ButtonSet = (): JSX.Element => {
+  const {remainingLives} = useGameContext();
   const {hasPlayerMoved, setHasPlayerMoved} = useAnimationContext();
-  const {isPlayerEliminated, remainingLives} = useEliminationContext();
+  const {isPlayerEliminated} = useEliminationContext();
   const [leftMissile, rightMissile] = useMissileContext();
 
   return (
     <View style={styles.buttonSet}>
       <View style={[styles.section, styles.top]}>
-        {new Array(remainingLives).fill(0).map((_, i) => (
-          <LifeIndicator key={i} />
-        ))}
+        {remainingLives > 0 &&
+          new Array(remainingLives)
+            .fill(0)
+            .map((_, i) => <LifeIndicator key={i} />)}
       </View>
       <View style={[styles.section, styles.middle]}>
         <ActionButton
