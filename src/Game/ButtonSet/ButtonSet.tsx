@@ -21,9 +21,6 @@ import {useMissileContext} from '../Fighter/MissileContext';
 const buttonSize = 56;
 
 const styles = StyleSheet.create({
-  buttonSet: {
-    flex: 1,
-  },
   section: {
     flex: 1,
   },
@@ -143,12 +140,12 @@ const ActionButton = ({
 
 const ButtonSet = (): JSX.Element => {
   const {remainingLives} = useGameContext();
-  const {hasPlayerMoved, setHasPlayerMoved} = useAnimationContext();
+  const {hasPlayerMoved} = useAnimationContext();
   const {isPlayerEliminated} = useEliminationContext();
   const [leftMissile, rightMissile] = useMissileContext();
 
   return (
-    <View style={styles.buttonSet}>
+    <View style={styles.section}>
       <View style={[styles.section, styles.top]}>
         {remainingLives > 0 &&
           new Array(remainingLives)
@@ -157,27 +154,23 @@ const ButtonSet = (): JSX.Element => {
       </View>
       <View style={[styles.section, styles.middle]}>
         <ActionButton
-          disabled={leftMissile.hasMissileFired || isPlayerEliminated}
+          disabled={
+            leftMissile.hasMissileFired || isPlayerEliminated || !hasPlayerMoved
+          }
           hasMissileFired={leftMissile.hasMissileFired}
           isEliminated={isPlayerEliminated}
-          onPress={() => {
-            if (!hasPlayerMoved) {
-              setHasPlayerMoved(true);
-            }
-            leftMissile.onFireMissile();
-          }}>
+          onPress={leftMissile.onFireMissile}>
           A
         </ActionButton>
         <ActionButton
-          disabled={rightMissile.hasMissileFired || isPlayerEliminated}
+          disabled={
+            rightMissile.hasMissileFired ||
+            isPlayerEliminated ||
+            !hasPlayerMoved
+          }
           hasMissileFired={rightMissile.hasMissileFired}
           isEliminated={isPlayerEliminated}
-          onPress={() => {
-            if (!hasPlayerMoved) {
-              setHasPlayerMoved(true);
-            }
-            rightMissile.onFireMissile();
-          }}>
+          onPress={rightMissile.onFireMissile}>
           B
         </ActionButton>
       </View>
