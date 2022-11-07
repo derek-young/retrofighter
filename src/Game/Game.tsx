@@ -11,12 +11,13 @@ import ButtonSet from './ButtonSet';
 import DPad from './DPad';
 import LevelCompletePopup from './LevelCompletePopup';
 import LevelFailedPopup from './LevelFailedPopup';
+import PauseMenu from './PauseMenu';
+import Score from './Score';
 import {GameProvider, useGameContext} from './GameContext';
 import {AnimationProvider} from './Fighter/AnimationContext';
 import {EliminationProvider} from './Fighter/EliminationContext';
 import {MissileProvider} from './Fighter/MissileContext';
 import {EnemyFactoryProvider} from './enemy/EnemyFactoryContext';
-import PauseMenu from './PauseMenu';
 
 const styles = StyleSheet.create({
   container: {
@@ -39,7 +40,7 @@ interface GameViewProps {
 }
 
 const GameView = ({onReset}: GameViewProps) => {
-  const {setIsPaused} = useGameContext();
+  const {pendingScores, setIsPaused} = useGameContext();
 
   return (
     <View style={styles.game}>
@@ -52,6 +53,9 @@ const GameView = ({onReset}: GameViewProps) => {
       <PauseMenu onReset={onReset} />
       <LevelCompletePopup onReset={onReset} />
       <LevelFailedPopup onReset={onReset} />
+      {pendingScores.map((score, i) => (
+        <Score key={i} score={score} top={(i + 1) * 20} />
+      ))}
     </View>
   );
 };

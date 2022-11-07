@@ -1,17 +1,9 @@
-import React, {
-  useCallback,
-  useContext,
-  useEffect,
-  useRef,
-  useState,
-} from 'react';
+import React, {useCallback, useContext, useRef, useState} from 'react';
 import {Animated} from 'react-native';
 
 import {missileSize} from 'Game/constants';
 import {MissileProps} from 'Game/types';
 import MissilePosition from 'Game/missilePositionFactory';
-
-import {useEliminationContext} from './EliminationContext';
 
 type MissileContextValue = MissileProps[];
 
@@ -32,7 +24,6 @@ const MissileContext = React.createContext(defaultValue);
 export const useMissileContext = () => useContext(MissileContext);
 
 export const MissileProvider = ({children}: {children: React.ReactNode}) => {
-  const {hasEliminationAnimationEnded} = useEliminationContext();
   const [hasLeftMissileFired, setHasLeftMissileFired] = useState(false);
   const [hasRightMissileFired, setHasRightMissileFired] = useState(false);
   const leftMissileAnim = useRef(new Animated.Value(missileSize / 2)).current;
@@ -40,26 +31,19 @@ export const MissileProvider = ({children}: {children: React.ReactNode}) => {
   const leftMissilePosition = useRef(new MissilePosition()).current;
   const rightMissilePosition = useRef(new MissilePosition()).current;
 
-  useEffect(() => {
-    if (hasEliminationAnimationEnded) {
-      setHasLeftMissileFired(false);
-      setHasRightMissileFired(false);
-    }
-  }, [hasEliminationAnimationEnded]);
-
   const onFireLeftMissile = useCallback(() => setHasLeftMissileFired(true), []);
   const onFireRightMissile = useCallback(
     () => setHasRightMissileFired(true),
     [],
   );
-  const onLeftFireAnimationEnded = useCallback(() => {
-    // setHasLeftFireAnimationEnded(true);
-    setHasLeftMissileFired(false);
-  }, []);
-  const onRightFireAnimationEnded = useCallback(() => {
-    // setHasRightFireAnimationEnded(true);
-    setHasRightMissileFired(false);
-  }, []);
+  const onLeftFireAnimationEnded = useCallback(
+    () => setHasLeftMissileFired(false),
+    [],
+  );
+  const onRightFireAnimationEnded = useCallback(
+    () => setHasRightMissileFired(false),
+    [],
+  );
 
   return (
     <MissileContext.Provider
