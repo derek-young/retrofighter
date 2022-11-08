@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>546339593164-bg4oqbl949eo2lr7rqrpv20da369gajh.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.546339593164-bg4oqbl949eo2lr7rqrpv20da369gajh</string>
+	<key>API_KEY</key>
+	<string>AIzaSyBY9dUQ7sDAhg2mHz4u8JTbLLwC0tlygco</string>
+	<key>GCM_SENDER_ID</key>
+	<string>546339593164</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>app.scratchtheory.retrofighter</string>
+	<key>PROJECT_ID</key>
+	<string>retro-fighter-f3c7d</string>
+	<key>STORAGE_BUCKET</key>
+	<string>retro-fighter-f3c7d.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:546339593164:ios:427e49eb834eaa11c5db69</string>
+</dict>
+</plist>

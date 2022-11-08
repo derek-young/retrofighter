@@ -1,12 +1,16 @@
-import React from 'react';
-import {Button, StyleSheet, View} from 'react-native';
+import React, {useEffect, useState} from 'react';
+import {ActivityIndicator, StyleSheet, View} from 'react-native';
 import {useNavigation} from '@react-navigation/native';
+import auth from '@react-native-firebase/auth';
 
 import Colors from 'types/colors';
 import {LoginNavigationProp} from 'types/app';
 import GradientText from 'components/GradientText';
 import IBMText from 'components/IBMText';
 import PressStartText from 'components/PressStartText';
+
+import GoogleSigninButton from './GoogleSigninButton';
+import {useAppContext} from 'AppContext';
 
 const styles = StyleSheet.create({
   container: {
@@ -25,8 +29,6 @@ const styles = StyleSheet.create({
   },
   bottom: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'flex-start',
   },
   title: {
     fontSize: 40,
@@ -50,7 +52,47 @@ const styles = StyleSheet.create({
 });
 
 const Login = (): JSX.Element => {
+  const {user, setUser} = useAppContext();
   const navigation = useNavigation<LoginNavigationProp>();
+  const [initializing, setInitializing] = useState(true);
+
+  useEffect(() => {
+    const subscriber = auth().onAuthStateChanged(nextUser => {
+      setUser(nextUser);
+      setInitializing(false);
+    });
+
+    return subscriber;
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
+    if (user) {
+      navigation.navigate('Catalog');
+    }
+  }, [navigation, user]);
+
+  const renderCenterView = () => {
+    if (initializing) {
+      return (
+        <View style={styles.center}>
+          <ActivityIndicator size="large" color={Colors.GREEN} />
+        </View>
+      );
+    }
+
+    return (
+      <View style={styles.center}>
+        <IBMText style={styles.basicText}>Sign In to Track Your Scores</IBMText>
+        <GoogleSigninButton />
+        <IBMText style={styles.basicText}>or</IBMText>
+        <PressStartText
+          onPress={() => navigation.navigate('Catalog')}
+          style={[styles.continueText, styles.textShadow]}>
+          Continue
+        </PressStartText>
+      </View>
+    );
+  };
 
   return (
     <View style={styles.container}>
@@ -65,20 +107,8 @@ const Login = (): JSX.Element => {
           }}
         />
       </View>
-      <View style={styles.center}>
-        <IBMText style={styles.basicText}>Sign In to Track Scores</IBMText>
-        <Button title="Sign In with Facebook" />
-        <Button title="Sign In with Google" />
-        <Button title="Sign In with Apple" />
-      </View>
-      <View style={styles.bottom}>
-        <IBMText style={styles.basicText}>or</IBMText>
-        <PressStartText
-          onPress={() => navigation.navigate('Catalog')}
-          style={[styles.continueText, styles.textShadow]}>
-          Continue
-        </PressStartText>
-      </View>
+      {renderCenterView()}
+      <View style={styles.bottom} />
     </View>
   );
 };
