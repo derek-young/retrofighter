@@ -5,6 +5,7 @@ import {useNavigation} from '@react-navigation/native';
 import {CatalogNavigationProp} from 'types/app';
 
 import CatalogButton from './CatalogButton';
+import DogTag from './DogTag';
 
 const styles = StyleSheet.create({
   container: {
@@ -15,7 +16,7 @@ const styles = StyleSheet.create({
   version: {
     position: 'absolute',
     left: 32,
-    top: 16,
+    bottom: 32,
     color: 'red',
   },
 });
@@ -25,6 +26,7 @@ const Catalog = (): JSX.Element => {
 
   return (
     <SafeAreaView style={styles.container}>
+      <DogTag />
       <CatalogButton onPress={() => navigation.navigate('Game', {epic: 0})}>
         Level 1
       </CatalogButton>
@@ -42,7 +44,7 @@ const Catalog = (): JSX.Element => {
       <CatalogButton onPress={() => navigation.navigate('Game', {epic: 4})}>
         Level 5
       </CatalogButton>
-      <Text style={styles.version}>v.1.6</Text>
+      <Text style={styles.version}>v.1.7</Text>
     </SafeAreaView>
   );
 };

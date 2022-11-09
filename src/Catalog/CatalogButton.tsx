@@ -12,7 +12,7 @@ const styles = StyleSheet.create({
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    margin: 8,
+    margin: 12,
   },
   button: {
     backgroundColor: Colors.GREY,
