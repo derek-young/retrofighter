@@ -10,7 +10,7 @@ const styles = StyleSheet.create({
   iconContainer: {
     height: craftSize,
     width: craftSize,
-    margin: 2,
+    margin: 4,
   },
   shadow: {
     position: 'absolute',

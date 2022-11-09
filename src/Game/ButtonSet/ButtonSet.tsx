@@ -17,6 +17,7 @@ import {useGameContext} from '../GameContext';
 import {useAnimationContext} from '../Fighter/AnimationContext';
 import {useEliminationContext} from '../Fighter/EliminationContext';
 import {useMissileContext} from '../Fighter/MissileContext';
+import IBMText from 'components/IBMText';
 
 const buttonSize = 56;
 
@@ -61,6 +62,10 @@ const styles = StyleSheet.create({
   buttonText: {
     color: 'white',
     fontSize: 24,
+  },
+  lives: {
+    color: 'white',
+    lineHeight: 24,
   },
 });
 
@@ -147,10 +152,12 @@ const ButtonSet = (): JSX.Element => {
   return (
     <View style={styles.section}>
       <View style={[styles.section, styles.top]}>
-        {remainingLives > 0 &&
-          new Array(remainingLives)
-            .fill(0)
-            .map((_, i) => <LifeIndicator key={i} />)}
+        {remainingLives > 0 && (
+          <>
+            <LifeIndicator />
+            <IBMText style={styles.lives}>x {remainingLives}</IBMText>
+          </>
+        )}
       </View>
       <View style={[styles.section, styles.middle]}>
         <ActionButton

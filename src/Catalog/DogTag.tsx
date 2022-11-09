@@ -11,19 +11,27 @@ import {getDisplayName, getRank, getRankInsignia} from './utils';
 
 const styles = StyleSheet.create({
   container: {
+    borderBottomWidth: 4,
+    borderColor: `${Colors.PURPLE}90`,
+    marginBottom: 16,
+    width: '100%',
+  },
+  gradiant: {
     display: 'flex',
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'flex-start',
+    justifyContent: 'space-between',
     height: 56,
-    width: '100%',
-    padding: 8,
-    marginBottom: 16,
+    paddingHorizontal: 16,
+  },
+  left: {
+    display: 'flex',
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   imageContainer: {
     display: 'flex',
     justifyContent: 'center',
-    marginLeft: 8,
     marginRight: 12,
   },
   image: {
@@ -43,23 +51,33 @@ const DogTag = () => {
   const {totalScore} = useGameContext();
 
   return (
-    <LinearGradient
-      colors={[Colors.GREY, 'white', Colors.GREY]}
-      style={styles.container}>
-      <View style={styles.imageContainer}>
-        <Image
-          resizeMode="contain"
-          source={getRankInsignia(totalScore)}
-          style={styles.image}
-        />
-      </View>
-      <View>
-        <IBMText style={[styles.name, styles.text]}>
-          {getDisplayName(user)}
-        </IBMText>
-        <IBMText style={styles.text}>{getRank(totalScore)}</IBMText>
-      </View>
-    </LinearGradient>
+    <View style={styles.container}>
+      <LinearGradient
+        colors={[Colors.GREY, 'white', Colors.GREY]}
+        style={styles.gradiant}>
+        <View style={styles.left}>
+          <View style={styles.imageContainer}>
+            <Image
+              resizeMode="contain"
+              source={getRankInsignia(totalScore)}
+              style={styles.image}
+            />
+          </View>
+          <View>
+            <IBMText style={[styles.name, styles.text]}>
+              {getDisplayName(user)}
+            </IBMText>
+            <IBMText style={styles.text}>{getRank(totalScore)}</IBMText>
+          </View>
+        </View>
+        <View style={styles.left}>
+          <IBMText>
+            High score:&nbsp;
+            {totalScore.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+          </IBMText>
+        </View>
+      </LinearGradient>
+    </View>
   );
 };
 

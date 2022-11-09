@@ -1,8 +1,15 @@
 import React from 'react';
-import {StyleSheet, TouchableOpacity, View, ViewStyle} from 'react-native';
+import {
+  Image,
+  StyleSheet,
+  TouchableOpacity,
+  View,
+  ViewStyle,
+} from 'react-native';
 
 import Colors from 'types/colors';
 import PressStartText from 'components/PressStartText';
+import silverStarImage from 'images/silver-star.png';
 
 const BUTTON_WIDTH = 160;
 const BUTTON_HEIGHT = 56;
@@ -19,12 +26,23 @@ const styles = StyleSheet.create({
     width: BUTTON_WIDTH - 12,
     height: BUTTON_HEIGHT - 12,
     borderRadius: 4,
+    paddingBottom: 4,
   },
   buttonBackground: {
-    backgroundColor: '#00000030',
+    backgroundColor: `${Colors.PURPLE}90`,
     width: BUTTON_WIDTH,
     height: BUTTON_HEIGHT,
     borderRadius: 8,
+  },
+  stars: {
+    display: 'flex',
+    flexDirection: 'row',
+    position: 'absolute',
+    bottom: 4,
+  },
+  star: {
+    height: 12,
+    width: 12,
   },
 });
 
@@ -32,12 +50,14 @@ type CatalogButtonProps = {
   children: string;
   disabled?: boolean;
   onPress: () => void;
+  stars: number;
 };
 
 const CatalogButton = ({
   children,
   disabled = false,
   onPress,
+  stars,
 }: CatalogButtonProps): JSX.Element => {
   const containerStyles = {
     ...styles.buttonContainer,
@@ -58,6 +78,11 @@ const CatalogButton = ({
         onPress={onPress}
         style={[styles.buttonContainer, styles.button]}>
         <PressStartText>{children}</PressStartText>
+        <View style={styles.stars}>
+          {new Array(stars).fill(0).map((_, i) => (
+            <Image key={i} source={silverStarImage} style={styles.star} />
+          ))}
+        </View>
       </ButtonComponent>
     </View>
   );
