@@ -52,7 +52,7 @@ const SigninButton = () => {
 
   return (
     <GoogleSigninButton
-      color={GoogleSigninButton.Color.Light}
+      color={GoogleSigninButton.Color.Dark}
       disabled={authStatus === STATUS.PENDING}
       onPress={signIn}
       size={GoogleSigninButton.Size.Wide}

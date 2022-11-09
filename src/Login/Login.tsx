@@ -1,10 +1,16 @@
 import React, {useEffect, useState} from 'react';
-import {ActivityIndicator, StyleSheet, View} from 'react-native';
+import {
+  ActivityIndicator,
+  ImageBackground,
+  StyleSheet,
+  View,
+} from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import auth from '@react-native-firebase/auth';
 
 import Colors from 'types/colors';
 import {LoginNavigationProp} from 'types/app';
+import loginBackground from 'images/backdrop_login.png';
 import GradientText from 'components/GradientText';
 import IBMText from 'components/IBMText';
 import PressStartText from 'components/PressStartText';
@@ -13,14 +19,21 @@ import GoogleSigninButton from './GoogleSigninButton';
 import {useAppContext} from 'AppContext';
 
 const styles = StyleSheet.create({
+  backdrop: {
+    flex: 1,
+  },
   container: {
     flex: 1,
-    marginTop: 32,
+    backgroundColor: `${Colors.DEEP_PURPLE}10`,
+    paddingTop: 64,
   },
   top: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'flex-end',
+    shadowColor: 'black',
+    shadowOffset: {height: 4, width: 4},
+    shadowOpacity: 0.4,
   },
   center: {
     flex: 2,
@@ -82,7 +95,9 @@ const Login = (): JSX.Element => {
 
     return (
       <View style={styles.center}>
-        <IBMText style={styles.basicText}>Sign In to Track Your Scores</IBMText>
+        <IBMText style={styles.basicText}>
+          Sign In to Track Your Progress
+        </IBMText>
         <GoogleSigninButton />
         <IBMText style={styles.basicText}>or</IBMText>
         <PressStartText
@@ -95,21 +110,23 @@ const Login = (): JSX.Element => {
   };
 
   return (
-    <View style={styles.container}>
-      <View style={styles.top}>
-        <GradientText
-          gradientProps={{
-            colors: [Colors.GREEN, Colors.GREEN, Colors.RED],
-          }}
-          textProps={{
-            children: 'Retro Fighter',
-            style: styles.title,
-          }}
-        />
+    <ImageBackground source={loginBackground} style={styles.backdrop}>
+      <View style={styles.container}>
+        <View style={styles.top}>
+          <GradientText
+            gradientProps={{
+              colors: [Colors.GREEN, Colors.GREEN, Colors.RED],
+            }}
+            textProps={{
+              children: 'Retro Fighter',
+              style: styles.title,
+            }}
+          />
+        </View>
+        {renderCenterView()}
+        <View style={styles.bottom} />
       </View>
-      {renderCenterView()}
-      <View style={styles.bottom} />
-    </View>
+    </ImageBackground>
   );
 };
 
