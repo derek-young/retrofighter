@@ -3,7 +3,11 @@ import {ImageBackground, StyleSheet, View} from 'react-native';
 import {RouteProp} from '@react-navigation/native';
 
 import {GameNavigationProp, RootStackParamList} from 'types/app';
-import backgroundImage from 'images/backdrop.jpg';
+import backgroundImageLvl1 from 'images/backdrop_level_1.jpg';
+import backgroundImageLvl2 from 'images/backdrop_level_2.jpg';
+import backgroundImageLvl3 from 'images/backdrop_level_3.jpg';
+import backgroundImageLvl4 from 'images/backdrop_level_4.jpg';
+import backgroundImageLvl5 from 'images/backdrop_level_5.jpg';
 import Button from 'components/Button';
 
 import Arena from './Arena';
@@ -34,6 +38,23 @@ const styles = StyleSheet.create({
     top: 20,
   },
 });
+
+function getBackgroundImage(epic: number) {
+  switch (epic) {
+    case 0:
+      return backgroundImageLvl1;
+    case 1:
+      return backgroundImageLvl2;
+    case 2:
+      return backgroundImageLvl3;
+    case 3:
+      return backgroundImageLvl4;
+    case 4:
+      return backgroundImageLvl5;
+    default:
+      return backgroundImageLvl1;
+  }
+}
 
 interface GameViewProps {
   onReset: () => void;
@@ -84,7 +105,7 @@ const Game = ({navigation, route}: GameProps): null | JSX.Element => {
       <View style={styles.container}>
         <ImageBackground
           key={uniqueKey}
-          source={backgroundImage}
+          source={getBackgroundImage(epic)}
           style={styles.container}>
           <AnimationProvider>
             <EliminationProvider>

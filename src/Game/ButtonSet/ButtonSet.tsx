@@ -19,7 +19,7 @@ import {useEliminationContext} from '../Fighter/EliminationContext';
 import {useMissileContext} from '../Fighter/MissileContext';
 import IBMText from 'components/IBMText';
 
-const buttonSize = 56;
+const buttonSize = 60;
 
 const styles = StyleSheet.create({
   section: {
@@ -41,10 +41,9 @@ const styles = StyleSheet.create({
     height: buttonSize,
     width: buttonSize,
     borderRadius: buttonSize / 2,
+    borderWidth: 4,
+    borderColor: `${Colors.SKY_BLUE}99`,
     margin: 12,
-    shadowColor: 'black',
-    shadowOffset: {width: 2, height: 2},
-    shadowOpacity: 0.4,
     overflow: 'hidden',
     backgroundColor: Colors.GREY,
   },
@@ -52,8 +51,8 @@ const styles = StyleSheet.create({
     opacity: 0.8,
   },
   buttonBackground: {
-    bottom: 0,
-    left: 0,
+    bottom: -4,
+    left: -4,
     width: buttonSize,
     position: 'absolute',
     zIndex: -1,

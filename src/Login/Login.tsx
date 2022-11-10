@@ -10,7 +10,7 @@ import auth from '@react-native-firebase/auth';
 
 import Colors from 'types/colors';
 import {LoginNavigationProp} from 'types/app';
-import loginBackground from 'images/backdrop_login.png';
+import loginBackground from 'images/backdrop_login.jpg';
 import GradientText from 'components/GradientText';
 import IBMText from 'components/IBMText';
 import PressStartText from 'components/PressStartText';

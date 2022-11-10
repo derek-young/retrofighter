@@ -17,17 +17,34 @@ const styles = StyleSheet.create({
   arena: {
     width: arenaSize,
     height: arenaSize,
-    backgroundColor: `${Colors.PINK}40`,
   },
   seperator: {
     position: 'absolute',
     backgroundColor: '#FFF',
     borderRadius: 2,
+    opacity: 0.8,
     shadowColor: 'black',
     shadowOffset: {width: 2, height: 2},
     shadowOpacity: 0.4,
   },
 });
+
+function getBackgroundColor(epic: number) {
+  switch (epic) {
+    case 0:
+      return `${Colors.SKY_BLUE}40`;
+    case 1:
+      return `${Colors.MIDNIGHT_BLUE}60`;
+    case 2:
+      return `${Colors.PINK}40`;
+    case 3:
+      return `${Colors.DEEP_PURPLE}40`;
+    case 4:
+      return `${Colors.SKY_BLUE}40`;
+    default:
+      return `${Colors.PINK}40`;
+  }
+}
 
 type SeperatorProps = {
   top: number;
@@ -100,10 +117,11 @@ const Enemies = () => {
 };
 
 const Arena = (): JSX.Element => {
-  const {remainingLives} = useGameContext();
+  const {epic, remainingLives} = useGameContext();
+  const backgroundColor = getBackgroundColor(epic);
 
   return (
-    <View style={styles.arena}>
+    <View style={[styles.arena, {backgroundColor}]}>
       <Seperators />
       <Enemies />
       <Fighter key={remainingLives} />
