@@ -15,6 +15,7 @@ import GradientText from 'components/GradientText';
 import IBMText from 'components/IBMText';
 import PressStartText from 'components/PressStartText';
 
+import CraftPreview from './CraftPreview';
 import GoogleSigninButton from './GoogleSigninButton';
 import {useAppContext} from 'AppContext';
 
@@ -35,8 +36,12 @@ const styles = StyleSheet.create({
     shadowOffset: {height: 4, width: 4},
     shadowOpacity: 0.4,
   },
+  preview: {
+    flex: 0.5,
+    justifyContent: 'flex-end',
+  },
   center: {
-    flex: 2,
+    flex: 1.5,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -122,6 +127,9 @@ const Login = (): JSX.Element => {
               style: styles.title,
             }}
           />
+        </View>
+        <View style={styles.preview}>
+          <CraftPreview />
         </View>
         {renderCenterView()}
         <View style={styles.bottom} />

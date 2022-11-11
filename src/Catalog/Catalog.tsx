@@ -23,43 +23,41 @@ const Catalog = (): JSX.Element => {
   const navigation = useNavigation<CatalogNavigationProp>();
 
   return (
-    <>
-      <ImageBackground
-        source={pyramidsImage}
-        resizeMode="cover"
-        style={styles.background}>
-        <TransparentSafeAreaView />
-        <View style={styles.container}>
-          <DogTag />
-          <CatalogButton
-            onPress={() => navigation.navigate('Game', {epic: 0})}
-            stars={1}>
-            Level 1
-          </CatalogButton>
-          <CatalogButton
-            onPress={() => navigation.navigate('Game', {epic: 1})}
-            stars={2}>
-            Level 2
-          </CatalogButton>
-          <CatalogButton
-            onPress={() => navigation.navigate('Game', {epic: 2})}
-            stars={3}>
-            Level 3
-          </CatalogButton>
-          <CatalogButton
-            onPress={() => navigation.navigate('Game', {epic: 3})}
-            stars={4}>
-            Level 4
-          </CatalogButton>
-          <CatalogButton
-            onPress={() => navigation.navigate('Game', {epic: 4})}
-            stars={5}>
-            Level 5
-          </CatalogButton>
-        </View>
-        <TransparentSafeAreaView />
-      </ImageBackground>
-    </>
+    <ImageBackground
+      source={pyramidsImage}
+      resizeMode="cover"
+      style={styles.background}>
+      <TransparentSafeAreaView />
+      <View style={styles.container}>
+        <DogTag />
+        <CatalogButton
+          onPress={() => navigation.navigate('Game', {epic: 0})}
+          stars={1}>
+          Level 1
+        </CatalogButton>
+        <CatalogButton
+          onPress={() => navigation.navigate('Game', {epic: 1})}
+          stars={2}>
+          Level 2
+        </CatalogButton>
+        <CatalogButton
+          onPress={() => navigation.navigate('Game', {epic: 2})}
+          stars={3}>
+          Level 3
+        </CatalogButton>
+        <CatalogButton
+          onPress={() => navigation.navigate('Game', {epic: 3})}
+          stars={4}>
+          Level 4
+        </CatalogButton>
+        <CatalogButton
+          onPress={() => navigation.navigate('Game', {epic: 4})}
+          stars={5}>
+          Level 5
+        </CatalogButton>
+      </View>
+      <TransparentSafeAreaView />
+    </ImageBackground>
   );
 };
 
