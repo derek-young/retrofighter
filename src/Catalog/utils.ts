@@ -1,4 +1,4 @@
-import {FireBaseUser} from 'AppContext';
+import {AuthUser} from 'AppContext';
 
 import rank1Insignia from 'images/rank1.png';
 import rank2Insignia from 'images/rank2.png';
@@ -49,7 +49,7 @@ export function getRankInsignia(score: number) {
   return rankInsignia[rankIndex];
 }
 
-export function getDisplayName(user: FireBaseUser) {
+export function getDisplayName(user: AuthUser) {
   if (user?.displayName?.length) {
     const [first, last] = user.displayName.split(' ');
 

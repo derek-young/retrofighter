@@ -3,7 +3,7 @@ import {FirebaseAuthTypes} from '@react-native-firebase/auth';
 
 const noop = () => {};
 
-export type FireBaseUser = null | FirebaseAuthTypes.User;
+export type AuthUser = null | FirebaseAuthTypes.User;
 
 const defaultValue: AppContextValue = {
   user: null,
@@ -11,8 +11,8 @@ const defaultValue: AppContextValue = {
 };
 
 interface AppContextValue {
-  user: FireBaseUser;
-  setUser: (user: FireBaseUser) => void;
+  user: AuthUser;
+  setUser: (user: AuthUser) => void;
 }
 
 const AppContext = React.createContext(defaultValue);
@@ -24,7 +24,7 @@ export const AppContextProvider = ({
 }: {
   children: React.ReactElement;
 }) => {
-  const [user, setUser] = useState<FireBaseUser>(null);
+  const [user, setUser] = useState<AuthUser>(null);
 
   return (
     <AppContext.Provider

@@ -1,8 +1,8 @@
 import React, {useEffect, useRef, useState} from 'react';
 import {Animated, StyleSheet, View} from 'react-native';
 import {useNavigation} from '@react-navigation/native';
-import database from '@react-native-firebase/database';
 
+import {userActions} from 'database';
 import {GameNavigationProp} from 'types/app';
 import Colors from 'types/colors';
 import Button from 'components/Button';
@@ -12,7 +12,6 @@ import PressStartText from 'components/PressStartText';
 import {useEnemyFactoryContext} from './enemy/EnemyFactoryContext';
 import {useGameContext} from './GameContext';
 import ExitLevelButton from './ExitLevelButton';
-import {useAppContext} from 'AppContext';
 
 const styles = StyleSheet.create({
   modal: {
@@ -53,7 +52,6 @@ const styles = StyleSheet.create({
 
 const LevelCompletePopup = ({onReset}: {onReset: () => void}) => {
   const navigation = useNavigation<GameNavigationProp>();
-  const {user} = useAppContext();
   const {epic, totalScore, setRemainingLives} = useGameContext();
   const enemies = useEnemyFactoryContext();
   const fontAnimation = useRef(new Animated.Value(0));
@@ -61,7 +59,7 @@ const LevelCompletePopup = ({onReset}: {onReset: () => void}) => {
   const [isOpen, setIsOpen] = useState(false);
   const [fontSize, setFontSize] = useState(0);
   const [score, setScore] = useState(0);
-  const [showButtons, setShowButtons] = useState(false);
+  const [haveAnimationsEnded, setHaveAnimationsEnded] = useState(false);
 
   const areAllEnemiesEliminated = enemies.every(
     e => e === null || e.isEliminated,
@@ -82,7 +80,7 @@ const LevelCompletePopup = ({onReset}: {onReset: () => void}) => {
 
   useEffect(() => {
     const onScoreAnimEnd = () => {
-      setShowButtons(true);
+      setHaveAnimationsEnded(true);
       setRemainingLives(l => l + 1);
     };
 
@@ -100,6 +98,21 @@ const LevelCompletePopup = ({onReset}: {onReset: () => void}) => {
       }).start(onScoreAnimEnd);
     }
   }, [isOpen, setRemainingLives, totalScore]);
+
+  useEffect(() => {
+    const recordHighScore = async () => {
+      const user = await userActions.get();
+      const highScore = user?.highScore ?? 0;
+
+      if (highScore < totalScore) {
+        userActions.set({highScore: totalScore});
+      }
+    };
+
+    if (haveAnimationsEnded && isOpen) {
+      recordHighScore();
+    }
+  }, [haveAnimationsEnded, isOpen, totalScore]);
 
   if (!isOpen) {
     return null;
@@ -127,7 +140,7 @@ const LevelCompletePopup = ({onReset}: {onReset: () => void}) => {
           )}
         </View>
         <View style={styles.buttonHolder}>
-          {showButtons && (
+          {haveAnimationsEnded && (
             <>
               <ExitLevelButton />
               <Button

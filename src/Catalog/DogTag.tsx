@@ -1,11 +1,11 @@
 import React, {useEffect, useState} from 'react';
 import {Image, StyleSheet, View} from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
-import database from '@react-native-firebase/database';
 
 import {useAppContext} from 'AppContext';
 import Colors from 'types/colors';
 import IBMText from 'components/IBMText';
+import {userActions} from 'database';
 
 import {getDisplayName, getRank, getRankInsignia} from './utils';
 
@@ -31,7 +31,6 @@ const styles = StyleSheet.create({
   },
   right: {
     display: 'flex',
-    // flexDirection: 'row',
     alignItems: 'flex-end',
   },
   imageContainer: {
@@ -54,6 +53,16 @@ const styles = StyleSheet.create({
 const DogTag = () => {
   const {user} = useAppContext();
   const [highScore, setHighScore] = useState(0);
+
+  useEffect(() => {
+    const onScoreChange = userActions.on(dbUser => {
+      const currHighScore = dbUser?.highScore ?? 0;
+
+      setHighScore(currHighScore);
+    });
+
+    return () => userActions.off(onScoreChange);
+  }, []);
 
   return (
     <View style={styles.container}>
