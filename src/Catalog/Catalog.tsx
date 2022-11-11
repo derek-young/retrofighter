@@ -1,5 +1,5 @@
 import React from 'react';
-import {ImageBackground, StyleSheet, Text, View} from 'react-native';
+import {ImageBackground, StyleSheet, View} from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 
 import {CatalogNavigationProp} from 'types/app';
@@ -16,12 +16,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: 'center',
-  },
-  version: {
-    position: 'absolute',
-    left: 32,
-    bottom: 0,
-    color: 'red',
   },
 });
 
@@ -62,7 +56,6 @@ const Catalog = (): JSX.Element => {
             stars={5}>
             Level 5
           </CatalogButton>
-          <Text style={styles.version}>v.1.7</Text>
         </View>
         <TransparentSafeAreaView />
       </ImageBackground>
