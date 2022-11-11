@@ -36,7 +36,7 @@ function getBackgroundColor(epic: number) {
     case 1:
       return `${Colors.MIDNIGHT_BLUE}60`;
     case 2:
-      return `${Colors.PINK}40`;
+      return `${Colors.MIDNIGHT_BLUE}60`;
     case 3:
       return `${Colors.DEEP_PURPLE}40`;
     case 4:

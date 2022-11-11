@@ -11,7 +11,7 @@ import rank7Insignia from 'images/rank7.png';
 const rankNames = [
   'Ensign',
   'Lieutenant',
-  'Lieutenant Commander',
+  'Lt.Commander',
   'Commander',
   'Captain',
   'Fleet Captain',

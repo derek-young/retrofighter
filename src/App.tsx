@@ -16,7 +16,11 @@ const App = (): JSX.Element => {
         <Stack.Navigator
           initialRouteName="Login"
           screenOptions={{headerShown: false}}>
-          <Stack.Screen name="Catalog" component={Catalog} />
+          <Stack.Screen
+            name="Catalog"
+            component={Catalog}
+            options={{orientation: 'portrait'}}
+          />
           <Stack.Screen
             name="Game"
             component={Game}

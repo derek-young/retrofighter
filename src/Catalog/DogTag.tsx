@@ -1,9 +1,9 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import {Image, StyleSheet, View} from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
+import database from '@react-native-firebase/database';
 
 import {useAppContext} from 'AppContext';
-import {useGameContext} from 'Game/GameContext';
 import Colors from 'types/colors';
 import IBMText from 'components/IBMText';
 
@@ -29,6 +29,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
   },
+  right: {
+    display: 'flex',
+    // flexDirection: 'row',
+    alignItems: 'flex-end',
+  },
   imageContainer: {
     display: 'flex',
     justifyContent: 'center',
@@ -48,7 +53,7 @@ const styles = StyleSheet.create({
 
 const DogTag = () => {
   const {user} = useAppContext();
-  const {totalScore} = useGameContext();
+  const [highScore, setHighScore] = useState(0);
 
   return (
     <View style={styles.container}>
@@ -59,7 +64,7 @@ const DogTag = () => {
           <View style={styles.imageContainer}>
             <Image
               resizeMode="contain"
-              source={getRankInsignia(totalScore)}
+              source={getRankInsignia(highScore)}
               style={styles.image}
             />
           </View>
@@ -67,13 +72,13 @@ const DogTag = () => {
             <IBMText style={[styles.name, styles.text]}>
               {getDisplayName(user)}
             </IBMText>
-            <IBMText style={styles.text}>{getRank(totalScore)}</IBMText>
+            <IBMText style={styles.text}>{getRank(highScore)}</IBMText>
           </View>
         </View>
-        <View style={styles.left}>
+        <View style={styles.right}>
+          <IBMText>High Score</IBMText>
           <IBMText>
-            High score:&nbsp;
-            {totalScore.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+            {highScore.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
           </IBMText>
         </View>
       </LinearGradient>

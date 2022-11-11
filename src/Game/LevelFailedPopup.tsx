@@ -1,8 +1,5 @@
 import React, {useEffect, useRef, useState} from 'react';
 import {Animated, StyleSheet, View} from 'react-native';
-import {useNavigation} from '@react-navigation/native';
-
-import {GameNavigationProp} from 'types/app';
 import Colors from 'types/colors';
 import Button from 'components/Button';
 import Modal from 'components/Modal';
@@ -10,6 +7,7 @@ import PressStartText from 'components/PressStartText';
 
 import {useEnemyFactoryContext} from './enemy/EnemyFactoryContext';
 import {useGameContext} from './GameContext';
+import ExitLevelButton from './ExitLevelButton';
 
 const styles = StyleSheet.create({
   modal: {
@@ -36,7 +34,6 @@ const styles = StyleSheet.create({
 });
 
 const LevelFailedPopup = ({onReset}: {onReset: () => void}) => {
-  const navigation = useNavigation<GameNavigationProp>();
   const {remainingLives, setRemainingLives} = useGameContext();
   const enemies = useEnemyFactoryContext();
   const fontAnimation = useRef(new Animated.Value(0));
@@ -93,12 +90,7 @@ const LevelFailedPopup = ({onReset}: {onReset: () => void}) => {
         <View style={styles.buttonHolder}>
           {showButtons && (
             <>
-              <Button
-                onPress={() => navigation.navigate('Catalog')}
-                style={styles.button}
-                variant="secondary">
-                Exit Game
-              </Button>
+              <ExitLevelButton />
               <Button
                 onPress={() => {
                   setRemainingLives(1);

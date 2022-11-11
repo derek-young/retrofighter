@@ -3,7 +3,7 @@ import {ImageBackground, StyleSheet, Text, View} from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 
 import {CatalogNavigationProp} from 'types/app';
-import pyramidsImage from 'images/backdrop_catalog.png';
+import pyramidsImage from 'images/backdrop_catalog.jpg';
 import TransparentSafeAreaView from 'components/TransparentSafeAreaView';
 
 import CatalogButton from './CatalogButton';
