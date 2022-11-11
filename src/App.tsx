@@ -1,7 +1,8 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import {StatusBar} from 'react-native';
 import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
+import SplashScreen from 'react-native-splash-screen';
 
 import Catalog from './Catalog';
 import Game from './Game';
@@ -11,6 +12,10 @@ import {AppContextProvider} from './AppContext';
 const Stack = createNativeStackNavigator();
 
 const App = (): JSX.Element => {
+  useEffect(() => {
+    SplashScreen.hide();
+  }, []);
+
   return (
     <AppContextProvider>
       <NavigationContainer>

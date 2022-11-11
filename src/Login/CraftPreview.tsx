@@ -14,6 +14,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-around',
     width: '100%',
+    paddingHorizontal: 32,
   },
   iconContainer: {
     height: previewSize,
@@ -37,7 +38,7 @@ const styles = StyleSheet.create({
   },
   missileRight: {
     right: -5,
-    bottom: 72,
+    bottom: 60,
   },
   fastGreen: {
     display: 'flex',
