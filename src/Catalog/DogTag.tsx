@@ -1,11 +1,10 @@
-import React, {useEffect, useState} from 'react';
+import React from 'react';
 import {Image, StyleSheet, View} from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 
 import {useAppContext} from 'AppContext';
 import Colors from 'types/colors';
 import IBMText from 'components/IBMText';
-import {userActions} from 'database';
 
 import {getDisplayName, getRank, getRankInsignia} from './utils';
 
@@ -51,18 +50,7 @@ const styles = StyleSheet.create({
 });
 
 const DogTag = () => {
-  const {user} = useAppContext();
-  const [highScore, setHighScore] = useState(0);
-
-  useEffect(() => {
-    const onScoreChange = userActions.on(dbUser => {
-      const currHighScore = dbUser?.highScore ?? 0;
-
-      setHighScore(currHighScore);
-    });
-
-    return () => userActions.off(onScoreChange);
-  }, []);
+  const {user, highScore} = useAppContext();
 
   return (
     <View style={styles.container}>

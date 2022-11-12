@@ -2,15 +2,15 @@ import React, {useEffect, useRef, useState} from 'react';
 import {Animated, StyleSheet, View} from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 
-import {userActions} from 'database';
 import {GameNavigationProp} from 'types/app';
+import {useAppContext} from 'AppContext';
 import Colors from 'types/colors';
 import Button from 'components/Button';
 import Modal from 'components/Modal';
 import PressStartText from 'components/PressStartText';
 
-import {useEnemyFactoryContext} from './enemy/EnemyFactoryContext';
 import {useGameContext} from './GameContext';
+import {useEnemyFactoryContext} from './enemy/EnemyFactoryContext';
 import ExitLevelButton from './ExitLevelButton';
 
 const styles = StyleSheet.create({
@@ -52,6 +52,7 @@ const styles = StyleSheet.create({
 
 const LevelCompletePopup = ({onReset}: {onReset: () => void}) => {
   const navigation = useNavigation<GameNavigationProp>();
+  const {setHighScore} = useAppContext();
   const {epic, totalScore, setRemainingLives} = useGameContext();
   const enemies = useEnemyFactoryContext();
   const fontAnimation = useRef(new Animated.Value(0));
@@ -100,19 +101,12 @@ const LevelCompletePopup = ({onReset}: {onReset: () => void}) => {
   }, [isOpen, setRemainingLives, totalScore]);
 
   useEffect(() => {
-    const recordHighScore = async () => {
-      const user = await userActions.get();
-      const highScore = user?.highScore ?? 0;
-
-      if (highScore < totalScore) {
-        userActions.set({highScore: totalScore});
-      }
-    };
-
     if (haveAnimationsEnded && isOpen) {
-      recordHighScore();
+      setHighScore(currentHighScore =>
+        currentHighScore < totalScore ? totalScore : currentHighScore,
+      );
     }
-  }, [haveAnimationsEnded, isOpen, totalScore]);
+  }, [haveAnimationsEnded, isOpen, setHighScore, totalScore]);
 
   if (!isOpen) {
     return null;

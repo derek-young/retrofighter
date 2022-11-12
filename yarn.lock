@@ -1673,10 +1673,10 @@
   "resolved" "https://registry.npmjs.org/@react-native-firebase/database/-/database-16.4.3.tgz"
   "version" "16.4.3"
 
-"@react-native-google-signin/google-signin@^8.2.0":
-  "integrity" "sha512-O43gUt0UtVNuLcxFvPouIXObJ68eMO8z08j5n/TXnc/nckg6l54p/BsmefaRoby15gIAi96OADB0GAbwaraDFg=="
-  "resolved" "https://registry.npmjs.org/@react-native-google-signin/google-signin/-/google-signin-8.2.0.tgz"
-  "version" "8.2.0"
+"@react-native-google-signin/google-signin@^8.2.1":
+  "integrity" "sha512-wtSjKXKxxwntE7A98b4ry6rbTDidxF6taAZISLnJ9WYffFvgyreliKjg3e9IDuTBLCDpDYKUOqK9I/h4hMFnjg=="
+  "resolved" "https://registry.npmjs.org/@react-native-google-signin/google-signin/-/google-signin-8.2.1.tgz"
+  "version" "8.2.1"
 
 "@react-native-masked-view/masked-view@^0.2.7":
   "integrity" "sha512-ME+egr2l25rkcIJjFoXQUWWlfkJMY2KHdhf/df2ZXbVdVx5HIeTPpJpjKTZOPttLFtmrtHpzsqK1/dmu8F755g=="
