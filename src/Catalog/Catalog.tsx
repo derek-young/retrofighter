@@ -3,6 +3,7 @@ import {ImageBackground, StyleSheet, View} from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 
 import {CatalogNavigationProp} from 'types/app';
+import {enemyPoints, startingEnemies} from 'Game/constants';
 import pyramidsImage from 'images/backdrop_catalog.jpg';
 import TransparentSafeAreaView from 'components/TransparentSafeAreaView';
 
@@ -19,6 +20,16 @@ const styles = StyleSheet.create({
   },
 });
 
+const epics = startingEnemies.map(enemies =>
+  enemies.reduce((totalPointsPossible, enemyName) => {
+    if (enemyName === null) {
+      return totalPointsPossible;
+    }
+
+    return totalPointsPossible + enemyPoints[enemyName];
+  }, 0),
+);
+
 const Catalog = (): JSX.Element => {
   const navigation = useNavigation<CatalogNavigationProp>();
 
@@ -30,31 +41,14 @@ const Catalog = (): JSX.Element => {
       <TransparentSafeAreaView />
       <View style={styles.container}>
         <DogTag />
-        <CatalogButton
-          onPress={() => navigation.navigate('Game', {epic: 0})}
-          stars={1}>
-          Level 1
-        </CatalogButton>
-        <CatalogButton
-          onPress={() => navigation.navigate('Game', {epic: 1})}
-          stars={2}>
-          Level 2
-        </CatalogButton>
-        <CatalogButton
-          onPress={() => navigation.navigate('Game', {epic: 2})}
-          stars={3}>
-          Level 3
-        </CatalogButton>
-        <CatalogButton
-          onPress={() => navigation.navigate('Game', {epic: 3})}
-          stars={4}>
-          Level 4
-        </CatalogButton>
-        <CatalogButton
-          onPress={() => navigation.navigate('Game', {epic: 4})}
-          stars={5}>
-          Level 5
-        </CatalogButton>
+        {epics.map((pointsPossible, epic) => (
+          <CatalogButton
+            key={epic}
+            onPress={() => navigation.navigate('Game', {epic})}
+            possible={pointsPossible}>
+            {`Level ${epic + 1}`}
+          </CatalogButton>
+        ))}
       </View>
       <TransparentSafeAreaView />
     </ImageBackground>

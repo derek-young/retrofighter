@@ -9,6 +9,7 @@ import Button from 'components/Button';
 import Modal from 'components/Modal';
 import PressStartText from 'components/PressStartText';
 
+import {startingEnemies} from './constants';
 import {useGameContext} from './GameContext';
 import {useEnemyFactoryContext} from './enemy/EnemyFactoryContext';
 import ExitLevelButton from './ExitLevelButton';
@@ -137,14 +138,16 @@ const LevelCompletePopup = ({onReset}: {onReset: () => void}) => {
           {haveAnimationsEnded && (
             <>
               <ExitLevelButton />
-              <Button
-                onPress={() => {
-                  navigation.navigate('Game', {epic: epic + 1});
-                  onReset();
-                }}
-                style={styles.button}>
-                Next Level
-              </Button>
+              {epic < startingEnemies.length - 1 && (
+                <Button
+                  onPress={() => {
+                    navigation.navigate('Game', {epic: epic + 1});
+                    onReset();
+                  }}
+                  style={styles.button}>
+                  Next Level
+                </Button>
+              )}
             </>
           )}
         </View>

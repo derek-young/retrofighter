@@ -1,7 +1,7 @@
 import React from 'react';
 
 import EnemyUAVIcon from 'icons/enemy-alt.svg';
-import {craftPixelsPerSecond} from 'Game/constants';
+import {craftPixelsPerSecond, Enemies, enemyPoints} from 'Game/constants';
 
 import {EnemyCraftContextProvider} from './EnemyCraftContext';
 import EnemyCraft from './EnemyCraft';
@@ -15,7 +15,7 @@ interface EnemyUAVProps {
 }
 
 const EnemyUAV = (): JSX.Element => {
-  return <EnemyCraft Icon={EnemyUAVIcon} score={200} />;
+  return <EnemyCraft Icon={EnemyUAVIcon} score={enemyPoints[Enemies.UAV]} />;
 };
 
 export default (props: EnemyUAVProps) => (

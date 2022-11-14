@@ -1,18 +1,12 @@
 import React from 'react';
-import {
-  Image,
-  StyleSheet,
-  TouchableOpacity,
-  View,
-  ViewStyle,
-} from 'react-native';
+import {StyleSheet, TouchableOpacity, View, ViewStyle} from 'react-native';
 
 import Colors from 'types/colors';
+import IBMText from 'components/IBMText';
 import PressStartText from 'components/PressStartText';
-import silverStarImage from 'images/silver-star.png';
 
 const BUTTON_WIDTH = 160;
-const BUTTON_HEIGHT = 56;
+const BUTTON_HEIGHT = 64;
 
 const styles = StyleSheet.create({
   buttonContainer: {
@@ -26,7 +20,7 @@ const styles = StyleSheet.create({
     width: BUTTON_WIDTH - 12,
     height: BUTTON_HEIGHT - 12,
     borderRadius: 4,
-    paddingBottom: 4,
+    paddingBottom: 8,
   },
   buttonBackground: {
     backgroundColor: `${Colors.PURPLE}90`,
@@ -34,11 +28,11 @@ const styles = StyleSheet.create({
     height: BUTTON_HEIGHT,
     borderRadius: 8,
   },
-  stars: {
+  score: {
     display: 'flex',
     flexDirection: 'row',
     position: 'absolute',
-    bottom: 4,
+    bottom: 6,
   },
   star: {
     height: 12,
@@ -50,14 +44,14 @@ type CatalogButtonProps = {
   children: string;
   disabled?: boolean;
   onPress: () => void;
-  stars: number;
+  possible: number;
 };
 
 const CatalogButton = ({
   children,
   disabled = false,
   onPress,
-  stars,
+  possible,
 }: CatalogButtonProps): JSX.Element => {
   const containerStyles = {
     ...styles.buttonContainer,
@@ -78,10 +72,8 @@ const CatalogButton = ({
         onPress={onPress}
         style={[styles.buttonContainer, styles.button]}>
         <PressStartText>{children}</PressStartText>
-        <View style={styles.stars}>
-          {new Array(stars).fill(0).map((_, i) => (
-            <Image key={i} source={silverStarImage} style={styles.star} />
-          ))}
+        <View style={styles.score}>
+          <IBMText style={{fontSize: 12}}>0/{possible}</IBMText>
         </View>
       </ButtonComponent>
     </View>

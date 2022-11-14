@@ -30,3 +30,62 @@ export const playerStartTop = maxTop;
 export const defaultPlayerFacing: Facing = 'N';
 
 export const totalWidth = alleyWidth + seperatorWidth;
+
+export enum Enemies {
+  DUAL_FIGHTER,
+  UAV,
+}
+
+export const enemyPoints = {
+  [Enemies.UAV]: 200,
+  [Enemies.DUAL_FIGHTER]: 300,
+};
+
+export const startingEnemies: (Enemies | null)[][] = [
+  [null, null, null, Enemies.UAV, null, Enemies.UAV, null, Enemies.UAV],
+  [
+    null,
+    null,
+    null,
+    Enemies.UAV,
+    Enemies.UAV,
+    Enemies.DUAL_FIGHTER,
+    Enemies.UAV,
+    Enemies.UAV,
+  ],
+  [
+    null,
+    null,
+    Enemies.UAV,
+    Enemies.UAV,
+    Enemies.DUAL_FIGHTER,
+    Enemies.DUAL_FIGHTER,
+    Enemies.DUAL_FIGHTER,
+    Enemies.UAV,
+    Enemies.UAV,
+  ],
+  [
+    null,
+    Enemies.UAV,
+    Enemies.UAV,
+    Enemies.DUAL_FIGHTER,
+    Enemies.DUAL_FIGHTER,
+    Enemies.DUAL_FIGHTER,
+    Enemies.DUAL_FIGHTER,
+    Enemies.DUAL_FIGHTER,
+    Enemies.UAV,
+    Enemies.UAV,
+  ],
+  [
+    Enemies.DUAL_FIGHTER,
+    Enemies.DUAL_FIGHTER,
+    Enemies.DUAL_FIGHTER,
+    Enemies.DUAL_FIGHTER,
+    Enemies.DUAL_FIGHTER,
+    Enemies.DUAL_FIGHTER,
+    Enemies.DUAL_FIGHTER,
+    Enemies.DUAL_FIGHTER,
+    Enemies.DUAL_FIGHTER,
+    Enemies.DUAL_FIGHTER,
+  ],
+];

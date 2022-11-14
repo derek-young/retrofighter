@@ -1,6 +1,7 @@
 import React from 'react';
 
 import DualFighterIcon from 'icons/enemy-plane.svg';
+import {Enemies, enemyPoints} from 'Game/constants';
 
 import {EnemyCraftContextProvider} from './EnemyCraftContext';
 import {EnemyMissileProvider} from './EnemyMissileContext';
@@ -28,7 +29,7 @@ const DualFighter = (): JSX.Element => {
             {...rest}
           />
         )}
-        score={300}
+        score={enemyPoints[Enemies.DUAL_FIGHTER]}
       />
       <EnemyMissile />
     </>
