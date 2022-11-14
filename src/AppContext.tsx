@@ -41,7 +41,11 @@ export const AppContextProvider = ({
 
   useEffect(() => {
     if (user?.uid) {
-      userActions.set({highScore});
+      userActions.get().then(dbUser => {
+        if ((dbUser.highScore ?? 0) < highScore) {
+          userActions.set({highScore});
+        }
+      });
     }
   }, [highScore, user?.uid]);
 
