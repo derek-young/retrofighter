@@ -2,6 +2,7 @@ import React from 'react';
 import {ImageBackground, StyleSheet, View} from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 
+import {useAppContext} from 'AppContext';
 import {CatalogNavigationProp} from 'types/app';
 import {enemyPoints, startingEnemies} from 'Game/constants';
 import pyramidsImage from 'images/backdrop_catalog.jpg';
@@ -20,7 +21,7 @@ const styles = StyleSheet.create({
   },
 });
 
-const epics = startingEnemies.map(enemies =>
+const levels = startingEnemies.map(enemies =>
   enemies.reduce((totalPointsPossible, enemyName) => {
     if (enemyName === null) {
       return totalPointsPossible;
@@ -31,6 +32,7 @@ const epics = startingEnemies.map(enemies =>
 );
 
 const Catalog = (): JSX.Element => {
+  const {scores} = useAppContext();
   const navigation = useNavigation<CatalogNavigationProp>();
 
   return (
@@ -41,14 +43,22 @@ const Catalog = (): JSX.Element => {
       <TransparentSafeAreaView />
       <View style={styles.container}>
         <DogTag />
-        {epics.map((pointsPossible, epic) => (
-          <CatalogButton
-            key={epic}
-            onPress={() => navigation.navigate('Game', {epic})}
-            possible={pointsPossible}>
-            {`Level ${epic + 1}`}
-          </CatalogButton>
-        ))}
+        {levels.map((pointsPossible, level) => {
+          const earned = scores[level] ?? 0;
+          const hasCompletedPreviousLevel =
+            level === 0 || Boolean(scores[level - 1]);
+
+          return (
+            <CatalogButton
+              key={level}
+              disabled={!hasCompletedPreviousLevel}
+              earned={earned}
+              level={level}
+              onPress={() => navigation.navigate('Game', {epic: level})}
+              possible={pointsPossible}
+            />
+          );
+        })}
       </View>
       <TransparentSafeAreaView />
     </ImageBackground>

@@ -53,8 +53,8 @@ const styles = StyleSheet.create({
 
 const LevelCompletePopup = ({onReset}: {onReset: () => void}) => {
   const navigation = useNavigation<GameNavigationProp>();
-  const {setHighScore} = useAppContext();
-  const {epic, totalScore, setRemainingLives} = useGameContext();
+  const {recordScores} = useAppContext();
+  const {epic, scoreForLevel, setRemainingLives} = useGameContext();
   const enemies = useEnemyFactoryContext();
   const fontAnimation = useRef(new Animated.Value(0));
   const scoreAnimation = useRef(new Animated.Value(0));
@@ -94,20 +94,18 @@ const LevelCompletePopup = ({onReset}: {onReset: () => void}) => {
       }).start();
 
       Animated.timing(scoreAnimation.current, {
-        toValue: totalScore,
+        toValue: scoreForLevel,
         duration: 2000,
         useNativeDriver: true,
       }).start(onScoreAnimEnd);
     }
-  }, [isOpen, setRemainingLives, totalScore]);
+  }, [isOpen, setRemainingLives, scoreForLevel]);
 
   useEffect(() => {
     if (haveAnimationsEnded && isOpen) {
-      setHighScore(currentHighScore =>
-        currentHighScore < totalScore ? totalScore : currentHighScore,
-      );
+      recordScores(epic, scoreForLevel);
     }
-  }, [haveAnimationsEnded, isOpen, setHighScore, totalScore]);
+  }, [epic, haveAnimationsEnded, isOpen, recordScores, scoreForLevel]);
 
   if (!isOpen) {
     return null;

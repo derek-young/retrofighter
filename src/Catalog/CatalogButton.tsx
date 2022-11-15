@@ -1,9 +1,16 @@
 import React from 'react';
-import {StyleSheet, TouchableOpacity, View, ViewStyle} from 'react-native';
+import {
+  Image,
+  StyleSheet,
+  TouchableOpacity,
+  View,
+  ViewStyle,
+} from 'react-native';
 
 import Colors from 'types/colors';
 import IBMText from 'components/IBMText';
 import PressStartText from 'components/PressStartText';
+import silverStarImage from 'images/silver-star.png';
 
 const BUTTON_WIDTH = 160;
 const BUTTON_HEIGHT = 64;
@@ -31,25 +38,31 @@ const styles = StyleSheet.create({
   score: {
     display: 'flex',
     flexDirection: 'row',
+    alignItems: 'center',
     position: 'absolute',
     bottom: 6,
   },
+  scoreText: {
+    fontSize: 12,
+  },
   star: {
-    height: 12,
-    width: 12,
+    height: 10,
+    width: 10,
   },
 });
 
 type CatalogButtonProps = {
-  children: string;
-  disabled?: boolean;
+  disabled: boolean;
+  earned: number;
+  level: number;
   onPress: () => void;
   possible: number;
 };
 
 const CatalogButton = ({
-  children,
   disabled = false,
+  earned,
+  level,
   onPress,
   possible,
 }: CatalogButtonProps): JSX.Element => {
@@ -71,9 +84,17 @@ const CatalogButton = ({
       <ButtonComponent
         onPress={onPress}
         style={[styles.buttonContainer, styles.button]}>
-        <PressStartText>{children}</PressStartText>
+        <PressStartText>{`Level ${level + 1}`}</PressStartText>
         <View style={styles.score}>
-          <IBMText style={{fontSize: 12}}>0/{possible}</IBMText>
+          {earned === possible && (
+            <Image source={silverStarImage} style={styles.star} />
+          )}
+          <IBMText style={styles.scoreText}>
+            {earned}/{possible}
+          </IBMText>
+          {earned === possible && (
+            <Image source={silverStarImage} style={styles.star} />
+          )}
         </View>
       </ButtonComponent>
     </View>

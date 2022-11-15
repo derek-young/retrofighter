@@ -12,7 +12,7 @@ const defaultValue: GameContextValue = {
   setIsPaused: noop,
   remainingLives: 1,
   setRemainingLives: noop,
-  totalScore: 0,
+  scoreForLevel: 0,
 };
 
 interface GameContextValue {
@@ -23,7 +23,7 @@ interface GameContextValue {
   setIsPaused: (isPaused: boolean) => void;
   remainingLives: number;
   setRemainingLives: React.Dispatch<React.SetStateAction<number>>;
-  totalScore: number;
+  scoreForLevel: number;
 }
 
 interface GameProviderProps {
@@ -44,7 +44,7 @@ export const GameProvider = ({children, epic}: GameProviderProps) => {
   const [isPaused, setIsPaused] = useState(false);
   const [remainingLives, setRemainingLives] = useState(1);
   const [pendingScores, setPendingScores] = useState<number[]>([]);
-  const [totalScore, setTotalScore] = useState(0);
+  const [scoreForLevel, setScoreForLevel] = useState(0);
 
   const resetScores = useCallback(() => {
     const now = Date.now();
@@ -58,7 +58,7 @@ export const GameProvider = ({children, epic}: GameProviderProps) => {
 
   const adjustScore = useCallback(
     (score: number) => {
-      setTotalScore(s => s + score);
+      setScoreForLevel(s => s + score);
 
       if (Date.now() - lastSet > 400) {
         lastSet = Date.now();
@@ -78,7 +78,7 @@ export const GameProvider = ({children, epic}: GameProviderProps) => {
   useEffect(() => {
     const unsubscribe = navigation?.addListener('blur', () => {
       setRemainingLives(1);
-      setTotalScore(0);
+      setScoreForLevel(0);
     });
 
     return unsubscribe;
@@ -95,7 +95,7 @@ export const GameProvider = ({children, epic}: GameProviderProps) => {
         setIsPaused,
         remainingLives,
         setRemainingLives,
-        totalScore,
+        scoreForLevel,
       }}
     />
   );

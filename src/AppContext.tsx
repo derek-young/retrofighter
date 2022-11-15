@@ -1,4 +1,10 @@
-import React, {useContext, useEffect, useState} from 'react';
+import React, {
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 import {FirebaseAuthTypes} from '@react-native-firebase/auth';
 
 import {userActions} from 'database';
@@ -8,15 +14,17 @@ const noop = () => {};
 export type AuthUser = null | FirebaseAuthTypes.User;
 
 const defaultValue: AppContextValue = {
-  highScore: 0,
-  setHighScore: noop,
+  scores: [],
+  recordScores: noop,
+  totalScore: 0,
   user: null,
   setUser: noop,
 };
 
 interface AppContextValue {
-  highScore: number;
-  setHighScore: React.Dispatch<React.SetStateAction<number>>;
+  scores: number[];
+  recordScores: (level: number, score: number) => void;
+  totalScore: number;
   user: AuthUser;
   setUser: (user: AuthUser) => void;
 }
@@ -31,30 +39,53 @@ export const AppContextProvider = ({
   children: React.ReactElement;
 }) => {
   const [user, setUser] = useState<AuthUser>(null);
-  const [highScore, setHighScore] = useState(0);
+  const [scores, setScores] = useState<number[]>([]);
 
-  useEffect(() => {
-    if (user?.uid) {
-      userActions.get().then(dbUser => setHighScore(dbUser.highScore ?? 0));
-    }
-  }, [user?.uid]);
+  const totalScore = useMemo(
+    () => scores.reduce((acc, score) => acc + score, 0),
+    [scores],
+  );
+
+  const setRemoteScores = useCallback(
+    (nextScores: number[]) => {
+      if (user?.uid) {
+        userActions.set({scores: nextScores});
+      }
+    },
+    [user?.uid],
+  );
+
+  const recordScores = useCallback(
+    (level: number, score: number) => {
+      if ((scores[level] ?? 0) < score) {
+        const nextScores = scores.slice();
+        nextScores[level] = score;
+        setScores(nextScores);
+        setRemoteScores(nextScores);
+      }
+    },
+    [scores, setRemoteScores],
+  );
 
   useEffect(() => {
     if (user?.uid) {
       userActions.get().then(dbUser => {
-        if ((dbUser.highScore ?? 0) < highScore) {
-          userActions.set({highScore});
+        if (dbUser.scores) {
+          setScores(dbUser.scores);
+        } else {
+          userActions.set({scores: []});
         }
       });
     }
-  }, [highScore, user?.uid]);
+  }, [user?.uid]);
 
   return (
     <AppContext.Provider
       children={children}
       value={{
-        highScore,
-        setHighScore,
+        recordScores,
+        scores,
+        totalScore,
         user,
         setUser,
       }}

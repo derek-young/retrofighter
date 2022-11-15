@@ -2,7 +2,7 @@ import auth from '@react-native-firebase/auth';
 import database from '@react-native-firebase/database';
 
 interface DbUser {
-  highScore?: number;
+  scores?: number[];
 }
 
 class User {

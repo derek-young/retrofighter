@@ -50,7 +50,7 @@ const styles = StyleSheet.create({
 });
 
 const DogTag = () => {
-  const {user, highScore} = useAppContext();
+  const {user, totalScore} = useAppContext();
 
   return (
     <View style={styles.container}>
@@ -61,7 +61,7 @@ const DogTag = () => {
           <View style={styles.imageContainer}>
             <Image
               resizeMode="contain"
-              source={getRankInsignia(highScore)}
+              source={getRankInsignia(totalScore)}
               style={styles.image}
             />
           </View>
@@ -69,13 +69,13 @@ const DogTag = () => {
             <IBMText style={[styles.name, styles.text]}>
               {getDisplayName(user)}
             </IBMText>
-            <IBMText style={styles.text}>{getRank(highScore)}</IBMText>
+            <IBMText style={styles.text}>{getRank(totalScore)}</IBMText>
           </View>
         </View>
         <View style={styles.right}>
           <IBMText>High Score</IBMText>
           <IBMText>
-            {highScore.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+            {totalScore.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
           </IBMText>
         </View>
       </LinearGradient>
