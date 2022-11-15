@@ -16,7 +16,7 @@ const styles = StyleSheet.create({
 });
 
 interface ModalProps {
-  children: React.ReactElement;
+  children: React.ReactNode;
   onClose?: () => void;
   open: boolean;
   style?: StyleProp<ViewStyle>;

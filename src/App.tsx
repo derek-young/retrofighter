@@ -17,8 +17,8 @@ const App = (): JSX.Element => {
   }, []);
 
   return (
-    <AppContextProvider>
-      <NavigationContainer>
+    <NavigationContainer>
+      <AppContextProvider>
         <StatusBar hidden />
         <Stack.Navigator
           initialRouteName="Login"
@@ -39,8 +39,8 @@ const App = (): JSX.Element => {
             options={{orientation: 'portrait'}}
           />
         </Stack.Navigator>
-      </NavigationContainer>
-    </AppContextProvider>
+      </AppContextProvider>
+    </NavigationContainer>
   );
 };
 
