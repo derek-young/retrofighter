@@ -11,6 +11,7 @@ const defaultValue: GameContextValue = {
   pendingScores: [],
   setIsPaused: noop,
   remainingLives: 1,
+  resetGameContext: noop,
   setRemainingLives: noop,
   scoreForLevel: 0,
 };
@@ -22,6 +23,7 @@ interface GameContextValue {
   pendingScores: number[];
   setIsPaused: (isPaused: boolean) => void;
   remainingLives: number;
+  resetGameContext: () => void;
   setRemainingLives: React.Dispatch<React.SetStateAction<number>>;
   scoreForLevel: number;
 }
@@ -45,6 +47,11 @@ export const GameProvider = ({children, epic}: GameProviderProps) => {
   const [remainingLives, setRemainingLives] = useState(1);
   const [pendingScores, setPendingScores] = useState<number[]>([]);
   const [scoreForLevel, setScoreForLevel] = useState(0);
+
+  const resetGameContext = useCallback(() => {
+    setRemainingLives(1);
+    setScoreForLevel(0);
+  }, []);
 
   const resetScores = useCallback(() => {
     const now = Date.now();
@@ -76,6 +83,10 @@ export const GameProvider = ({children, epic}: GameProviderProps) => {
   );
 
   useEffect(() => {
+    setScoreForLevel(0);
+  }, [epic]);
+
+  useEffect(() => {
     const unsubscribe = navigation?.addListener('blur', () => {
       setRemainingLives(1);
       setScoreForLevel(0);
@@ -94,6 +105,7 @@ export const GameProvider = ({children, epic}: GameProviderProps) => {
         pendingScores,
         setIsPaused,
         remainingLives,
+        resetGameContext,
         setRemainingLives,
         scoreForLevel,
       }}

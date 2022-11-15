@@ -22,10 +22,7 @@ class User {
   }
 
   set(nextValue: Partial<DbUser>) {
-    return database()
-      .ref(`/users/${this.userId}`)
-      .set(nextValue)
-      .then(updatedValue => console.log('Data set.', updatedValue));
+    return database().ref(`/users/${this.userId}`).set(nextValue);
   }
 
   on(callback: (user: DbUser) => void) {

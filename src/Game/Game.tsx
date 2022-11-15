@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import {ImageBackground, StyleSheet, View} from 'react-native';
 import {RouteProp} from '@react-navigation/native';
 
@@ -57,11 +57,16 @@ function getBackgroundImage(epic: number) {
 }
 
 interface GameViewProps {
-  onReset: () => void;
+  onResetBoard: () => void;
 }
 
-const GameView = ({onReset}: GameViewProps) => {
-  const {pendingScores, setIsPaused} = useGameContext();
+const GameView = ({onResetBoard}: GameViewProps) => {
+  const {pendingScores, resetGameContext, setIsPaused} = useGameContext();
+
+  const onResetLevel = useCallback(() => {
+    onResetBoard();
+    resetGameContext();
+  }, [onResetBoard, resetGameContext]);
 
   return (
     <View style={styles.game}>
@@ -71,9 +76,12 @@ const GameView = ({onReset}: GameViewProps) => {
       <View style={styles.pauseButtonContainer}>
         <Button onPress={() => setIsPaused(true)}>Menu</Button>
       </View>
-      <PauseMenu onReset={onReset} />
-      <LevelCompletePopup onReset={onReset} />
-      <LevelFailedPopup onReset={onReset} />
+      <PauseMenu onResetLevel={onResetLevel} />
+      <LevelCompletePopup
+        onResetBoard={onResetBoard}
+        onResetLevel={onResetLevel}
+      />
+      <LevelFailedPopup onResetLevel={onResetLevel} />
       {pendingScores.map((score, i) => (
         <Score key={i} score={score} top={(i + 1) * 20} />
       ))}
@@ -100,6 +108,8 @@ const Game = ({navigation, route}: GameProps): null | JSX.Element => {
     return unsubscribe;
   }, [navigation]);
 
+  const onResetBoard = useCallback(() => setUniqueKey(Date.now()), []);
+
   return (
     <GameProvider epic={epic}>
       <View style={styles.container}>
@@ -111,7 +121,7 @@ const Game = ({navigation, route}: GameProps): null | JSX.Element => {
             <EliminationProvider>
               <MissileProvider>
                 <EnemyFactoryProvider>
-                  <GameView onReset={() => setUniqueKey(Date.now())} />
+                  <GameView onResetBoard={onResetBoard} />
                 </EnemyFactoryProvider>
               </MissileProvider>
             </EliminationProvider>

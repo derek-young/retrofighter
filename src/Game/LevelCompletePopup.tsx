@@ -51,7 +51,15 @@ const styles = StyleSheet.create({
   },
 });
 
-const LevelCompletePopup = ({onReset}: {onReset: () => void}) => {
+interface LevelCompletePopupProps {
+  onResetBoard: () => void;
+  onResetLevel: () => void;
+}
+
+const LevelCompletePopup = ({
+  onResetBoard,
+  onResetLevel,
+}: LevelCompletePopupProps) => {
   const navigation = useNavigation<GameNavigationProp>();
   const {recordScores} = useAppContext();
   const {epic, scoreForLevel, setRemainingLives} = useGameContext();
@@ -136,11 +144,17 @@ const LevelCompletePopup = ({onReset}: {onReset: () => void}) => {
           {haveAnimationsEnded && (
             <>
               <ExitLevelButton />
+              <Button
+                onPress={onResetLevel}
+                variant="secondary"
+                style={styles.button}>
+                Retry Level
+              </Button>
               {epic < startingEnemies.length - 1 && (
                 <Button
                   onPress={() => {
                     navigation.navigate('Game', {epic: epic + 1});
-                    onReset();
+                    onResetBoard();
                   }}
                   style={styles.button}>
                   Next Level

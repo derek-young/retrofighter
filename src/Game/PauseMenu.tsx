@@ -28,10 +28,10 @@ const styles = StyleSheet.create({
 });
 
 interface PauseMenuProps {
-  onReset: () => void;
+  onResetLevel: () => void;
 }
 
-const PauseMenu = ({onReset}: PauseMenuProps): null | JSX.Element => {
+const PauseMenu = ({onResetLevel}: PauseMenuProps): null | JSX.Element => {
   const navigation = useNavigation<GameNavigationProp>();
   const {isPaused, setIsPaused} = useGameContext();
   const onClose = () => setIsPaused(false);
@@ -41,7 +41,7 @@ const PauseMenu = ({onReset}: PauseMenuProps): null | JSX.Element => {
       <Pressable style={styles.menuItems}>
         <Pressable
           onPress={() => {
-            onReset();
+            onResetLevel();
             onClose();
           }}
           style={({pressed}) => [

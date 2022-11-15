@@ -33,8 +33,8 @@ const styles = StyleSheet.create({
   },
 });
 
-const LevelFailedPopup = ({onReset}: {onReset: () => void}) => {
-  const {remainingLives, setRemainingLives} = useGameContext();
+const LevelFailedPopup = ({onResetLevel}: {onResetLevel: () => void}) => {
+  const {remainingLives} = useGameContext();
   const enemies = useEnemyFactoryContext();
   const fontAnimation = useRef(new Animated.Value(0));
   const [isOpen, setIsOpen] = useState(false);
@@ -91,12 +91,7 @@ const LevelFailedPopup = ({onReset}: {onReset: () => void}) => {
           {showButtons && (
             <>
               <ExitLevelButton />
-              <Button
-                onPress={() => {
-                  setRemainingLives(1);
-                  onReset();
-                }}
-                style={styles.button}>
+              <Button onPress={onResetLevel} style={styles.button}>
                 Retry Level
               </Button>
             </>
