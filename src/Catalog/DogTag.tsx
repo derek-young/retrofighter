@@ -1,5 +1,11 @@
 import React, {useState} from 'react';
-import {Image, Pressable, StyleSheet, View} from 'react-native';
+import {
+  Image,
+  Pressable,
+  StyleSheet,
+  View,
+  useWindowDimensions,
+} from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 
 import {useAppContext} from 'AppContext';
@@ -28,7 +34,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 16,
     height: topHeight,
   },
   bottom: {
@@ -70,6 +75,8 @@ const styles = StyleSheet.create({
 const DogTag = () => {
   const {onSignOut, user, totalScore} = useAppContext();
   const [isExpanded, setIsExpanded] = useState(false);
+  const {height, width} = useWindowDimensions();
+  const isPortrait = height > width;
 
   return (
     <View style={styles.borderContainer}>
@@ -84,7 +91,7 @@ const DogTag = () => {
           {height: isExpanded ? expandedHeight : topHeight},
         ]}>
         <LinearGradient colors={[Colors.GREY, 'white', Colors.GREY]}>
-          <View style={styles.top}>
+          <View style={[styles.top, {paddingHorizontal: isPortrait ? 16 : 40}]}>
             <View style={styles.left}>
               <View style={styles.imageContainer}>
                 <Image
