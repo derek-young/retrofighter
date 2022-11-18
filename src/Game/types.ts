@@ -1,4 +1,6 @@
-import {Animated} from 'react-native';
+import React from 'react';
+import {Animated, StyleProp, ViewStyle} from 'react-native';
+import {SvgProps} from 'react-native-svg';
 
 export type Facing = 'N' | 'S' | 'E' | 'W';
 
@@ -28,9 +30,13 @@ export interface MissileProps extends Omit<MissileIconProps, 'Icon'> {
 export interface MissileAnimationProps {
   craftRotation: number;
   facing: Facing;
-  Icon: React.ElementType;
+  Icon: React.FC<IconProps>;
   leftAnim: Animated.Value;
   topAnim: Animated.Value;
   missileProps: MissileProps;
   positionOffset?: number;
+}
+
+export interface IconProps extends SvgProps {
+  style: StyleProp<ViewStyle>;
 }

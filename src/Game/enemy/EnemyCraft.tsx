@@ -1,15 +1,15 @@
 import React, {useEffect, useState} from 'react';
-import {SvgProps} from 'react-native-svg';
 
 import Colors from 'types/colors';
 import Craft from 'Game/Craft';
 
 import {useEnemyCraftContext} from './EnemyCraftContext';
 import {useEnemyMissileContext} from './EnemyMissileContext';
+import {IconProps} from 'Game/types';
 
 interface EnemyCraftProps {
   craftColor?: string;
-  Icon: React.FC<SvgProps>;
+  Icon: React.FC<IconProps>;
   score: number;
 }
 
