@@ -21,6 +21,7 @@ const styles = StyleSheet.create({
     color: Colors.RED,
     shadowColor: 'black',
     shadowOpacity: 0.4,
+    textAlign: 'center',
   },
   buttonHolder: {
     display: 'flex',

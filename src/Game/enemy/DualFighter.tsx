@@ -2,6 +2,7 @@ import React from 'react';
 
 import DualFighterIcon from 'icons/enemy-plane.svg';
 import {Enemies, enemyPoints} from 'Game/constants';
+import {IconProps} from 'Game/types';
 
 import {EnemyCraftContextProvider} from './EnemyCraftContext';
 import {EnemyMissileProvider} from './EnemyMissileContext';
@@ -20,12 +21,9 @@ const DualFighter = (): JSX.Element => {
   return (
     <>
       <EnemyCraft
-        Icon={({style, ...rest}) => (
+        Icon={({style, ...rest}: IconProps) => (
           <DualFighterIcon
-            style={{
-              ...style,
-              transform: [{rotate: '-45deg'}],
-            }}
+            style={{...(style as object), transform: [{rotate: '-45deg'}]}}
             {...rest}
           />
         )}

@@ -43,3 +43,16 @@ export function getNextAlley(position: number, direction: Facing) {
 
   return Math.min(numColumns - 1, Math.ceil(nextAlley));
 }
+
+export function getIsThanksgivingDay() {
+  const today = new Date();
+  const isNovember = today.getMonth() === 10;
+  const isThursday = today.getDay() === 4;
+  const daysRemainingInMonth = 30 - today.getDate();
+  const isLastThursdayBeforeAFullWeekend =
+    daysRemainingInMonth >= 2 && daysRemainingInMonth <= 7;
+  const isThanksgivingDay =
+    isNovember && isThursday && isLastThursdayBeforeAFullWeekend;
+
+  return isThanksgivingDay;
+}
