@@ -16,7 +16,6 @@ import DPad from './DPad';
 import LevelCompletePopup from './LevelCompletePopup';
 import LevelFailedPopup from './LevelFailedPopup';
 import PauseMenu from './PauseMenu';
-import Score from './Score';
 import {GameProvider, useGameContext} from './GameContext';
 import {AnimationProvider} from './Fighter/AnimationContext';
 import {EliminationProvider} from './Fighter/EliminationContext';
@@ -61,7 +60,7 @@ interface GameViewProps {
 }
 
 const GameView = ({onResetBoard}: GameViewProps) => {
-  const {pendingScores, resetGameContext, setIsPaused} = useGameContext();
+  const {resetGameContext, setIsPaused} = useGameContext();
 
   const onResetLevel = useCallback(() => {
     onResetBoard();
@@ -82,9 +81,6 @@ const GameView = ({onResetBoard}: GameViewProps) => {
         onResetLevel={onResetLevel}
       />
       <LevelFailedPopup onResetLevel={onResetLevel} />
-      {pendingScores.map((score, i) => (
-        <Score key={i} score={score} top={(i + 1) * 20} />
-      ))}
     </View>
   );
 };

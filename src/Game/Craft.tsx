@@ -1,9 +1,11 @@
 import React, {useEffect, useRef, useState} from 'react';
 import {Animated, StyleSheet} from 'react-native';
 
+import Colors from 'types/colors';
 import ExposionIcon from 'icons/supernova.svg';
+import PressStartText from 'components/PressStartText';
 
-import {craftSize} from './constants';
+import {alleyWidth, craftSize} from './constants';
 import {Facing} from './types';
 import {useGameContext} from './GameContext';
 
@@ -27,8 +29,6 @@ const styles = StyleSheet.create({
     position: 'absolute',
     shadowColor: 'black',
     shadowOpacity: 0.4,
-    left: -72,
-    top: 16,
   },
 });
 
@@ -70,6 +70,25 @@ const SHADOW_POS = {
   ['S']: {top: -3, left: -2},
   ['W']: {top: 3, left: -2},
 };
+
+const scorePosition: Record<Facing, Record<string, number>> = {
+  ['N']: {top: 28},
+  ['E']: {right: 4},
+  ['S']: {top: 28},
+  ['W']: {left: 4},
+};
+
+function getScorePosition(facing: Facing, top: number) {
+  if (facing === 'E' && top < alleyWidth) {
+    return {left: 4};
+  }
+
+  if (facing === 'W' && top < alleyWidth) {
+    return {right: 4};
+  }
+
+  return scorePosition[facing];
+}
 
 export type CraftProps = {
   Icon: React.ElementType;
@@ -129,7 +148,7 @@ const Craft = ({
 
       Animated.timing(elimAnimation.current, {
         toValue: 50,
-        duration: 400,
+        duration: 800,
         useNativeDriver: true,
       }).start(() => {
         onEliminationEndRef.current();
@@ -159,6 +178,8 @@ const Craft = ({
     });
   }, [facing]);
 
+  const scoreFontSize = Math.min(16, elimValue);
+
   return (
     <Animated.View
       style={[
@@ -180,6 +201,21 @@ const Craft = ({
         width={elimValue}
         style={styles.elimination}
       />
+      <PressStartText
+        style={[
+          styles.score,
+          {
+            color: score > 0 ? Colors.GREEN : Colors.RED,
+            fontSize: scoreFontSize,
+            width: scoreFontSize * 4,
+            shadowOffset: {width: scoreFontSize / 8, height: scoreFontSize / 8},
+            transform: [{rotate: `${rotationState * -1}deg`}],
+            // @ts-ignore
+            ...getScorePosition(facing, top._value),
+          },
+        ]}>
+        {score > 0 ? `+${score}` : score}
+      </PressStartText>
     </Animated.View>
   );
 };

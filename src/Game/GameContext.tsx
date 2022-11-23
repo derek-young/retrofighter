@@ -8,7 +8,6 @@ const defaultValue: GameContextValue = {
   adjustScore: noop,
   epic: 0,
   isPaused: false,
-  pendingScores: [],
   setIsPaused: noop,
   remainingLives: 1,
   resetGameContext: noop,
@@ -20,7 +19,6 @@ interface GameContextValue {
   adjustScore: (score: number) => void;
   epic: number;
   isPaused: boolean;
-  pendingScores: number[];
   setIsPaused: (isPaused: boolean) => void;
   remainingLives: number;
   resetGameContext: () => void;
@@ -37,15 +35,10 @@ const GameContext = React.createContext(defaultValue);
 
 export const useGameContext = () => useContext(GameContext);
 
-export const scorePersistMs = 4000;
-
-let lastSet = Date.now();
-
 export const GameProvider = ({children, epic}: GameProviderProps) => {
   const navigation = useNavigation<GameNavigationProp>();
   const [isPaused, setIsPaused] = useState(false);
   const [remainingLives, setRemainingLives] = useState(1);
-  const [pendingScores, setPendingScores] = useState<number[]>([]);
   const [scoreForLevel, setScoreForLevel] = useState(0);
 
   const resetGameContext = useCallback(() => {
@@ -53,33 +46,9 @@ export const GameProvider = ({children, epic}: GameProviderProps) => {
     setScoreForLevel(0);
   }, []);
 
-  const resetScores = useCallback(() => {
-    const now = Date.now();
-
-    if (now - lastSet > scorePersistMs) {
-      setPendingScores([]);
-    }
-
-    setTimeout(resetScores, now - lastSet);
-  }, []);
-
   const adjustScore = useCallback(
-    (score: number) => {
-      setScoreForLevel(s => s + score);
-
-      if (Date.now() - lastSet > 400) {
-        lastSet = Date.now();
-        setPendingScores(scores => [...scores, score]);
-      } else {
-        setTimeout(() => {
-          lastSet = Date.now();
-          setPendingScores(scores => [...scores, score]);
-        }, 400);
-      }
-
-      resetScores();
-    },
-    [resetScores],
+    (score: number) => setScoreForLevel(s => s + score),
+    [],
   );
 
   useEffect(() => {
@@ -102,7 +71,6 @@ export const GameProvider = ({children, epic}: GameProviderProps) => {
         adjustScore,
         epic,
         isPaused,
-        pendingScores,
         setIsPaused,
         remainingLives,
         resetGameContext,
