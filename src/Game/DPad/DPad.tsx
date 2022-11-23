@@ -72,6 +72,7 @@ const Directional = ({facing, rotation}: DirectionalProps): JSX.Element => {
 
   return (
     <Pressable
+      delayLongPress={250}
       onLongPress={() => {
         setIsPressed(true);
         setThrusterEngagedFacing(facing);
@@ -127,19 +128,21 @@ const DPad = (): JSX.Element => {
         const xDiff = e.nativeEvent.pageX - xRef.current;
         const yDiff = e.nativeEvent.pageY - yRef.current;
 
-        if (Math.abs(xDiff) > Math.abs(yDiff)) {
-          if (xDiff > 0) {
-            onRightPress();
-          }
-          if (xDiff < 0) {
-            onLeftPress();
-          }
-        } else {
-          if (yDiff > 0) {
-            onDownPress();
-          }
-          if (yDiff < 0) {
-            onUpPress();
+        if (Math.abs(xDiff) > 40 || Math.abs(yDiff) > 40) {
+          if (Math.abs(xDiff) > Math.abs(yDiff)) {
+            if (xDiff > 0) {
+              onRightPress();
+            }
+            if (xDiff < 0) {
+              onLeftPress();
+            }
+          } else {
+            if (yDiff > 0) {
+              onDownPress();
+            }
+            if (yDiff < 0) {
+              onUpPress();
+            }
           }
         }
       }}
