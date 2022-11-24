@@ -49,6 +49,7 @@ export const EnemyMissileProvider = ({children}: EnemyMissileProviderProps) => {
   const [hasMissileFired, setHasMissileFired] = useState(false);
   const missileAnimRef = useRef(new Animated.Value(enemyMissileStartingTop));
   const missilePositionRef = useRef(new MissilePosition());
+  const timeoutIdRef = useRef<number | undefined>();
 
   const onFireAnimationEnded = useCallback(() => setHasMissileFired(false), []);
   const onFireMissile = useCallback(() => {
@@ -86,7 +87,11 @@ export const EnemyMissileProvider = ({children}: EnemyMissileProviderProps) => {
       isPlayerInLineOfSight &&
       DEFAULT_FACING_ROTATION[facing] === craftRotation
     ) {
-      onFireMissile();
+      timeoutIdRef.current = setTimeout(onFireMissile, 400);
+    }
+
+    if (!isPlayerInLineOfSight && timeoutIdRef.current) {
+      clearTimeout(timeoutIdRef.current);
     }
   }, [
     craftRotation,
