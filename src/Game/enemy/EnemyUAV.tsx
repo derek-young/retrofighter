@@ -1,6 +1,6 @@
 import React from 'react';
 
-import EnemyUAVIcon from 'icons/enemy-alt.svg';
+import EnemyUAVIcon from 'icons/enemy-uav.svg';
 import PumpkinPieIcon from 'icons/pumpkin-pie.svg';
 import {craftPixelsPerSecond, Enemies, enemyPoints} from 'Game/constants';
 import {getIsThanksgivingDay} from 'Game/utils';
@@ -34,6 +34,7 @@ const EnemyUAV = (): JSX.Element => {
 
 export default (props: EnemyUAVProps) => (
   <EnemyCraftContextProvider
+    defaultCraftSpeed={craftPixelsPerSecond}
     craftSpeedWhenLockedOn={craftPixelsPerSecond * 1.5}
     {...props}>
     <EnemyUAV />

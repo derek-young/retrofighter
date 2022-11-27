@@ -6,8 +6,8 @@ export const craftSize = 20;
 export const seperatorWidth = 16;
 export const missileSize = craftSize * 0.6;
 export const numColumns = 10;
-export const craftPixelsPerSecond = 60; // Craft speed
-export const missileSpeed = craftPixelsPerSecond * 2;
+export const craftPixelsPerSecond = 50; // Craft speed
+export const missileSpeed = craftPixelsPerSecond * 2.2;
 
 export const arenaSize = Math.min(
   Dimensions.get('window').width,
@@ -33,12 +33,14 @@ export const totalWidth = alleyWidth + seperatorWidth;
 
 export enum Enemies {
   DUAL_FIGHTER,
+  SPEEDER,
   UAV,
 }
 
 export const enemyPoints = {
   [Enemies.UAV]: 200,
   [Enemies.DUAL_FIGHTER]: 300,
+  [Enemies.SPEEDER]: 400,
 };
 
 export const startingEnemies: (Enemies | null)[][] = [

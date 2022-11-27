@@ -37,6 +37,7 @@ const defaultValue: EnemyCraftContextValue = {
 export interface EnemyCraftContextProviderProps {
   children: React.ReactNode;
   craftSpeedWhenLockedOn?: number;
+  defaultCraftSpeed: number;
   defaultFacing?: Facing;
   isEliminated: boolean;
   onEliminationAnimationEnd: () => void;
@@ -52,6 +53,7 @@ export const useEnemyCraftContext = () => useContext(EnemyCraftContext);
 export const EnemyCraftContextProvider = ({
   children,
   craftSpeedWhenLockedOn,
+  defaultCraftSpeed,
   defaultFacing = 'S',
   isEliminated,
   onEliminationAnimationEnd,
@@ -70,6 +72,7 @@ export const EnemyCraftContextProvider = ({
   const {facing, isPlayerInLineOfSight, leftAnim, topAnim} =
     useEnemyCraftAnimation({
       craftSpeedWhenLockedOn,
+      defaultCraftSpeed,
       defaultFacing,
       isEliminated,
       startingLeft,

@@ -4,12 +4,15 @@ import {useGameContext} from 'Game/GameContext';
 import {Enemies, startingEnemies} from 'Game/constants';
 
 import DualFighter from './DualFighter';
+import EnemySpeeder from './EnemySpeeder';
 import EnemyUAV from './EnemyUAV';
 
 function getEnemyComponent(enemyName: Enemies | null) {
   switch (enemyName) {
     case Enemies.DUAL_FIGHTER:
       return DualFighter;
+    case Enemies.SPEEDER:
+      return EnemySpeeder;
     case Enemies.UAV:
       return EnemyUAV;
     default:
@@ -19,7 +22,7 @@ function getEnemyComponent(enemyName: Enemies | null) {
 
 interface Enemy {
   key: number;
-  Enemy: typeof DualFighter | typeof EnemyUAV;
+  Enemy: typeof DualFighter | typeof EnemyUAV | typeof EnemySpeeder;
   hasEliminationAnimationEnded: boolean;
   isEliminated: boolean;
   onEliminationAnimationEnd: () => void;

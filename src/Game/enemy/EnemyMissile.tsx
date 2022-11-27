@@ -3,7 +3,7 @@ import {alleyWidth, missileSize} from 'Game/constants';
 import {getIsThanksgivingDay} from 'Game/utils';
 import Missile from 'Game/Missile';
 import {IconProps} from 'Game/types';
-import EnemyMissileIcon from 'icons/skull.svg';
+import EnemyMissileIcon from 'icons/enemy-missile.svg';
 import TurkyLegIcon from 'icons/turkey-leg.svg';
 
 import {useEnemyCraftContext} from './EnemyCraftContext';

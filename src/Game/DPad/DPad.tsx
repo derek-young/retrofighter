@@ -128,7 +128,7 @@ const DPad = (): JSX.Element => {
         const xDiff = e.nativeEvent.pageX - xRef.current;
         const yDiff = e.nativeEvent.pageY - yRef.current;
 
-        if (Math.abs(xDiff) > 40 || Math.abs(yDiff) > 40) {
+        if (Math.abs(xDiff) > 24 || Math.abs(yDiff) > 24) {
           if (Math.abs(xDiff) > Math.abs(yDiff)) {
             if (xDiff > 0) {
               onRightPress();

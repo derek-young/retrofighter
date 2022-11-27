@@ -3,7 +3,7 @@ import {StyleSheet, View} from 'react-native';
 
 import Colors from 'types/colors';
 import FighterIcon from 'icons/spaceship.svg';
-import DualFighterIcon from 'icons/enemy-plane.svg';
+import DualFighterIcon from 'icons/dual-fighter.svg';
 import MissileIcon from 'icons/missile.svg';
 
 const previewSize = 40;
