@@ -32,15 +32,17 @@ export const defaultPlayerFacing: Facing = 'N';
 export const totalWidth = alleyWidth + seperatorWidth;
 
 export enum Enemies {
+  CARGO_SHIP,
   DUAL_FIGHTER,
   SPEEDER,
   UAV,
 }
 
 export const enemyPoints = {
-  [Enemies.UAV]: 200,
+  [Enemies.CARGO_SHIP]: 100,
   [Enemies.DUAL_FIGHTER]: 300,
   [Enemies.SPEEDER]: 400,
+  [Enemies.UAV]: 200,
 };
 
 export const startingEnemies: (Enemies | null)[][] = [

@@ -4,11 +4,14 @@ import {useGameContext} from 'Game/GameContext';
 import {Enemies, startingEnemies} from 'Game/constants';
 
 import DualFighter from './DualFighter';
+import EnemyCargoShip from './EnemyCargoShip';
 import EnemySpeeder from './EnemySpeeder';
 import EnemyUAV from './EnemyUAV';
 
 function getEnemyComponent(enemyName: Enemies | null) {
   switch (enemyName) {
+    case Enemies.CARGO_SHIP:
+      return EnemyCargoShip;
     case Enemies.DUAL_FIGHTER:
       return DualFighter;
     case Enemies.SPEEDER:
