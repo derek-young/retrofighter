@@ -31,18 +31,20 @@ const styles = StyleSheet.create({
 
 function getBackgroundColor(epic: number) {
   switch (epic) {
-    case 0:
-      return `${Colors.SKY_BLUE}40`;
-    case 1:
-      return `${Colors.MIDNIGHT_BLUE}60`;
     case 2:
       return `${Colors.MIDNIGHT_BLUE}60`;
     case 3:
       return `${Colors.DEEP_PURPLE}40`;
-    case 4:
-      return `${Colors.SKY_BLUE}40`;
-    default:
+    case 5:
       return `${Colors.PINK}40`;
+    case 7:
+      return `${Colors.DEEP_PURPLE}40`;
+    case 8:
+      return `${Colors.MIDNIGHT_BLUE}40`;
+    case 9:
+      return `${Colors.PINK}40`;
+    default:
+      return `${Colors.SKY_BLUE}40`;
   }
 }
 

@@ -8,6 +8,11 @@ import backgroundImageLvl2 from 'images/backdrop_level_2.jpg';
 import backgroundImageLvl3 from 'images/backdrop_level_3.jpg';
 import backgroundImageLvl4 from 'images/backdrop_level_4.jpg';
 import backgroundImageLvl5 from 'images/backdrop_level_5.jpg';
+import backgroundImageLvl6 from 'images/backdrop_level_6.jpg';
+import backgroundImageLvl7 from 'images/backdrop_level_7.jpg';
+import backgroundImageLvl8 from 'images/backdrop_level_8.jpg';
+import backgroundImageLvl9 from 'images/backdrop_level_9.jpg';
+import backgroundImageLvl10 from 'images/backdrop_level_10.jpg';
 import Button from 'components/Button';
 
 import Arena from './Arena';
@@ -50,6 +55,16 @@ function getBackgroundImage(epic: number) {
       return backgroundImageLvl4;
     case 4:
       return backgroundImageLvl5;
+    case 5:
+      return backgroundImageLvl6;
+    case 6:
+      return backgroundImageLvl7;
+    case 7:
+      return backgroundImageLvl8;
+    case 8:
+      return backgroundImageLvl9;
+    case 9:
+      return backgroundImageLvl10;
     default:
       return backgroundImageLvl1;
   }

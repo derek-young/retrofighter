@@ -1,5 +1,5 @@
 import React from 'react';
-import {ImageBackground, StyleSheet, View} from 'react-native';
+import {ImageBackground, ScrollView, StyleSheet, View} from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 
 import {useAppContext} from 'AppContext';
@@ -17,7 +17,11 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
+  },
+  scrollContainer: {
+    display: 'flex',
     alignItems: 'center',
+    flexGrow: 1,
   },
 });
 
@@ -41,24 +45,26 @@ const Catalog = (): JSX.Element => {
       resizeMode="cover"
       style={styles.background}>
       <TransparentSafeAreaView />
+      <DogTag />
       <View style={styles.container}>
-        <DogTag />
-        {levels.map((pointsPossible, level) => {
-          const earned = scores[level] ?? 0;
-          const hasCompletedPreviousLevel =
-            level === 0 || Boolean(scores[level - 1]);
+        <ScrollView contentContainerStyle={styles.scrollContainer}>
+          {levels.map((pointsPossible, level) => {
+            const earned = scores[level] ?? 0;
+            const hasCompletedPreviousLevel =
+              level === 0 || Boolean(scores[level - 1]);
 
-          return (
-            <CatalogButton
-              key={level}
-              disabled={!hasCompletedPreviousLevel}
-              earned={earned}
-              level={level}
-              onPress={() => navigation.navigate('Game', {epic: level})}
-              possible={pointsPossible}
-            />
-          );
-        })}
+            return (
+              <CatalogButton
+                key={level}
+                disabled={!hasCompletedPreviousLevel}
+                earned={earned}
+                level={level}
+                onPress={() => navigation.navigate('Game', {epic: level})}
+                possible={pointsPossible}
+              />
+            );
+          })}
+        </ScrollView>
       </View>
       <TransparentSafeAreaView />
     </ImageBackground>
