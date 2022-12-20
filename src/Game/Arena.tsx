@@ -97,7 +97,7 @@ const Seperators = () => (
 );
 
 const Enemies = () => {
-  const enemies = useEnemyFactoryContext();
+  const {enemies} = useEnemyFactoryContext();
 
   return (
     <View>

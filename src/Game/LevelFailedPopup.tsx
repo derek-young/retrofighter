@@ -36,15 +36,11 @@ const styles = StyleSheet.create({
 
 const LevelFailedPopup = ({onResetLevel}: {onResetLevel: () => void}) => {
   const {remainingLives} = useGameContext();
-  const enemies = useEnemyFactoryContext();
+  const {areAllEnemiesEliminated} = useEnemyFactoryContext();
   const fontAnimation = useRef(new Animated.Value(0));
   const [isOpen, setIsOpen] = useState(false);
   const [fontSize, setFontSize] = useState(0);
   const [showButtons, setShowButtons] = useState(false);
-
-  const areAllEnemiesEliminated = enemies.every(
-    e => e === null || e.isEliminated,
-  );
 
   useEffect(() => {
     if (!areAllEnemiesEliminated && remainingLives < 0) {

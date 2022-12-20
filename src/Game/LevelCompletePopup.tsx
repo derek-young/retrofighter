@@ -63,17 +63,13 @@ const LevelCompletePopup = ({
   const navigation = useNavigation<GameNavigationProp>();
   const {recordScores} = useAppContext();
   const {epic, scoreForLevel, setRemainingLives} = useGameContext();
-  const enemies = useEnemyFactoryContext();
+  const {areAllEnemiesEliminated} = useEnemyFactoryContext();
   const fontAnimation = useRef(new Animated.Value(0));
   const scoreAnimation = useRef(new Animated.Value(0));
   const [isOpen, setIsOpen] = useState(false);
   const [fontSize, setFontSize] = useState(0);
   const [score, setScore] = useState(0);
   const [haveAnimationsEnded, setHaveAnimationsEnded] = useState(false);
-
-  const areAllEnemiesEliminated = enemies.every(
-    e => e === null || e.isEliminated,
-  );
 
   useEffect(() => {
     if (areAllEnemiesEliminated) {
