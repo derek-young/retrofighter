@@ -8,14 +8,7 @@ import {EnemyCraftContextProvider} from './EnemyCraftContext';
 import {EnemyMissileProvider} from './EnemyMissileContext';
 import EnemyCraft from './EnemyCraft';
 import EnemyMissile from './EnemyMissile';
-
-interface DualFighterProps {
-  isEliminated: boolean;
-  onEliminationAnimationEnd: () => void;
-  onIsEliminated: () => void;
-  startingLeft?: number;
-  startingTop?: number;
-}
+import {EnemyProps} from './enemyProps';
 
 const DualFighter = (): JSX.Element => {
   return (
@@ -34,7 +27,7 @@ const DualFighter = (): JSX.Element => {
   );
 };
 
-export default (props: DualFighterProps) => (
+export default (props: EnemyProps) => (
   <EnemyCraftContextProvider
     defaultCraftSpeed={craftPixelsPerSecond}
     {...props}>

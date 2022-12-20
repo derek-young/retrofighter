@@ -16,14 +16,8 @@ import {
   useEnemyCraftContext,
 } from './EnemyCraftContext';
 import EnemyCraft from './EnemyCraft';
-
-interface EnemyCargoShipProps {
-  isEliminated: boolean;
-  onEliminationAnimationEnd: () => void;
-  onIsEliminated: () => void;
-  startingLeft?: number;
-  startingTop?: number;
-}
+import {useEnemyFactoryContext} from './EnemyFactoryContext';
+import {EnemyProps} from './enemyProps';
 
 const styles = StyleSheet.create({
   radarWave: {
@@ -61,19 +55,25 @@ const RadarWave = ({
   );
 };
 
-const EnemyCargoShip = (): JSX.Element => {
+const EnemyCargoShip = ({id}: {id: number}): JSX.Element | null => {
+  const {addEnemy, removeEnemy} = useEnemyFactoryContext();
   const {isPlayerInLineOfSight, leftAnim, topAnim} = useEnemyCraftContext();
   const [fixedLeft, setFixedLeft] = useState(null);
   const [fixedTop, setFixedTop] = useState(null);
   const [hasWaveAnimationEnded, setHasWaveAnimationEnded] = useState(false);
+  const [craftOpacity, setCraftOpacity] = useState(1);
   const [waveSize, setWaveSize] = useState(0);
+  const craftOpacityAnimation = useRef(new Animated.Value(1));
   const waveAnimation = useRef(new Animated.Value(0));
 
   const hasFixedValue = fixedLeft !== null && fixedTop !== null;
 
+  const opacityValueListener = ({value}: {value: number}) =>
+    setCraftOpacity(value);
   const waveValueListener = ({value}: {value: number}) => setWaveSize(value);
 
   useEffect(() => {
+    craftOpacityAnimation.current.addListener(opacityValueListener);
     waveAnimation.current.addListener(waveValueListener);
   }, []);
 
@@ -104,12 +104,32 @@ const EnemyCargoShip = (): JSX.Element => {
     }
   }, [hasFixedValue]);
 
+  useEffect(() => {
+    if (hasWaveAnimationEnded) {
+      Animated.timing(craftOpacityAnimation.current, {
+        duration: 2000,
+        toValue: 0,
+        useNativeDriver: true,
+      }).start(() => {
+        setTimeout(() =>
+          addEnemy(Enemies.SPEEDER, {
+            startingLeft: fixedLeft ?? 0,
+            startingTop: fixedTop ?? 0,
+          }),
+        );
+        removeEnemy(id);
+      });
+    }
+  }, [addEnemy, fixedLeft, fixedTop, hasWaveAnimationEnded, removeEnemy, id]);
+
   return (
     <>
-      <EnemyCraft
-        Icon={EnemyCargoShipIcon}
-        score={enemyPoints[Enemies.CARGO_SHIP]}
-      />
+      <View style={{opacity: craftOpacity}}>
+        <EnemyCraft
+          Icon={EnemyCargoShipIcon}
+          score={enemyPoints[Enemies.CARGO_SHIP]}
+        />
+      </View>
       {hasFixedValue && !hasWaveAnimationEnded && (
         <>
           <RadarWave
@@ -137,10 +157,12 @@ const EnemyCargoShip = (): JSX.Element => {
   );
 };
 
-export default (props: EnemyCargoShipProps) => (
-  <EnemyCraftContextProvider
-    defaultCraftSpeed={craftPixelsPerSecond * 0.6}
-    {...props}>
-    <EnemyCargoShip />
-  </EnemyCraftContextProvider>
-);
+export default (props: EnemyProps) => {
+  return (
+    <EnemyCraftContextProvider
+      defaultCraftSpeed={craftPixelsPerSecond * 0.6}
+      {...props}>
+      <EnemyCargoShip id={props.id} />
+    </EnemyCraftContextProvider>
+  );
+};

@@ -3,27 +3,9 @@ import React, {useCallback, useContext, useEffect, useState} from 'react';
 import {useGameContext} from 'Game/GameContext';
 import {Enemies, startingEnemies} from 'Game/constants';
 
-import DualFighter from './DualFighter';
-import EnemyCargoShip from './EnemyCargoShip';
-import EnemySpeeder from './EnemySpeeder';
-import EnemyUAV from './EnemyUAV';
-
-function getEnemyComponent(enemyName: Enemies) {
-  switch (enemyName) {
-    case Enemies.CARGO_SHIP:
-      return EnemyCargoShip;
-    case Enemies.DUAL_FIGHTER:
-      return DualFighter;
-    case Enemies.SPEEDER:
-      return EnemySpeeder;
-    case Enemies.UAV:
-      return EnemyUAV;
-  }
-}
-
 interface Enemy {
   key: number;
-  Enemy: typeof DualFighter | typeof EnemyUAV | typeof EnemySpeeder;
+  enemyName: Enemies;
   hasEliminationAnimationEnded: boolean;
   isEliminated: boolean;
   onEliminationAnimationEnd: () => void;
@@ -31,22 +13,29 @@ interface Enemy {
 }
 
 interface EnemyFactoryContextValue {
+  addEnemy: (
+    enemyName: Enemies,
+    position: {startingLeft: number; startingTop: number},
+  ) => void;
   areAllEnemiesEliminated: boolean;
   enemies: (null | Enemy)[];
+  removeEnemy: (key: number) => void;
 }
 
 const defaultValue: EnemyFactoryContextValue = {
+  addEnemy: () => {},
   areAllEnemiesEliminated: false,
   enemies: [
     {
       key: 1,
-      Enemy: DualFighter,
+      enemyName: Enemies.DUAL_FIGHTER,
       hasEliminationAnimationEnded: false,
       isEliminated: false,
       onEliminationAnimationEnd: () => {},
       onIsEliminated: () => {},
     },
   ],
+  removeEnemy: () => {},
 };
 
 interface EnemyFactoryProviderProps {
@@ -62,28 +51,30 @@ export const EnemyFactoryProvider = ({children}: EnemyFactoryProviderProps) => {
   const [eliminatedEnemies, setEliminatedEnemies] = useState<boolean[]>([]);
   const [animationEnded, setAnimationEnded] = useState<boolean[]>([]);
 
-  const createEnemy = useCallback((key: number, enemyName: Enemies) => {
-    const Enemy = getEnemyComponent(enemyName);
-
-    return {
-      key,
-      Enemy,
-      hasEliminationAnimationEnded: false,
-      isEliminated: false,
-      onEliminationAnimationEnd: () =>
-        setAnimationEnded(curr => {
-          const next = [...curr];
-          next[key] = true;
-          return next;
-        }),
-      onIsEliminated: () =>
-        setEliminatedEnemies(currElim => {
-          const nextElim = [...currElim];
-          nextElim[key] = true;
-          return nextElim;
-        }),
-    };
-  }, []);
+  const createEnemy = useCallback(
+    (key: number, enemyName: Enemies, overrides = {}) => {
+      return {
+        key,
+        enemyName,
+        hasEliminationAnimationEnded: false,
+        isEliminated: false,
+        onEliminationAnimationEnd: () =>
+          setAnimationEnded(curr => {
+            const next = [...curr];
+            next[key] = true;
+            return next;
+          }),
+        onIsEliminated: () =>
+          setEliminatedEnemies(currElim => {
+            const nextElim = [...currElim];
+            nextElim[key] = true;
+            return nextElim;
+          }),
+        ...overrides,
+      };
+    },
+    [],
+  );
 
   const [enemies, setEnemies] = useState(
     startingEnemies[epic].map((enemyName, i) => {
@@ -111,6 +102,30 @@ export const EnemyFactoryProvider = ({children}: EnemyFactoryProviderProps) => {
     );
   }, [animationEnded, eliminatedEnemies]);
 
+  const addEnemy = useCallback(
+    (
+      enemyName: Enemies,
+      position: {startingLeft: number; startingTop: number},
+    ) =>
+      setEnemies(e => {
+        const next = [...e];
+        const newEnemy = createEnemy(next.length, enemyName, position);
+        next.push(newEnemy);
+        return next;
+      }),
+    [createEnemy],
+  );
+
+  const removeEnemy = useCallback(
+    (key: number) =>
+      setEnemies(e => {
+        const next = [...e];
+        next[key] = null;
+        return next;
+      }),
+    [],
+  );
+
   const areAllEnemiesEliminated = enemies.every(
     e => e === null || e.isEliminated,
   );
@@ -118,7 +133,7 @@ export const EnemyFactoryProvider = ({children}: EnemyFactoryProviderProps) => {
   return (
     <EnemyFactoryContext.Provider
       children={children}
-      value={{areAllEnemiesEliminated, enemies}}
+      value={{addEnemy, areAllEnemiesEliminated, enemies, removeEnemy}}
     />
   );
 };

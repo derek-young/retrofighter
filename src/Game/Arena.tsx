@@ -3,15 +3,33 @@ import {StyleSheet, View} from 'react-native';
 import Colors from 'types/colors';
 
 import Fighter from './Fighter';
+import DualFighter from './enemy/DualFighter';
+import EnemyCargoShip from './enemy/EnemyCargoShip';
+import EnemySpeeder from './enemy/EnemySpeeder';
+import EnemyUAV from './enemy/EnemyUAV';
 import {useGameContext} from './GameContext';
 import {useEnemyFactoryContext} from './enemy/EnemyFactoryContext';
 import {
   alleyWidth,
   arenaSize,
+  Enemies,
   numColumns,
   seperatorWidth,
   totalWidth,
 } from './constants';
+
+function getEnemyComponent(enemyName: Enemies) {
+  switch (enemyName) {
+    case Enemies.CARGO_SHIP:
+      return EnemyCargoShip;
+    case Enemies.DUAL_FIGHTER:
+      return DualFighter;
+    case Enemies.SPEEDER:
+      return EnemySpeeder;
+    case Enemies.UAV:
+      return EnemyUAV;
+  }
+}
 
 const styles = StyleSheet.create({
   arena: {
@@ -96,7 +114,7 @@ const Seperators = () => (
   </View>
 );
 
-const Enemies = () => {
+const EnemiesView = () => {
   const {enemies} = useEnemyFactoryContext();
 
   return (
@@ -105,14 +123,16 @@ const Enemies = () => {
         if (enemy === null) {
           return null;
         }
-
-        const {key, Enemy, hasEliminationAnimationEnded, ...rest} = enemy;
+        const {key, enemyName, hasEliminationAnimationEnded, ...rest} = enemy;
+        const Enemy = getEnemyComponent(enemyName);
 
         if (rest.isEliminated && hasEliminationAnimationEnded) {
           return null;
         }
 
-        return <Enemy key={key} startingLeft={totalWidth * i} {...rest} />;
+        return (
+          <Enemy key={key} id={key} startingLeft={totalWidth * i} {...rest} />
+        );
       })}
     </View>
   );
@@ -125,7 +145,7 @@ const Arena = (): JSX.Element => {
   return (
     <View style={[styles.arena, {backgroundColor}]}>
       <Seperators />
-      <Enemies />
+      <EnemiesView />
       <Fighter key={remainingLives} />
     </View>
   );
