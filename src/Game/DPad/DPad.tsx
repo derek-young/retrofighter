@@ -1,5 +1,5 @@
 import React, {useRef, useState} from 'react';
-import {Pressable, StyleSheet, Text, View} from 'react-native';
+import {Pressable, StyleSheet, View} from 'react-native';
 
 import Colors from 'types/colors';
 import ChevronRight from 'icons/right-chevron.svg';
