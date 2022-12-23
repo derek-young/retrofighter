@@ -13,6 +13,7 @@ import {startingEnemies} from './constants';
 import {useGameContext} from './GameContext';
 import {useEnemyFactoryContext} from './enemy/EnemyFactoryContext';
 import ExitLevelButton from './ExitLevelButton';
+import {useMissileContext} from './Fighter/MissileContext';
 
 const styles = StyleSheet.create({
   modal: {
@@ -64,6 +65,7 @@ const LevelCompletePopup = ({
   const {recordScores} = useAppContext();
   const {epic, scoreForLevel, setRemainingLives} = useGameContext();
   const {areAllEnemiesEliminated} = useEnemyFactoryContext();
+  const [leftMissile, rightMissile] = useMissileContext();
   const fontAnimation = useRef(new Animated.Value(0));
   const scoreAnimation = useRef(new Animated.Value(0));
   const [isOpen, setIsOpen] = useState(false);
@@ -72,10 +74,18 @@ const LevelCompletePopup = ({
   const [haveAnimationsEnded, setHaveAnimationsEnded] = useState(false);
 
   useEffect(() => {
-    if (areAllEnemiesEliminated) {
+    if (
+      areAllEnemiesEliminated &&
+      !leftMissile.hasMissileFired &&
+      !rightMissile.hasMissileFired
+    ) {
       setTimeout(() => setIsOpen(true), 1000);
     }
-  }, [areAllEnemiesEliminated]);
+  }, [
+    areAllEnemiesEliminated,
+    leftMissile.hasMissileFired,
+    rightMissile.hasMissileFired,
+  ]);
 
   useEffect(() => {
     fontAnimation.current.addListener(({value}) => setFontSize(value));
@@ -109,7 +119,7 @@ const LevelCompletePopup = ({
     if (haveAnimationsEnded && isOpen) {
       recordScores(epic, scoreForLevel);
     }
-  }, [epic, haveAnimationsEnded, isOpen, recordScores, scoreForLevel]);
+  }, [haveAnimationsEnded, isOpen]); // eslint-disable-line react-hooks/exhaustive-deps
 
   if (!isOpen) {
     return null;
