@@ -1,5 +1,5 @@
 import React, {useRef, useState} from 'react';
-import {Pressable, StyleSheet, View} from 'react-native';
+import {Pressable, StyleSheet, Text, View} from 'react-native';
 
 import Colors from 'types/colors';
 import ChevronRight from 'icons/right-chevron.svg';
@@ -7,6 +7,8 @@ import ChevronRightNarrow from 'icons/right-chevron-narrow.svg';
 
 import {useAnimationContext} from '../Fighter/AnimationContext';
 import {Facing} from '../types';
+import IBMText from 'components/IBMText';
+import {useGameContext} from 'Game/GameContext';
 
 const buttonSize = 40;
 
@@ -56,6 +58,19 @@ const styles = StyleSheet.create({
     height: 16,
     width: 16,
     left: -4,
+  },
+  helperTextContainer: {
+    position: 'absolute',
+    bottom: -20,
+    right: -32,
+    transform: [{rotate: '-45deg'}],
+    backgroundColor: 'rgba(0, 0, 0, 0.3)',
+    padding: 4,
+    borderRadius: 4,
+  },
+  helperText: {
+    color: 'white',
+    fontSize: 12,
   },
 });
 
@@ -113,6 +128,7 @@ const DPad = (): JSX.Element => {
     onLeftPress,
     onRightPress,
   } = useAnimationContext();
+  const {epic} = useGameContext();
 
   return (
     <View
@@ -148,6 +164,13 @@ const DPad = (): JSX.Element => {
       }}
       style={styles.dPad}>
       <View style={styles.container}>
+        {epic === 0 ? (
+          <View style={styles.helperTextContainer}>
+            <IBMText style={styles.helperText}>Swipe pad to turn.</IBMText>
+            <IBMText style={styles.helperText}>Press and hold to</IBMText>
+            <IBMText style={styles.helperText}>engage boosters.</IBMText>
+          </View>
+        ) : null}
         <View style={styles.swipeableArea} />
         <View>
           <Directional facing="N" rotation={225} />

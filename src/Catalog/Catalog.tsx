@@ -4,7 +4,7 @@ import {useNavigation} from '@react-navigation/native';
 
 import {useAppContext} from 'AppContext';
 import {CatalogNavigationProp} from 'types/app';
-import {enemyPoints, startingEnemies} from 'Game/constants';
+import {Enemies, enemyPoints, startingEnemies} from 'Game/constants';
 import pyramidsImage from 'images/backdrop_catalog.jpg';
 import TransparentSafeAreaView from 'components/TransparentSafeAreaView';
 
@@ -25,13 +25,18 @@ const styles = StyleSheet.create({
   },
 });
 
+const pointsForLevel = {
+  ...enemyPoints,
+  [Enemies.CARGO_SHIP]: 400,
+};
+
 const levels = startingEnemies.map(enemies =>
   enemies.reduce((totalPointsPossible, enemyName) => {
     if (enemyName === null) {
       return totalPointsPossible;
     }
 
-    return totalPointsPossible + enemyPoints[enemyName];
+    return totalPointsPossible + pointsForLevel[enemyName];
   }, 0),
 );
 

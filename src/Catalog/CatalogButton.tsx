@@ -86,13 +86,13 @@ const CatalogButton = ({
         style={[styles.buttonContainer, styles.button]}>
         <PressStartText>{`Level ${level + 1}`}</PressStartText>
         <View style={styles.score}>
-          {earned === possible && (
+          {earned >= possible && (
             <Image source={silverStarImage} style={styles.star} />
           )}
           <IBMText style={styles.scoreText}>
             {earned}/{possible}
           </IBMText>
-          {earned === possible && (
+          {earned >= possible && (
             <Image source={silverStarImage} style={styles.star} />
           )}
         </View>
