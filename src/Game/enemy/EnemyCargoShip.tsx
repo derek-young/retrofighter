@@ -97,7 +97,7 @@ const EnemyCargoShip = ({id}: {id: number}): JSX.Element | null => {
     if (hasFixedValue) {
       Animated.timing(waveAnimation.current, {
         easing: Easing.linear,
-        duration: 2000,
+        duration: 1500,
         toValue: arenaSize,
         useNativeDriver: true,
       }).start(() => setHasWaveAnimationEnded(true));
@@ -111,13 +111,23 @@ const EnemyCargoShip = ({id}: {id: number}): JSX.Element | null => {
         toValue: 0,
         useNativeDriver: true,
       }).start(() => {
-        setTimeout(() =>
+        addEnemy(Enemies.SPEEDER, {
+          startingLeft: fixedLeft ?? 0,
+          startingTop: fixedTop ?? 0,
+        });
+        setTimeout(() => {
           addEnemy(Enemies.SPEEDER, {
             startingLeft: fixedLeft ?? 0,
             startingTop: fixedTop ?? 0,
-          }),
-        );
-        removeEnemy(id);
+          });
+        }, 300);
+        setTimeout(() => {
+          addEnemy(Enemies.SPEEDER, {
+            startingLeft: fixedLeft ?? 0,
+            startingTop: fixedTop ?? 0,
+          });
+        }, 600);
+        setTimeout(() => removeEnemy(id), 600);
       });
     }
   }, [addEnemy, fixedLeft, fixedTop, hasWaveAnimationEnded, removeEnemy, id]);

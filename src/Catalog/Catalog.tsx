@@ -27,7 +27,7 @@ const styles = StyleSheet.create({
 
 const pointsForLevel = {
   ...enemyPoints,
-  [Enemies.CARGO_SHIP]: 400,
+  [Enemies.CARGO_SHIP]: 1200,
 };
 
 const levels = startingEnemies.map(enemies =>
