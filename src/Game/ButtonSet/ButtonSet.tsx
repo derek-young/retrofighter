@@ -9,7 +9,8 @@ import {
 } from 'react-native';
 
 import Colors from 'types/colors';
-import {missileDuration} from 'Game/constants';
+import {maxScreenSize, missileDuration} from 'Game/constants';
+import IBMText from 'components/IBMText';
 
 import LifeIndicator from './LifeIndicator';
 
@@ -17,9 +18,8 @@ import {useGameContext} from '../GameContext';
 import {useAnimationContext} from '../Fighter/AnimationContext';
 import {useEliminationContext} from '../Fighter/EliminationContext';
 import {useMissileContext} from '../Fighter/MissileContext';
-import IBMText from 'components/IBMText';
 
-const buttonSize = 60;
+const buttonSize = Math.min(maxScreenSize / 12, 60);
 
 const styles = StyleSheet.create({
   section: {
@@ -43,7 +43,7 @@ const styles = StyleSheet.create({
     borderRadius: buttonSize / 2,
     borderWidth: 4,
     borderColor: `${Colors.SKY_BLUE}99`,
-    margin: 12,
+    margin: buttonSize / 6,
     overflow: 'hidden',
     backgroundColor: Colors.GREY,
   },

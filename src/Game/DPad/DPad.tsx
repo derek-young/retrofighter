@@ -5,17 +5,20 @@ import Colors from 'types/colors';
 import ChevronRight from 'icons/right-chevron.svg';
 import ChevronRightNarrow from 'icons/right-chevron-narrow.svg';
 
-import {useAnimationContext} from '../Fighter/AnimationContext';
-import {Facing} from '../types';
 import IBMText from 'components/IBMText';
 import {useGameContext} from 'Game/GameContext';
+import {maxScreenSize} from 'Game/constants';
 
-const buttonSize = 40;
+import {useAnimationContext} from '../Fighter/AnimationContext';
+import {Facing} from '../types';
+
+const buttonSize = Math.min(maxScreenSize / 20, 40);
 
 const styles = StyleSheet.create({
   dPad: {
     flex: 1,
     justifyContent: 'center',
+    alignItems: 'center',
   },
   container: {
     display: 'flex',
@@ -23,6 +26,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     transform: [{rotate: '45deg'}],
+    width: '100%',
   },
   swipeableArea: {
     position: 'absolute',
@@ -33,7 +37,6 @@ const styles = StyleSheet.create({
   },
   directional: {
     display: 'flex',
-    alignItems: 'center',
     justifyContent: 'center',
     width: buttonSize * 3,
     height: buttonSize * 3,
@@ -61,9 +64,7 @@ const styles = StyleSheet.create({
   },
   helperTextContainer: {
     position: 'absolute',
-    bottom: -20,
-    right: -32,
-    transform: [{rotate: '-45deg'}],
+    bottom: 20,
     backgroundColor: 'rgba(0, 0, 0, 0.3)',
     padding: 4,
     borderRadius: 4,
@@ -163,14 +164,14 @@ const DPad = (): JSX.Element => {
         }
       }}
       style={styles.dPad}>
+      {epic === 0 ? (
+        <View style={styles.helperTextContainer}>
+          <IBMText style={styles.helperText}>Swipe pad to turn.</IBMText>
+          <IBMText style={styles.helperText}>Press and hold to</IBMText>
+          <IBMText style={styles.helperText}>engage boosters.</IBMText>
+        </View>
+      ) : null}
       <View style={styles.container}>
-        {epic === 0 ? (
-          <View style={styles.helperTextContainer}>
-            <IBMText style={styles.helperText}>Swipe pad to turn.</IBMText>
-            <IBMText style={styles.helperText}>Press and hold to</IBMText>
-            <IBMText style={styles.helperText}>engage boosters.</IBMText>
-          </View>
-        ) : null}
         <View style={styles.swipeableArea} />
         <View>
           <Directional facing="N" rotation={225} />
