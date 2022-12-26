@@ -16,6 +16,7 @@ import IBMText from 'components/IBMText';
 import PressStartText from 'components/PressStartText';
 
 import CraftPreview from './CraftPreview';
+import AppleSigninButton from './AppleSigninButton';
 import GoogleSigninButton from './GoogleSigninButton';
 import {useAppContext} from 'AppContext';
 
@@ -104,6 +105,7 @@ const Login = (): JSX.Element => {
           Sign In to Track Your Progress
         </IBMText>
         <GoogleSigninButton />
+        <AppleSigninButton />
         <IBMText style={styles.basicText}>or</IBMText>
         <PressStartText
           onPress={() => navigation.navigate('Catalog')}

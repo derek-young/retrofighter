@@ -27,7 +27,7 @@ const App = (): JSX.Element => {
           <Stack.Screen
             name="Game"
             component={Game}
-            options={{orientation: 'landscape'}}
+            options={{gestureEnabled: false, orientation: 'landscape'}}
           />
           <Stack.Screen
             name="Login"
