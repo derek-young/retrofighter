@@ -46,6 +46,7 @@
 		5B509084C07FAB1CD29B8616 /* Pods_RetroFighter_RetroFighterTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_RetroFighter_RetroFighterTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = RetroFighter/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		8FB6EEA53D16B047C2976C01 /* Pods-RetroFighter.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RetroFighter.debug.xcconfig"; path = "Target Support Files/Pods-RetroFighter/Pods-RetroFighter.debug.xcconfig"; sourceTree = "<group>"; };
+		BB46F06B295A60D300FD7F7D /* RetroFighter.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = RetroFighter.entitlements; path = RetroFighter/RetroFighter.entitlements; sourceTree = "<group>"; };
 		BB4BC7D628D21B730005C8CE /* PressStart2P-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "PressStart2P-Regular.ttf"; path = "/Users/derekyoung/Documents/retrofighter/assets/fonts/PressStart2P-Regular.ttf"; sourceTree = "<absolute>"; };
 		BB67C1B1291965B50084149E /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		BB6C22FC28D235C00089938C /* IBMPlexMono-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "IBMPlexMono-Regular.ttf"; path = "/Users/derekyoung/Documents/retrofighter/assets/fonts/IBMPlexMono-Regular.ttf"; sourceTree = "<absolute>"; };
@@ -93,6 +94,7 @@
 		13B07FAE1A68108700A75B9A /* RetroFighter */ = {
 			isa = PBXGroup;
 			children = (
+				BB46F06B295A60D300FD7F7D /* RetroFighter.entitlements */,
 				13B07FAF1A68108700A75B9A /* AppDelegate.h */,
 				13B07FB01A68108700A75B9A /* AppDelegate.mm */,
 				13B07FB51A68108700A75B9A /* Images.xcassets */,
@@ -485,6 +487,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_ENTITLEMENTS = RetroFighter/RetroFighter.entitlements;
 				CURRENT_PROJECT_VERSION = 1.0;
 				DEVELOPMENT_TEAM = AW39ZSR962;
 				ENABLE_BITCODE = NO;
@@ -513,6 +516,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_ENTITLEMENTS = RetroFighter/RetroFighter.entitlements;
 				CURRENT_PROJECT_VERSION = 1.0;
 				DEVELOPMENT_TEAM = AW39ZSR962;
 				INFOPLIST_FILE = RetroFighter/Info.plist;

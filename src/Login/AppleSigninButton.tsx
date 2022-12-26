@@ -10,8 +10,9 @@ import {useAppContext} from 'AppContext';
 
 const styles = StyleSheet.create({
   button: {
-    height: 48,
-    width: 192,
+    height: 42,
+    width: 184,
+    marginTop: 8,
   },
 });
 
@@ -59,7 +60,7 @@ const AppleSigninButton = () => {
 
   return (
     <AppleButton
-      buttonStyle={AppleButton.Style.WHITE}
+      buttonStyle={AppleButton.Style.WHITE_OUTLINE}
       buttonType={AppleButton.Type.SIGN_IN}
       onPress={signIn}
       style={[
