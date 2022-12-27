@@ -95,7 +95,7 @@ export const startingEnemies: (Enemies | null)[][] = [
   [
     null,
     null,
-    null,
+    Enemies.DUAL_FIGHTER,
     Enemies.UAV,
     Enemies.DUAL_FIGHTER,
     Enemies.CARGO_SHIP,
@@ -115,7 +115,7 @@ export const startingEnemies: (Enemies | null)[][] = [
   ],
   [
     null,
-    null,
+    Enemies.UAV,
     Enemies.DUAL_FIGHTER,
     Enemies.CARGO_SHIP,
     Enemies.DUAL_FIGHTER,
