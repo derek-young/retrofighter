@@ -5,8 +5,11 @@ import React, {
   useMemo,
   useState,
 } from 'react';
+import {Alert} from 'react-native';
 import auth, {FirebaseAuthTypes} from '@react-native-firebase/auth';
 import {useNavigation} from '@react-navigation/native';
+import {GoogleSignin} from '@react-native-google-signin/google-signin';
+import {appleAuth} from '@invertase/react-native-apple-authentication';
 
 import {userActions} from 'database';
 import {CatalogNavigationProp} from 'types/app';
@@ -16,6 +19,7 @@ const noop = () => {};
 export type AuthUser = null | FirebaseAuthTypes.User;
 
 const defaultValue: AppContextValue = {
+  onDeleteAcct: noop,
   onSignOut: noop,
   scores: [],
   recordScores: noop,
@@ -25,6 +29,7 @@ const defaultValue: AppContextValue = {
 };
 
 interface AppContextValue {
+  onDeleteAcct: () => void;
   onSignOut: () => void;
   scores: number[];
   recordScores: (level: number, score: number) => void;
@@ -68,6 +73,46 @@ export const AppContextProvider = ({children}: {children: React.ReactNode}) => {
     [scores, setRemoteScores],
   );
 
+  const onDeleteConfirm = useCallback(async () => {
+    try {
+      const providerId = user?.providerData[0]?.providerId;
+      let credential;
+
+      if (providerId === 'google.com') {
+        await GoogleSignin.hasPlayServices();
+        const {idToken} = await GoogleSignin.signIn();
+        credential = auth.GoogleAuthProvider.credential(idToken);
+      } else if (providerId === 'apple.com') {
+        const appleAuthRequestResponse = await appleAuth.performRequest({
+          requestedOperation: appleAuth.Operation.LOGIN,
+          requestedScopes: [appleAuth.Scope.EMAIL, appleAuth.Scope.FULL_NAME],
+        });
+
+        const {identityToken, nonce} = appleAuthRequestResponse;
+        credential = auth.AppleAuthProvider.credential(identityToken, nonce);
+      }
+
+      if (credential) {
+        await user?.reauthenticateWithCredential(credential);
+        await user?.delete();
+        navigation.navigate('Login');
+      }
+    } catch (e) {
+      console.log('Error deleting user', e);
+    }
+  }, [navigation, user]);
+
+  const onDeleteAcct = useCallback(async () => {
+    Alert.alert(
+      'Are you sure?',
+      'This will permanently erase all data. This action cannot be undone.',
+      [
+        {text: 'Cancel', style: 'cancel'},
+        {text: 'OK', onPress: onDeleteConfirm},
+      ],
+    );
+  }, [onDeleteConfirm]);
+
   const onSignOut = useCallback(async () => {
     await auth().signOut();
     navigation.navigate('Login');
@@ -76,7 +121,7 @@ export const AppContextProvider = ({children}: {children: React.ReactNode}) => {
   useEffect(() => {
     if (user?.uid) {
       userActions.get().then(dbUser => {
-        if (dbUser.scores) {
+        if (dbUser?.scores) {
           setScores(dbUser.scores);
         } else {
           userActions.set({scores: []});
@@ -91,6 +136,7 @@ export const AppContextProvider = ({children}: {children: React.ReactNode}) => {
     <AppContext.Provider
       children={children}
       value={{
+        onDeleteAcct,
         onSignOut,
         recordScores,
         scores,

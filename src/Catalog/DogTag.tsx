@@ -38,6 +38,7 @@ const styles = StyleSheet.create({
   },
   bottom: {
     display: 'flex',
+    flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     height: bottomHeight,
@@ -66,14 +67,17 @@ const styles = StyleSheet.create({
   name: {
     fontSize: 16,
   },
-  logout: {
-    width: 96,
-    marginTop: 24,
+  button: {
+    marginHorizontal: 8,
+  },
+  deleteButton: {
+    backgroundColor: Colors.RED,
+    color: Colors.DAVY_GREY,
   },
 });
 
 const DogTag = () => {
-  const {onSignOut, user, totalScore} = useAppContext();
+  const {onDeleteAcct, onSignOut, user, totalScore} = useAppContext();
   const [isExpanded, setIsExpanded] = useState(false);
   const {height, width} = useWindowDimensions();
   const isPortrait = height > width;
@@ -116,8 +120,13 @@ const DogTag = () => {
           </View>
           {user?.uid ? (
             <View style={styles.bottom}>
-              <Button onPress={onSignOut} style={styles.logout}>
+              <Button onPress={onSignOut} style={styles.button}>
                 Sign Out
+              </Button>
+              <Button
+                onPress={onDeleteAcct}
+                style={[styles.button, styles.deleteButton]}>
+                Delete Acct
               </Button>
             </View>
           ) : null}
