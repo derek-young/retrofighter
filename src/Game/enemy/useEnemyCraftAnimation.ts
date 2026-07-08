@@ -250,8 +250,7 @@ function useEnemyCraftAnimation({
 
       isPlayerInLineOfSightPrevRef.current = true;
     } else if (!isPlayerInLineOfSight && isPlayerInLineOfSightPrevRef.current) {
-      detectedPlayerFacingRef.current =
-        simulation.getFacing(PLAYER_ID) ?? null;
+      detectedPlayerFacingRef.current = simulation.getFacing(PLAYER_ID) ?? null;
       detectedPlayerPositionRef.current =
         simulation.getPosition(PLAYER_ID) ?? null;
       leftAnim.stopAnimation();

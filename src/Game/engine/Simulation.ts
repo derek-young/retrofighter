@@ -1,5 +1,10 @@
 import {Facing} from 'Game/types';
-import {alleyWidth, craftSize, maxScreenSize, missileSpeed} from 'Game/constants';
+import {
+  alleyWidth,
+  craftSize,
+  maxScreenSize,
+  missileSpeed,
+} from 'Game/constants';
 import {getIsPlayerInLineOfSight} from 'Game/enemy/animation';
 
 export const PLAYER_ID = 'player';
@@ -235,9 +240,7 @@ class Simulation {
   getMissileValue(id: string, now = Date.now()): number | undefined {
     const missile = this.missiles.get(id);
 
-    return missile === undefined
-      ? undefined
-      : this.missileValue(missile, now);
+    return missile === undefined ? undefined : this.missileValue(missile, now);
   }
 
   pause(now = Date.now()): void {
