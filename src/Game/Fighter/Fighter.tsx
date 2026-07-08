@@ -53,26 +53,11 @@ const Fighter = (): null | JSX.Element => {
 
   const craftColor = hasPlayerMoved ? Colors.GREEN : `${Colors.GREEN}80`;
 
+  // Missiles are mounted before the craft so the craft paints on top of
+  // them (they used to rely on zIndex, which breaks native-driver
+  // transforms on iOS).
   return (
     <>
-      <Craft
-        Icon={FighterIcon}
-        fill={craftColor}
-        facing={facing}
-        isEliminated={isPlayerEliminated}
-        onEliminationEnd={() => {
-          if (hasFiredMissile) {
-            setIsAwaitingMissileAnimEnd(true);
-          } else {
-            onEliminationEnd();
-          }
-        }}
-        left={leftAnim}
-        top={topAnim}
-        rotationAnim={rotationAnim}
-        simId={PLAYER_ID}
-        score={-500}
-      />
       {(!isPlayerEliminated || leftMissileProps.hasMissileFired) && (
         <FighterMissile
           craftColor={craftColor}
@@ -99,6 +84,24 @@ const Fighter = (): null | JSX.Element => {
           positionOffset={18}
         />
       )}
+      <Craft
+        Icon={FighterIcon}
+        fill={craftColor}
+        facing={facing}
+        isEliminated={isPlayerEliminated}
+        onEliminationEnd={() => {
+          if (hasFiredMissile) {
+            setIsAwaitingMissileAnimEnd(true);
+          } else {
+            onEliminationEnd();
+          }
+        }}
+        left={leftAnim}
+        top={topAnim}
+        rotationAnim={rotationAnim}
+        simId={PLAYER_ID}
+        score={-500}
+      />
     </>
   );
 };

@@ -20,13 +20,14 @@ function RotatedDualFighterIcon({style, ...rest}: IconProps) {
 }
 
 const DualFighter = (): JSX.Element => {
+  // Missile first so the craft paints on top of it.
   return (
     <>
+      <EnemyMissile />
       <EnemyCraft
         Icon={RotatedDualFighterIcon}
         score={enemyPoints[Enemies.DUAL_FIGHTER]}
       />
-      <EnemyMissile />
     </>
   );
 };

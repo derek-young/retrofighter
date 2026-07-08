@@ -14,16 +14,24 @@ import {useGameContext} from './GameContext';
 import {useSimulationContext} from './engine/SimulationContext';
 
 const styles = StyleSheet.create({
-  missile: {
-    position: 'absolute',
-  },
+  // No zIndex here: on iOS, mixing zIndex sorting with native-driver
+  // transforms makes the view lose its transform. Missiles render behind
+  // their craft by being mounted before it (paint order) instead.
   missileContainer: {
     position: 'absolute',
     top: 0,
     left: 0,
     height: craftSize,
     width: craftSize,
-    zIndex: -1,
+  },
+  // Must span the container: the icon inside is absolutely positioned, so a
+  // sized box is required for it to lay out (and render) against.
+  missileTravel: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    height: craftSize,
+    width: craftSize,
   },
 });
 
@@ -31,6 +39,10 @@ const rotationRange = {
   inputRange: [-360, 360],
   outputRange: ['-360deg', '360deg'],
 };
+
+// Plain object (not a StyleSheet entry) so icon components can spread it
+// into their own style objects.
+const missileIconStyle = {position: 'absolute' as const};
 
 type FiredState = {
   left: number;
@@ -142,8 +154,8 @@ const Missile = ({
     <Animated.View
       style={[styles.missileContainer, {transform: containerTransform}]}>
       <Animated.View
-        style={[styles.missile, {transform: [{translateY: missileAnim}]}]}>
-        <Icon style={styles.missile} />
+        style={[styles.missileTravel, {transform: [{translateY: missileAnim}]}]}>
+        <Icon style={missileIconStyle} />
       </Animated.View>
     </Animated.View>
   );

@@ -26,7 +26,6 @@ const styles = StyleSheet.create({
     borderColor: Colors.RED,
     opacity: 0.4,
     position: 'absolute',
-    zIndex: -100,
     height: arenaSize,
     width: arenaSize,
     borderRadius: arenaSize / 2,
@@ -104,14 +103,10 @@ const EnemyCargoShip = ({id}: {id: number}): JSX.Element | null => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [addEnemy, hasWaveAnimationEnded, removeEnemy, id]);
 
+  // Waves render before the craft so the craft paints on top of them
+  // (zIndex breaks native-driver transforms on iOS).
   return (
     <>
-      <Animated.View style={{opacity: craftOpacityAnim}}>
-        <EnemyCraft
-          Icon={EnemyCargoShipIcon}
-          score={enemyPoints[Enemies.CARGO_SHIP]}
-        />
-      </Animated.View>
       {frozenPosition && !hasWaveAnimationEnded && (
         <>
           <RadarWave
@@ -131,6 +126,12 @@ const EnemyCargoShip = ({id}: {id: number}): JSX.Element | null => {
           />
         </>
       )}
+      <Animated.View style={{opacity: craftOpacityAnim}}>
+        <EnemyCraft
+          Icon={EnemyCargoShipIcon}
+          score={enemyPoints[Enemies.CARGO_SHIP]}
+        />
+      </Animated.View>
     </>
   );
 };

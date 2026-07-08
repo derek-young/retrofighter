@@ -56,7 +56,6 @@ const styles = StyleSheet.create({
     width: buttonSize,
     height: buttonSize,
     position: 'absolute',
-    zIndex: -1,
     backgroundColor: Colors.RED,
   },
   buttonText: {
@@ -143,11 +142,13 @@ const ActionButton = ({
     />
   );
 
+  // The fill renders before the label so the label paints on top (zIndex
+  // breaks native-driver transforms on iOS).
   if (disabled) {
     return (
       <View style={[styles.actionButton, styles.buttonDisabled]}>
-        <Text style={styles.buttonText}>{children}</Text>
         {background}
+        <Text style={styles.buttonText}>{children}</Text>
       </View>
     );
   }
@@ -157,8 +158,8 @@ const ActionButton = ({
       disabled={disabled}
       onPressIn={onPress}
       style={styles.actionButton}>
-      <Text style={styles.buttonText}>{children}</Text>
       {background}
+      <Text style={styles.buttonText}>{children}</Text>
     </TouchableOpacity>
   );
 };
