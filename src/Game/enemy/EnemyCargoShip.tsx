@@ -122,11 +122,6 @@ const EnemyCargoShip = ({id}: {id: number}): JSX.Element | null => {
           <RadarWave
             center={frozenPosition}
             waveAnim={waveAnim}
-            waveOffset={0}
-          />
-          <RadarWave
-            center={frozenPosition}
-            waveAnim={waveAnim}
             waveOffset={80}
           />
           <RadarWave
