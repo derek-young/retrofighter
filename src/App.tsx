@@ -2,7 +2,7 @@ import React, {useEffect} from 'react';
 import {StatusBar} from 'react-native';
 import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
-import SplashScreen from 'react-native-splash-screen';
+import BootSplash from 'react-native-bootsplash';
 
 import Catalog from './Catalog';
 import Game from './Game';
@@ -13,7 +13,7 @@ const Stack = createNativeStackNavigator();
 
 const App = (): JSX.Element => {
   useEffect(() => {
-    SplashScreen.hide();
+    BootSplash.hide({fade: true}).catch(() => {});
   }, []);
 
   return (
