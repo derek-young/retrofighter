@@ -9,10 +9,7 @@ import TurkyLegIcon from 'icons/turkey-leg.svg';
 import {useEnemyCraftContext} from './EnemyCraftContext';
 import {useEnemyMissileContext} from './EnemyMissileContext';
 
-interface EnemyMissileProps {
-  missileColor?: string;
-}
-
+const missileColor = '#FF0042';
 const leftOffset = 4;
 
 const isThanksgivingDay = getIsThanksgivingDay();
@@ -26,28 +23,34 @@ const MissileIcon: React.FC<IconProps> = isThanksgivingDay
     )
   : EnemyMissileIcon;
 
-const EnemyMissile = ({
-  missileColor = '#FF0042',
-}: EnemyMissileProps): null | JSX.Element => {
-  const {craftRotation, facing, leftAnim, topAnim} = useEnemyCraftContext();
+function StyledMissileIcon({style}: IconProps) {
+  return (
+    <MissileIcon
+      fill={missileColor}
+      height={missileSize}
+      width={missileSize}
+      style={{...(style as object), left: leftOffset}}
+    />
+  );
+}
+
+const EnemyMissile = (): null | JSX.Element => {
+  const {facing, leftAnim, rotationAnim, simId, topAnim} =
+    useEnemyCraftContext();
   const missileProps = useEnemyMissileContext();
 
   return (
     <Missile
-      craftRotation={craftRotation}
       facing={facing}
-      Icon={({style}) => (
-        <MissileIcon
-          fill={missileColor}
-          height={missileSize}
-          width={missileSize}
-          style={{...(style as object), left: leftOffset}}
-        />
-      )}
+      Icon={StyledMissileIcon}
       leftAnim={leftAnim}
       topAnim={topAnim}
+      missileId={`${simId}-missile`}
       missileProps={missileProps}
+      ownerId={simId}
       positionOffset={alleyWidth / 2}
+      rotationAnim={rotationAnim}
+      targetKind="player"
     />
   );
 };

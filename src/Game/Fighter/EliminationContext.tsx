@@ -1,6 +1,15 @@
-import React, {useCallback, useContext, useState} from 'react';
+import React, {
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 
 import {useGameContext} from 'Game/GameContext';
+import {PLAYER_ID} from 'Game/engine/Simulation';
+import {useSimulationContext} from 'Game/engine/SimulationContext';
+
 import {useAnimationContext} from './AnimationContext';
 
 type EliminationContextValue = {
@@ -33,6 +42,7 @@ interface EliminationProviderProps {
 
 export const EliminationProvider = ({children}: EliminationProviderProps) => {
   const {remainingLives, setRemainingLives} = useGameContext();
+  const simulation = useSimulationContext();
   const {resetAnimationContext} = useAnimationContext();
   const [isPlayerEliminated, setIsPlayerEliminated] = useState(false);
   const [hasEliminationAnimationEnded, setHasEliminationAnimationEnded] =
@@ -41,6 +51,12 @@ export const EliminationProvider = ({children}: EliminationProviderProps) => {
   const onIsPlayerEliminated = useCallback(() => {
     setIsPlayerEliminated(true);
   }, []);
+
+  useEffect(() => {
+    simulation.setCraftCallbacks(PLAYER_ID, {
+      onEliminated: onIsPlayerEliminated,
+    });
+  }, [onIsPlayerEliminated, simulation]);
 
   const resetEliminationContext = useCallback(() => {
     setIsPlayerEliminated(false);
@@ -65,19 +81,27 @@ export const EliminationProvider = ({children}: EliminationProviderProps) => {
     resetEliminationContext,
   ]);
 
+  const value = useMemo(
+    () => ({
+      onIsPlayerEliminated,
+      hasEliminationAnimationEnded,
+      isPlayerEliminated,
+      onEliminationEnd,
+      resetEliminationContext,
+      shouldRenderPlayer: !(isPlayerEliminated && hasEliminationAnimationEnded),
+    }),
+    [
+      onIsPlayerEliminated,
+      hasEliminationAnimationEnded,
+      isPlayerEliminated,
+      onEliminationEnd,
+      resetEliminationContext,
+    ],
+  );
+
   return (
-    <EliminationContext.Provider
-      children={children}
-      value={{
-        onIsPlayerEliminated,
-        hasEliminationAnimationEnded,
-        isPlayerEliminated,
-        onEliminationEnd,
-        resetEliminationContext,
-        shouldRenderPlayer: !(
-          isPlayerEliminated && hasEliminationAnimationEnded
-        ),
-      }}
-    />
+    <EliminationContext.Provider value={value}>
+      {children}
+    </EliminationContext.Provider>
   );
 };

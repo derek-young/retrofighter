@@ -1,5 +1,5 @@
 import React, {useRef, useState} from 'react';
-import {Pressable, StyleSheet, View} from 'react-native';
+import {GestureResponderEvent, Pressable, StyleSheet, View} from 'react-native';
 
 import Colors from 'types/colors';
 import ChevronRight from 'icons/right-chevron.svg';
@@ -13,6 +13,7 @@ import {useAnimationContext} from '../Fighter/AnimationContext';
 import {Facing} from '../types';
 
 const buttonSize = Math.min(maxScreenSize / 20, 40);
+const swipeThreshold = 24;
 
 const styles = StyleSheet.create({
   dPad: {
@@ -88,7 +89,7 @@ const Directional = ({facing, rotation}: DirectionalProps): JSX.Element => {
 
   return (
     <Pressable
-      delayLongPress={250}
+      delayLongPress={150}
       onLongPress={() => {
         setIsPressed(true);
         setThrusterEngagedFacing(facing);
@@ -121,8 +122,8 @@ const Directional = ({facing, rotation}: DirectionalProps): JSX.Element => {
 const DPad = (): JSX.Element => {
   const xRef = useRef(0);
   const yRef = useRef(0);
+  const hasGestureFiredRef = useRef(false);
   const {
-    hasPlayerMoved,
     setHasPlayerMoved,
     onDownPress,
     onUpPress,
@@ -131,38 +132,47 @@ const DPad = (): JSX.Element => {
   } = useAnimationContext();
   const {epic} = useGameContext();
 
+  // Fires as soon as the swipe crosses the threshold — during the gesture,
+  // not on finger lift — so turns feel immediate.
+  const handleSwipe = (e: GestureResponderEvent) => {
+    if (hasGestureFiredRef.current) {
+      return;
+    }
+
+    const xDiff = e.nativeEvent.pageX - xRef.current;
+    const yDiff = e.nativeEvent.pageY - yRef.current;
+
+    if (Math.abs(xDiff) <= swipeThreshold && Math.abs(yDiff) <= swipeThreshold) {
+      return;
+    }
+
+    hasGestureFiredRef.current = true;
+
+    if (Math.abs(xDiff) > Math.abs(yDiff)) {
+      if (xDiff > 0) {
+        onRightPress();
+      } else {
+        onLeftPress();
+      }
+    } else {
+      if (yDiff > 0) {
+        onDownPress();
+      } else {
+        onUpPress();
+      }
+    }
+  };
+
   return (
     <View
       onTouchStart={e => {
-        if (!hasPlayerMoved) {
-          setHasPlayerMoved(true);
-        }
-
+        setHasPlayerMoved(true);
+        hasGestureFiredRef.current = false;
         xRef.current = e.nativeEvent.pageX;
         yRef.current = e.nativeEvent.pageY;
       }}
-      onTouchEnd={e => {
-        const xDiff = e.nativeEvent.pageX - xRef.current;
-        const yDiff = e.nativeEvent.pageY - yRef.current;
-
-        if (Math.abs(xDiff) > 24 || Math.abs(yDiff) > 24) {
-          if (Math.abs(xDiff) > Math.abs(yDiff)) {
-            if (xDiff > 0) {
-              onRightPress();
-            }
-            if (xDiff < 0) {
-              onLeftPress();
-            }
-          } else {
-            if (yDiff > 0) {
-              onDownPress();
-            }
-            if (yDiff < 0) {
-              onUpPress();
-            }
-          }
-        }
-      }}
+      onTouchMove={handleSwipe}
+      onTouchEnd={handleSwipe}
       style={styles.dPad}>
       {epic === 0 ? (
         <View style={styles.helperTextContainer}>

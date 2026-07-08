@@ -24,7 +24,9 @@ const EnemyCraft = ({
     leftAnim,
     topAnim,
     onEliminationAnimationEnd,
-    onRotationChange,
+    onRotationEnd,
+    rotationAnim,
+    simId,
   } = useEnemyCraftContext();
   const missileProps = useEnemyMissileContext();
   const [isAwaitingMissileAnimEnd, setIsAwaitingMissileAnimEnd] =
@@ -55,7 +57,9 @@ const EnemyCraft = ({
           onEliminationAnimationEnd();
         }
       }}
-      rotationListener={onRotationChange}
+      onRotationEnd={onRotationEnd}
+      rotationAnim={rotationAnim}
+      simId={simId}
       score={score}
     />
   );

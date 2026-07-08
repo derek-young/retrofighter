@@ -1,4 +1,4 @@
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useEffect, useMemo, useRef, useState} from 'react';
 import {Animated, StyleSheet} from 'react-native';
 
 import Colors from 'types/colors';
@@ -8,12 +8,18 @@ import PressStartText from 'components/PressStartText';
 import {alleyWidth, craftSize} from './constants';
 import {Facing} from './types';
 import {useGameContext} from './GameContext';
+import {useSimulationContext} from './engine/SimulationContext';
+
+const explosionSize = 50;
+const scoreFontSize = 16;
 
 const styles = StyleSheet.create({
   iconContainer: {
     height: craftSize,
     width: craftSize,
     position: 'absolute',
+    top: 0,
+    left: 0,
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
@@ -25,10 +31,15 @@ const styles = StyleSheet.create({
   elimination: {
     position: 'absolute',
   },
-  score: {
+  scoreContainer: {
     position: 'absolute',
+  },
+  score: {
+    fontSize: scoreFontSize,
+    width: scoreFontSize * 4,
     shadowColor: 'black',
     shadowOpacity: 0.4,
+    shadowOffset: {width: scoreFontSize / 8, height: scoreFontSize / 8},
   },
 });
 
@@ -90,6 +101,11 @@ function getScorePosition(facing: Facing, top: number) {
   return scorePosition[facing];
 }
 
+const rotationRange = {
+  inputRange: [-360, 360],
+  outputRange: ['-360deg', '360deg'],
+};
+
 export type CraftProps = {
   Icon: React.ElementType;
   isEliminated: boolean;
@@ -98,7 +114,9 @@ export type CraftProps = {
   onEliminationEnd: () => void;
   top: number | Animated.Value;
   left: number | Animated.Value;
-  rotationListener?: (props: {value: number}) => void;
+  rotationAnim?: Animated.Value;
+  onRotationEnd?: (rotation: number) => void;
+  simId?: string;
   score: number;
 };
 
@@ -110,84 +128,108 @@ const Craft = ({
   onEliminationEnd,
   left,
   top,
-  rotationListener,
+  rotationAnim,
+  onRotationEnd,
+  simId,
   score,
 }: CraftProps): JSX.Element => {
   const {adjustScore} = useGameContext();
-  const rotation = DEFAULT_FACING_ROTATION[facing];
+  const simulation = useSimulationContext();
   const shadow = SHADOW_POS[facing];
-  const rotationAnim = useRef(new Animated.Value(rotation));
-  const elimAnimation = useRef(new Animated.Value(0));
+  const fallbackRotationAnim = useRef(
+    new Animated.Value(DEFAULT_FACING_ROTATION[facing]),
+  ).current;
+  const rotation = rotationAnim ?? fallbackRotationAnim;
+  const elimAnim = useRef(new Animated.Value(0)).current;
   const facingRef = useRef(facing);
   const onEliminationEndRef = useRef(onEliminationEnd);
-  const rotationListenerRef = useRef(rotationListener);
-  const [elimValue, setElimValue] = useState(0);
+  const onRotationEndRef = useRef(onRotationEnd);
   const [hasEliminationEnded, setHasEliminationEnded] = useState(false);
-  const [rotationState, setRotationState] = useState(0);
+  const [scorePlacement, setScorePlacement] = useState<Record<
+    string,
+    number
+  > | null>(null);
 
-  rotationListenerRef.current = rotationListener;
+  onRotationEndRef.current = onRotationEnd;
   onEliminationEndRef.current = onEliminationEnd;
 
-  const elimValueListener = ({value}: {value: number}) => setElimValue(value);
-
-  const rotationValueListener = ({value}: {value: number}) =>
-    setRotationState(Math.round(value));
-
-  useEffect(() => {
-    elimAnimation.current.addListener(elimValueListener);
-    rotationAnim.current.addListener(rotationValueListener);
-
-    if (rotationListenerRef.current) {
-      rotationAnim.current.addListener(rotationListenerRef.current);
-    }
-  }, []);
+  const {rotate, counterRotate, explosionScale, scoreScale} = useMemo(
+    () => ({
+      rotate: rotation.interpolate(rotationRange),
+      counterRotate: Animated.multiply(rotation, -1).interpolate(
+        rotationRange,
+      ),
+      explosionScale: elimAnim,
+      scoreScale: elimAnim.interpolate({
+        inputRange: [0, 0.32, 1],
+        outputRange: [0, 1, 1],
+      }),
+    }),
+    [elimAnim, rotation],
+  );
 
   useEffect(() => {
     if (isEliminated) {
       adjustScore(score);
 
-      Animated.timing(elimAnimation.current, {
-        toValue: 50,
+      const craftTop = simId
+        ? simulation.getPosition(simId)?.top
+        : typeof top === 'number'
+        ? top
+        : undefined;
+
+      setScorePlacement(getScorePosition(facingRef.current, craftTop ?? 0));
+
+      Animated.timing(elimAnim, {
+        toValue: 1,
         duration: 800,
         useNativeDriver: true,
       }).start(() => {
         onEliminationEndRef.current();
-        elimAnimation.current.setValue(0);
+        elimAnim.setValue(0);
         setHasEliminationEnded(true);
       });
     }
-  }, [adjustScore, elimAnimation, isEliminated, score]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [adjustScore, elimAnim, isEliminated, score, simId, simulation]);
 
   useEffect(() => {
     const nextRotation = getNextRotationSet(facingRef.current)[facing];
 
     facingRef.current = facing;
 
-    Animated.timing(rotationAnim.current, {
+    Animated.timing(rotation, {
       toValue: nextRotation,
       duration: 150,
       useNativeDriver: true,
-    }).start(() => {
-      // Normalize values on animation finish
+    }).start(({finished}) => {
+      if (!finished) {
+        return;
+      }
+
+      // Normalize values on animation finish so the value stays within the
+      // interpolation range across repeated turns.
+      let settledRotation = nextRotation;
+
       if (nextRotation === -180) {
-        rotationAnim.current.setValue(180);
+        rotation.setValue(180);
+        settledRotation = 180;
       }
       if (nextRotation === 270) {
-        rotationAnim.current.setValue(-90);
+        rotation.setValue(-90);
+        settledRotation = -90;
       }
-    });
-  }, [facing]);
 
-  const scoreFontSize = Math.min(16, elimValue);
+      onRotationEndRef.current?.(settledRotation);
+    });
+  }, [facing, rotation]);
 
   return (
     <Animated.View
       style={[
+        styles.iconContainer,
         {
-          ...styles.iconContainer,
-          transform: [{rotate: `${rotationState}deg`}],
-          top,
-          left,
+          transform: [{translateX: left}, {translateY: top}, {rotate}],
         },
       ]}>
       {hasEliminationEnded ? null : (
@@ -196,26 +238,26 @@ const Craft = ({
           <Icon fill="#00000040" style={{...styles.shadow, ...shadow}} />
         </>
       )}
-      <ExposionIcon
-        height={elimValue}
-        width={elimValue}
-        style={styles.elimination}
-      />
-      <PressStartText
-        style={[
-          styles.score,
-          {
-            color: score > 0 ? Colors.GREEN : Colors.RED,
-            fontSize: scoreFontSize,
-            width: scoreFontSize * 4,
-            shadowOffset: {width: scoreFontSize / 8, height: scoreFontSize / 8},
-            transform: [{rotate: `${rotationState * -1}deg`}],
-            // @ts-ignore
-            ...getScorePosition(facing, top._value),
-          },
-        ]}>
-        {score > 0 ? `+${score}` : score}
-      </PressStartText>
+      <Animated.View
+        style={[styles.elimination, {transform: [{scale: explosionScale}]}]}>
+        <ExposionIcon height={explosionSize} width={explosionSize} />
+      </Animated.View>
+      {isEliminated && !hasEliminationEnded && scorePlacement !== null && (
+        <Animated.View
+          style={[
+            styles.scoreContainer,
+            scorePlacement,
+            {transform: [{rotate: counterRotate}, {scale: scoreScale}]},
+          ]}>
+          <PressStartText
+            style={[
+              styles.score,
+              {color: score > 0 ? Colors.GREEN : Colors.RED},
+            ]}>
+            {score > 0 ? `+${score}` : score}
+          </PressStartText>
+        </Animated.View>
+      )}
     </Animated.View>
   );
 };

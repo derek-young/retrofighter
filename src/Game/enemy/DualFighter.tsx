@@ -10,16 +10,20 @@ import EnemyCraft from './EnemyCraft';
 import EnemyMissile from './EnemyMissile';
 import {EnemyProps} from './enemyProps';
 
+function RotatedDualFighterIcon({style, ...rest}: IconProps) {
+  return (
+    <DualFighterIcon
+      style={{...(style as object), transform: [{rotate: '-45deg'}]}}
+      {...rest}
+    />
+  );
+}
+
 const DualFighter = (): JSX.Element => {
   return (
     <>
       <EnemyCraft
-        Icon={({style, ...rest}: IconProps) => (
-          <DualFighterIcon
-            style={{...(style as object), transform: [{rotate: '-45deg'}]}}
-            {...rest}
-          />
-        )}
+        Icon={RotatedDualFighterIcon}
         score={enemyPoints[Enemies.DUAL_FIGHTER]}
       />
       <EnemyMissile />
@@ -27,7 +31,7 @@ const DualFighter = (): JSX.Element => {
   );
 };
 
-export default (props: EnemyProps) => (
+export default React.memo((props: EnemyProps) => (
   <EnemyCraftContextProvider
     defaultCraftSpeed={craftPixelsPerSecond}
     {...props}>
@@ -35,4 +39,4 @@ export default (props: EnemyProps) => (
       <DualFighter />
     </EnemyMissileProvider>
   </EnemyCraftContextProvider>
-);
+));

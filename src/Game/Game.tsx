@@ -22,6 +22,7 @@ import LevelCompletePopup from './LevelCompletePopup';
 import LevelFailedPopup from './LevelFailedPopup';
 import PauseMenu from './PauseMenu';
 import {GameProvider, useGameContext} from './GameContext';
+import {SimulationProvider} from './engine/SimulationContext';
 import {AnimationProvider} from './Fighter/AnimationContext';
 import {EliminationProvider} from './Fighter/EliminationContext';
 import {MissileProvider} from './Fighter/MissileContext';
@@ -128,15 +129,17 @@ const Game = ({navigation, route}: GameProps): null | JSX.Element => {
           key={uniqueKey}
           source={getBackgroundImage(epic)}
           style={styles.container}>
-          <AnimationProvider>
-            <EliminationProvider>
-              <MissileProvider>
-                <EnemyFactoryProvider>
-                  <GameView onResetBoard={onResetBoard} />
-                </EnemyFactoryProvider>
-              </MissileProvider>
-            </EliminationProvider>
-          </AnimationProvider>
+          <SimulationProvider>
+            <AnimationProvider>
+              <EliminationProvider>
+                <MissileProvider>
+                  <EnemyFactoryProvider>
+                    <GameView onResetBoard={onResetBoard} />
+                  </EnemyFactoryProvider>
+                </MissileProvider>
+              </EliminationProvider>
+            </AnimationProvider>
+          </SimulationProvider>
         </ImageBackground>
       </View>
     </GameProvider>
