@@ -1,5 +1,3 @@
 module.exports = {
-  preset: 'react-native',
-  moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
-  verbose: false,
+  preset: '@react-native/jest-preset',
 };
