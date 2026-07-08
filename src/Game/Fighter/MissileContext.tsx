@@ -1,9 +1,8 @@
-import React, {useCallback, useContext, useRef, useState} from 'react';
+import React, {useCallback, useContext, useMemo, useRef, useState} from 'react';
 import {Animated} from 'react-native';
 
 import {missileSize} from 'Game/constants';
 import {MissileProps} from 'Game/types';
-import MissilePosition from 'Game/missilePositionFactory';
 
 type MissileContextValue = MissileProps[];
 
@@ -13,7 +12,6 @@ const defaultValue: MissileContextValue = [
   {
     hasMissileFired: false,
     missileAnim: new Animated.Value(missileSize / 2),
-    missilePosition: new MissilePosition(),
     onFireAnimationEnded: noop,
     onFireMissile: noop,
   },
@@ -28,8 +26,6 @@ export const MissileProvider = ({children}: {children: React.ReactNode}) => {
   const [hasRightMissileFired, setHasRightMissileFired] = useState(false);
   const leftMissileAnim = useRef(new Animated.Value(missileSize / 2)).current;
   const rightMissileAnim = useRef(new Animated.Value(missileSize / 2)).current;
-  const leftMissilePosition = useRef(new MissilePosition()).current;
-  const rightMissilePosition = useRef(new MissilePosition()).current;
 
   const onFireLeftMissile = useCallback(() => setHasLeftMissileFired(true), []);
   const onFireRightMissile = useCallback(
@@ -45,25 +41,32 @@ export const MissileProvider = ({children}: {children: React.ReactNode}) => {
     [],
   );
 
-  return (
-    <MissileContext.Provider
-      children={children}
-      value={[
-        {
-          hasMissileFired: hasLeftMissileFired,
-          missileAnim: leftMissileAnim,
-          missilePosition: leftMissilePosition,
-          onFireAnimationEnded: onLeftFireAnimationEnded,
-          onFireMissile: onFireLeftMissile,
-        },
-        {
-          hasMissileFired: hasRightMissileFired,
-          missileAnim: rightMissileAnim,
-          missilePosition: rightMissilePosition,
-          onFireAnimationEnded: onRightFireAnimationEnded,
-          onFireMissile: onFireRightMissile,
-        },
-      ]}
-    />
+  const value = useMemo(
+    () => [
+      {
+        hasMissileFired: hasLeftMissileFired,
+        missileAnim: leftMissileAnim,
+        onFireAnimationEnded: onLeftFireAnimationEnded,
+        onFireMissile: onFireLeftMissile,
+      },
+      {
+        hasMissileFired: hasRightMissileFired,
+        missileAnim: rightMissileAnim,
+        onFireAnimationEnded: onRightFireAnimationEnded,
+        onFireMissile: onFireRightMissile,
+      },
+    ],
+    [
+      hasLeftMissileFired,
+      hasRightMissileFired,
+      leftMissileAnim,
+      rightMissileAnim,
+      onLeftFireAnimationEnded,
+      onRightFireAnimationEnded,
+      onFireLeftMissile,
+      onFireRightMissile,
+    ],
   );
+
+  return <MissileContext.Provider value={value}>{children}</MissileContext.Provider>;
 };

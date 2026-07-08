@@ -1,4 +1,10 @@
-import React, {useCallback, useContext, useEffect, useState} from 'react';
+import React, {
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 import {useNavigation} from '@react-navigation/native';
 import {GameNavigationProp} from 'types/app';
 
@@ -64,19 +70,19 @@ export const GameProvider = ({children, epic}: GameProviderProps) => {
     return unsubscribe;
   }, [navigation]);
 
-  return (
-    <GameContext.Provider
-      children={children}
-      value={{
-        adjustScore,
-        epic,
-        isPaused,
-        setIsPaused,
-        remainingLives,
-        resetGameContext,
-        setRemainingLives,
-        scoreForLevel,
-      }}
-    />
+  const value = useMemo(
+    () => ({
+      adjustScore,
+      epic,
+      isPaused,
+      setIsPaused,
+      remainingLives,
+      resetGameContext,
+      setRemainingLives,
+      scoreForLevel,
+    }),
+    [adjustScore, epic, isPaused, remainingLives, resetGameContext, scoreForLevel],
   );
+
+  return <GameContext.Provider value={value}>{children}</GameContext.Provider>;
 };

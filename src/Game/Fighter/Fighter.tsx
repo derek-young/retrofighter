@@ -1,12 +1,18 @@
-import React, {useCallback, useEffect, useState} from 'react';
-import {StyleSheet} from 'react-native';
+import React, {useEffect, useRef, useState} from 'react';
+import {Animated, StyleSheet} from 'react-native';
 
 import Colors from 'types/colors';
 import FighterIcon from 'icons/spaceship.svg';
+import {PLAYER_ID} from 'Game/engine/Simulation';
 
-import Craft from '../Craft';
+import Craft, {DEFAULT_FACING_ROTATION} from '../Craft';
+import {defaultPlayerFacing} from '../constants';
 import FighterMissile from './FighterMissile';
-import {useAnimationContext} from './AnimationContext';
+import {
+  useAnimationContext,
+  useHasPlayerMoved,
+  usePlayerFacing,
+} from './AnimationContext';
 import {useEliminationContext} from './EliminationContext';
 import {useMissileContext} from './MissileContext';
 
@@ -20,18 +26,17 @@ const styles = StyleSheet.create({
 });
 
 const Fighter = (): null | JSX.Element => {
-  const {facing, hasPlayerMoved, leftAnim, topAnim} = useAnimationContext();
+  const {leftAnim, topAnim} = useAnimationContext();
+  const facing = usePlayerFacing();
+  const hasPlayerMoved = useHasPlayerMoved();
   const {hasEliminationAnimationEnded, isPlayerEliminated, onEliminationEnd} =
     useEliminationContext();
   const [leftMissileProps, rightMissileProps] = useMissileContext();
-  const [craftRotation, setCraftRotation] = useState(0);
+  const rotationAnim = useRef(
+    new Animated.Value(DEFAULT_FACING_ROTATION[defaultPlayerFacing]),
+  ).current;
   const [isAwaitingMissileAnimEnd, setIsAwaitingMissileAnimEnd] =
     useState(false);
-
-  const onRotationChange = useCallback(
-    ({value}: {value: number}) => setCraftRotation(Math.round(value)),
-    [],
-  );
 
   const hasFiredMissile =
     leftMissileProps.hasMissileFired || rightMissileProps.hasMissileFired;
@@ -64,17 +69,19 @@ const Fighter = (): null | JSX.Element => {
         }}
         left={leftAnim}
         top={topAnim}
-        rotationListener={onRotationChange}
+        rotationAnim={rotationAnim}
+        simId={PLAYER_ID}
         score={-500}
       />
       {(!isPlayerEliminated || leftMissileProps.hasMissileFired) && (
         <FighterMissile
           craftColor={craftColor}
-          craftRotation={craftRotation}
+          craftRotationAnim={rotationAnim}
           facing={facing}
           iconStyle={styles.missileLeft}
           leftAnim={leftAnim}
           topAnim={topAnim}
+          missileId="player-missile-left"
           missileProps={leftMissileProps}
           positionOffset={6.9}
         />
@@ -82,11 +89,12 @@ const Fighter = (): null | JSX.Element => {
       {(!isPlayerEliminated || rightMissileProps.hasMissileFired) && (
         <FighterMissile
           craftColor={craftColor}
-          craftRotation={craftRotation}
+          craftRotationAnim={rotationAnim}
           facing={facing}
           iconStyle={styles.missileRight}
           leftAnim={leftAnim}
           topAnim={topAnim}
+          missileId="player-missile-right"
           missileProps={rightMissileProps}
           positionOffset={18}
         />

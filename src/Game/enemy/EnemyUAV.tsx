@@ -25,11 +25,11 @@ const EnemyUAV = (): JSX.Element => {
   return <EnemyCraft Icon={EnemyCraftIcon} score={enemyPoints[Enemies.UAV]} />;
 };
 
-export default (props: EnemyProps) => (
+export default React.memo((props: EnemyProps) => (
   <EnemyCraftContextProvider
     defaultCraftSpeed={craftPixelsPerSecond}
     craftSpeedWhenLockedOn={craftPixelsPerSecond * 1.6}
     {...props}>
     <EnemyUAV />
   </EnemyCraftContextProvider>
-);
+));

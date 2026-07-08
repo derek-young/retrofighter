@@ -1,13 +1,17 @@
-import {useGameContext} from 'Game/GameContext';
 import React, {
   useCallback,
   useContext,
   useEffect,
+  useMemo,
   useRef,
   useState,
 } from 'react';
 
 import {Animated} from 'react-native';
+
+import {useGameContext} from 'Game/GameContext';
+import {Axis, PLAYER_ID} from 'Game/engine/Simulation';
+import {useSimulationContext} from 'Game/engine/SimulationContext';
 
 import {
   craftPixelsPerSecond,
@@ -21,19 +25,11 @@ import {
   totalWidth,
 } from '../constants';
 import {Facing} from '../types';
-import {animateCraft, getNextAlley} from '../utils';
+import {animateCraft, getNextAlley, isHorizontalFacing} from '../utils';
 
-type UpdaterProps = {
-  value: number;
-};
-
-type AnimationContextValue = {
-  facing: Facing;
-  hasPlayerMoved: boolean;
+type PlayerControlsContextValue = {
   leftAnim: Animated.Value;
   topAnim: Animated.Value;
-  leftRef: React.MutableRefObject<number>;
-  topRef: React.MutableRefObject<number>;
   onDownPress: () => void;
   onUpPress: () => void;
   onLeftPress: () => void;
@@ -45,13 +41,9 @@ type AnimationContextValue = {
 
 const noop = () => {};
 
-const defaultValue: AnimationContextValue = {
-  facing: defaultPlayerFacing,
-  hasPlayerMoved: false,
+const defaultControls: PlayerControlsContextValue = {
   leftAnim: new Animated.Value(playerStartLeft),
   topAnim: new Animated.Value(playerStartTop),
-  leftRef: {current: playerStartLeft},
-  topRef: {current: playerStartTop},
   onDownPress: noop,
   onUpPress: noop,
   onLeftPress: noop,
@@ -61,12 +53,21 @@ const defaultValue: AnimationContextValue = {
   setThrusterEngagedFacing: noop,
 };
 
-const AnimationContext = React.createContext(defaultValue);
+const PlayerControlsContext = React.createContext(defaultControls);
+const PlayerFacingContext = React.createContext<Facing>(defaultPlayerFacing);
+const HasPlayerMovedContext = React.createContext(false);
 
-export const useAnimationContext = () => useContext(AnimationContext);
+export const useAnimationContext = () => useContext(PlayerControlsContext);
+export const usePlayerFacing = () => useContext(PlayerFacingContext);
+export const useHasPlayerMoved = () => useContext(HasPlayerMovedContext);
+
+function getPlayerSpeed(thrustersEngaged: boolean) {
+  return thrustersEngaged ? craftPixelsPerSecond * 1.5 : craftPixelsPerSecond;
+}
 
 export const AnimationProvider = ({children}: {children: React.ReactNode}) => {
   const {isPaused} = useGameContext();
+  const simulation = useSimulationContext();
   const [thrustersEngagedFacing, setThrusterEngagedFacing] =
     useState<null | Facing>(null);
   const [hasPlayerMoved, setHasPlayerMoved] = useState(false);
@@ -74,37 +75,14 @@ export const AnimationProvider = ({children}: {children: React.ReactNode}) => {
   const facingRef = useRef(facing);
   const leftAnim = useRef(new Animated.Value(playerStartLeft)).current;
   const topAnim = useRef(new Animated.Value(playerStartTop)).current;
-  const topRef = useRef(playerStartTop);
-  const leftRef = useRef(playerStartLeft);
-  const nextRowRef = useRef(getNextAlley(playerStartTop, facing));
-  const nextColRef = useRef(getNextAlley(playerStartLeft, facing));
-  const craftSpeedRef = useRef(craftPixelsPerSecond);
-  const isPausedRef = useRef(isPaused);
+  const thrustersEngagedRef = useRef(false);
 
-  craftSpeedRef.current =
-    thrustersEngagedFacing === null
-      ? craftPixelsPerSecond
-      : craftPixelsPerSecond * 1.5;
   facingRef.current = facing;
-  isPausedRef.current = isPaused;
-
-  const topUpdaterRef = useRef<(props: UpdaterProps) => void>(
-    ({value}: UpdaterProps) => {
-      nextRowRef.current = getNextAlley(value, facingRef.current);
-      topRef.current = value;
-    },
-  );
-  const leftUpdaterRef = useRef<(props: UpdaterProps) => void>(
-    ({value}: UpdaterProps) => {
-      nextColRef.current = getNextAlley(value, facingRef.current);
-      leftRef.current = value;
-    },
-  );
+  thrustersEngagedRef.current = thrustersEngagedFacing !== null;
 
   useEffect(() => {
-    leftAnim.addListener(leftUpdaterRef.current);
-    topAnim.addListener(topUpdaterRef.current);
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+    simulation.setCollidable(PLAYER_ID, hasPlayerMoved);
+  }, [hasPlayerMoved, simulation]);
 
   useEffect(() => {
     if (isPaused) {
@@ -116,142 +94,124 @@ export const AnimationProvider = ({children}: {children: React.ReactNode}) => {
   const resetAnimationContext = useCallback(() => {
     leftAnim.setValue(playerStartLeft);
     topAnim.setValue(playerStartTop);
+    simulation.resetCraft(PLAYER_ID, {
+      top: playerStartTop,
+      left: playerStartLeft,
+      facing: defaultPlayerFacing,
+    });
     setFacing(defaultPlayerFacing);
     setHasPlayerMoved(false);
-  }, [leftAnim, topAnim]);
+  }, [leftAnim, topAnim, simulation]);
 
-  const interceptVerticalAnimation = useCallback(
-    (callback: () => void) => {
-      const nextRowPosition = nextRowRef.current * totalWidth + 1;
+  /**
+   * Starts a movement leg on one axis: records the segment with the
+   * simulation and starts the matching native-driver animation from the
+   * simulation's authoritative position.
+   */
+  const moveAlongAxis = useCallback(
+    (
+      axis: Axis,
+      toValue: number,
+      callback?: (result: {finished: boolean}) => void,
+    ) => {
+      const position = simulation.getPosition(PLAYER_ID);
 
-      leftAnim.stopAnimation();
+      if (!position) {
+        return;
+      }
 
+      const craftSpeed = getPlayerSpeed(thrustersEngagedRef.current);
+
+      simulation.setSegment(PLAYER_ID, {axis, to: toValue, speed: craftSpeed});
       animateCraft({
-        animation: topAnim,
-        callback: ({finished}) => {
-          if (finished) {
-            callback();
-          }
-        },
-        craftSpeed: craftSpeedRef.current,
-        pixelsToMove: Math.abs(nextRowPosition - topRef.current) + 1,
-        toValue: nextRowPosition,
+        animation: axis === 'top' ? topAnim : leftAnim,
+        callback,
+        craftSpeed,
+        from: axis === 'top' ? position.top : position.left,
+        toValue,
       });
     },
-    [leftAnim, topAnim],
+    [leftAnim, simulation, topAnim],
   );
 
-  const interceptHorizontalAnimation = useCallback(
-    (callback: () => void) => {
-      const nextColPosition = nextColRef.current * totalWidth + 1;
+  const onMove = useCallback(
+    (nextFacing: Facing) => {
+      const toValue = {N: minTop, S: maxTop, W: minLeft, E: maxLeft}[
+        nextFacing
+      ];
+      const axis: Axis = isHorizontalFacing(nextFacing) ? 'left' : 'top';
 
-      topAnim.stopAnimation();
+      simulation.setFacing(PLAYER_ID, nextFacing);
+      setFacing(nextFacing);
+      moveAlongAxis(axis, toValue);
+    },
+    [moveAlongAxis, simulation],
+  );
 
-      animateCraft({
-        animation: leftAnim,
-        callback: ({finished}) => {
-          if (finished) {
-            callback();
-          }
-        },
-        craftSpeed: craftSpeedRef.current,
-        pixelsToMove: Math.abs(nextColPosition - leftRef.current),
-        toValue: nextColPosition,
+  /**
+   * A perpendicular turn first travels to the center of the next alley on
+   * the current axis, then starts the requested move. Facing is unchanged
+   * until the turn actually happens, exactly like the original engine.
+   */
+  const interceptToAlley = useCallback(
+    (axis: Axis, onDone: () => void) => {
+      const position = simulation.getPosition(PLAYER_ID);
+
+      if (!position) {
+        return;
+      }
+
+      const current = axis === 'top' ? position.top : position.left;
+      const nextAlley = getNextAlley(current, facingRef.current);
+
+      moveAlongAxis(axis, nextAlley * totalWidth + 1, ({finished}) => {
+        if (finished) {
+          onDone();
+        }
       });
     },
-    [leftAnim, topAnim],
+    [moveAlongAxis, simulation],
   );
 
-  const onVerticalMove = useCallback(
-    (onMove: () => void) => {
-      if (facingRef.current === 'E' || facingRef.current === 'W') {
-        interceptHorizontalAnimation(onMove);
+  const onDirectionPress = useCallback(
+    (nextFacing: Facing) => {
+      const isTurningAcross =
+        isHorizontalFacing(facingRef.current) !==
+        isHorizontalFacing(nextFacing);
+
+      if (isTurningAcross) {
+        // Finish travelling to the next alley on the current axis first.
+        const alleyAxis: Axis = isHorizontalFacing(facingRef.current)
+          ? 'left'
+          : 'top';
+
+        interceptToAlley(alleyAxis, () => onMove(nextFacing));
       } else {
-        onMove();
+        onMove(nextFacing);
       }
     },
-    [interceptHorizontalAnimation],
-  );
-
-  const onHorizontalMove = useCallback(
-    (onMove: () => void) => {
-      if (facingRef.current === 'N' || facingRef.current === 'S') {
-        interceptVerticalAnimation(onMove);
-      } else {
-        onMove();
-      }
-    },
-    [interceptVerticalAnimation],
-  );
-
-  const onMoveDown = useCallback(() => {
-    const pixelsToMove = maxTop - topRef.current;
-
-    animateCraft({
-      animation: topAnim,
-      craftSpeed: craftSpeedRef.current,
-      pixelsToMove,
-      toValue: maxTop,
-    });
-    setFacing('S');
-  }, [topAnim]);
-
-  const onMoveUp = useCallback(() => {
-    const pixelsToMove = topRef.current;
-
-    animateCraft({
-      animation: topAnim,
-      craftSpeed: craftSpeedRef.current,
-      pixelsToMove,
-      toValue: minTop,
-    });
-    setFacing('N');
-  }, [topAnim]);
-
-  const onMoveLeft = useCallback(() => {
-    const pixelsToMove = leftRef.current;
-
-    animateCraft({
-      animation: leftAnim,
-      craftSpeed: craftSpeedRef.current,
-      pixelsToMove,
-      toValue: minLeft,
-    });
-    setFacing('W');
-  }, [leftAnim]);
-
-  const onMoveRight = useCallback(() => {
-    const pixelsToMove = maxLeft - leftRef.current;
-
-    animateCraft({
-      animation: leftAnim,
-      craftSpeed: craftSpeedRef.current,
-      pixelsToMove,
-      toValue: maxLeft,
-    });
-    setFacing('E');
-  }, [leftAnim]);
-
-  const onDownPress = useCallback(
-    () => onVerticalMove(onMoveDown),
-    [onMoveDown, onVerticalMove],
+    [interceptToAlley, onMove],
   );
 
   const onUpPress = useCallback(
-    () => onVerticalMove(onMoveUp),
-    [onMoveUp, onVerticalMove],
+    () => onDirectionPress('N'),
+    [onDirectionPress],
   );
-
+  const onDownPress = useCallback(
+    () => onDirectionPress('S'),
+    [onDirectionPress],
+  );
   const onLeftPress = useCallback(
-    () => onHorizontalMove(onMoveLeft),
-    [onMoveLeft, onHorizontalMove],
+    () => onDirectionPress('W'),
+    [onDirectionPress],
   );
-
   const onRightPress = useCallback(
-    () => onHorizontalMove(onMoveRight),
-    [onMoveRight, onHorizontalMove],
+    () => onDirectionPress('E'),
+    [onDirectionPress],
   );
 
+  // Re-issues movement when thrusters engage/disengage (speed change) and
+  // when the game resumes from pause.
   useEffect(() => {
     if (!hasPlayerMoved || isPaused) {
       return;
@@ -262,40 +222,39 @@ export const AnimationProvider = ({children}: {children: React.ReactNode}) => {
         ? facingRef.current
         : thrustersEngagedFacing;
 
-    switch (nextFacing) {
-      case 'N':
-        onUpPress();
-        break;
-      case 'S':
-        onDownPress();
-        break;
-      case 'E':
-        onRightPress();
-        break;
-      case 'W':
-        onLeftPress();
-        break;
-    }
+    onDirectionPress(nextFacing);
   }, [isPaused, thrustersEngagedFacing]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  const controls = useMemo(
+    () => ({
+      leftAnim,
+      topAnim,
+      onDownPress,
+      onUpPress,
+      onLeftPress,
+      onRightPress,
+      resetAnimationContext,
+      setHasPlayerMoved,
+      setThrusterEngagedFacing,
+    }),
+    [
+      leftAnim,
+      topAnim,
+      onDownPress,
+      onUpPress,
+      onLeftPress,
+      onRightPress,
+      resetAnimationContext,
+    ],
+  );
+
   return (
-    <AnimationContext.Provider
-      children={children}
-      value={{
-        facing,
-        hasPlayerMoved,
-        setHasPlayerMoved,
-        leftAnim,
-        topAnim,
-        leftRef,
-        topRef,
-        onDownPress,
-        onUpPress,
-        onLeftPress,
-        onRightPress,
-        resetAnimationContext,
-        setThrusterEngagedFacing,
-      }}
-    />
+    <PlayerControlsContext.Provider value={controls}>
+      <PlayerFacingContext.Provider value={facing}>
+        <HasPlayerMovedContext.Provider value={hasPlayerMoved}>
+          {children}
+        </HasPlayerMovedContext.Provider>
+      </PlayerFacingContext.Provider>
+    </PlayerControlsContext.Provider>
   );
 };

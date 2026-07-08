@@ -1,17 +1,17 @@
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useEffect, useMemo, useRef, useState} from 'react';
 import {Animated, Easing, StyleSheet} from 'react-native';
 
 import {
-  alleyWidth,
   craftSize,
   maxScreenSize,
-  missileDuration,
   missileSize,
+  missileSpeed,
 } from 'Game/constants';
 
 import {DEFAULT_FACING_ROTATION} from './Craft';
-import {Facing, MissileAnimationProps, MissileIconProps} from './types';
+import {Facing, MissileAnimationProps} from './types';
 import {useGameContext} from './GameContext';
+import {useSimulationContext} from './engine/SimulationContext';
 
 const styles = StyleSheet.create({
   missile: {
@@ -19,161 +19,135 @@ const styles = StyleSheet.create({
   },
   missileContainer: {
     position: 'absolute',
+    top: 0,
+    left: 0,
     height: craftSize,
     width: craftSize,
     zIndex: -1,
   },
 });
 
-type AnimationCallback = (callbackProps: {finished: boolean}) => void;
+const rotationRange = {
+  inputRange: [-360, 360],
+  outputRange: ['-360deg', '360deg'],
+};
 
-interface AnimateMissileProps {
-  callback: AnimationCallback;
-  missileAnim: Animated.Value;
-}
-
-function animateMissile({callback, missileAnim}: AnimateMissileProps) {
-  Animated.timing(missileAnim, {
-    duration: missileDuration,
-    easing: Easing.linear,
-    toValue: maxScreenSize * -1,
-    useNativeDriver: true,
-  }).start(callback);
-}
-
-const MissileIcon = ({
-  hasMissileFired,
-  Icon,
-  missileAnim,
-  onFireAnimationEnded,
-  startingTop = missileSize / 2,
-}: MissileIconProps) => {
-  const {isPaused} = useGameContext();
-  const [missileTop, setMissileTop] = useState(startingTop);
-  const missileAnimCallbackRef = useRef<AnimationCallback>(({finished}) => {
-    if (finished) {
-      onFireAnimationEnded();
-    }
-  });
-
-  useEffect(() => {
-    missileAnim.addListener(({value}: {value: number}) => setMissileTop(value));
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
-
-  useEffect(() => {
-    if (isPaused) {
-      missileAnim.stopAnimation();
-    } else if (!isPaused && hasMissileFired) {
-      animateMissile({
-        callback: missileAnimCallbackRef.current,
-        missileAnim,
-      });
-    }
-  }, [hasMissileFired, isPaused, missileAnim]);
-
-  useEffect(() => {
-    if (hasMissileFired) {
-      animateMissile({
-        callback: missileAnimCallbackRef.current,
-        missileAnim,
-      });
-    } else {
-      missileAnim.setValue(startingTop);
-    }
-  }, [hasMissileFired, missileAnim, startingTop]);
-
-  return <Icon style={{...styles.missile, top: missileTop}} />;
+type FiredState = {
+  left: number;
+  top: number;
+  facing: Facing;
 };
 
 const Missile = ({
-  craftRotation,
+  rotationAnim,
   facing,
   Icon,
   leftAnim,
   topAnim,
+  missileId,
   missileProps,
+  ownerId,
   positionOffset = 0,
+  targetKind,
 }: MissileAnimationProps) => {
-  const [leftValue, setLeftValue] = useState(null);
-  const [topValue, setTopValue] = useState(null);
-  const facingRef = useRef<null | Facing>(null);
-  const leftValueRef = useRef(0);
-  const topValueRef = useRef(0);
-  const left = leftValue ?? leftAnim;
-  const top = topValue ?? topAnim;
-  const rotation =
-    facingRef.current !== null
-      ? DEFAULT_FACING_ROTATION[facingRef.current]
-      : craftRotation;
+  const simulation = useSimulationContext();
+  const {isPaused} = useGameContext();
+  const {
+    hasMissileFired,
+    missileAnim,
+    onFireAnimationEnded,
+    startingTop = missileSize / 2,
+  } = missileProps;
+  const [firedState, setFiredState] = useState<null | FiredState>(null);
+  const onFireAnimationEndedRef = useRef(onFireAnimationEnded);
 
-  leftValueRef.current = leftValue ?? 0;
-  topValueRef.current = topValue ?? 0;
+  onFireAnimationEndedRef.current = onFireAnimationEnded;
 
+  const dockedRotation = useMemo(
+    () => rotationAnim.interpolate(rotationRange),
+    [rotationAnim],
+  );
+
+  // Snapshots the launch position and registers the missile with the
+  // simulation, which detects impacts. Runs before the animation effect
+  // below so the sim entry exists when the visual starts.
   useEffect(() => {
-    if (missileProps.hasMissileFired) {
-      facingRef.current = facing;
-      // @ts-ignore
-      setLeftValue(leftAnim._value);
-      // @ts-ignore
-      setTopValue(topAnim._value);
-    } else {
-      facingRef.current = null;
-      setLeftValue(null);
-      setTopValue(null);
+    if (!hasMissileFired) {
+      setFiredState(null);
+      return;
     }
-  }, [missileProps.hasMissileFired]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  useEffect(() => {
-    if (!missileProps.hasMissileFired) {
-      facingRef.current = null;
-      setLeftValue(null);
-      setTopValue(null);
+    const position = simulation.getPosition(ownerId);
+
+    if (!position) {
+      onFireAnimationEndedRef.current();
+      return;
     }
-  }, [missileProps.hasMissileFired]);
 
-  useEffect(() => {
-    missileProps.missileAnim.addListener(({value}: {value: number}) => {
-      const listeners = missileProps.missilePosition.getListeners();
-
-      listeners.forEach(listener => {
-        let missileLeft = leftValueRef.current;
-        let missileTop = topValueRef.current;
-
-        switch (facingRef.current) {
-          case 'N':
-            missileLeft += positionOffset;
-            missileTop += value;
-            break;
-          case 'E':
-            missileLeft -= value;
-            missileTop += positionOffset;
-            break;
-          case 'S':
-            missileLeft += alleyWidth - positionOffset;
-            missileTop -= value;
-            break;
-          case 'W':
-            missileLeft += value;
-            missileTop += alleyWidth - positionOffset;
-            break;
-        }
-
-        listener({left: missileLeft, top: missileTop});
-      });
+    setFiredState({left: position.left, top: position.top, facing});
+    simulation.addMissile(missileId, {
+      originLeft: position.left,
+      originTop: position.top,
+      facing,
+      positionOffset,
+      startValue: startingTop,
+      targetKind,
+      onImpact: () => onFireAnimationEndedRef.current(),
     });
 
-    return () => missileProps.missileAnim.removeAllListeners();
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+    return () => simulation.removeMissile(missileId);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [hasMissileFired]);
+
+  useEffect(() => {
+    if (!hasMissileFired) {
+      missileAnim.stopAnimation();
+      missileAnim.setValue(startingTop);
+      return;
+    }
+
+    if (isPaused) {
+      missileAnim.stopAnimation();
+      return;
+    }
+
+    // Resumes from the simulation's authoritative travel value, so the
+    // visual and the impact detection always agree.
+    const value = simulation.getMissileValue(missileId) ?? startingTop;
+    const duration = ((value + maxScreenSize) / missileSpeed) * 1000;
+
+    missileAnim.setValue(value);
+    Animated.timing(missileAnim, {
+      toValue: -maxScreenSize,
+      duration,
+      easing: Easing.linear,
+      useNativeDriver: true,
+    }).start(({finished}) => {
+      if (finished) {
+        onFireAnimationEndedRef.current();
+      }
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [hasMissileFired, isPaused]);
+
+  const containerTransform = firedState
+    ? [
+        {translateX: firedState.left},
+        {translateY: firedState.top},
+        {rotate: `${DEFAULT_FACING_ROTATION[firedState.facing]}deg`},
+      ]
+    : [
+        {translateX: leftAnim},
+        {translateY: topAnim},
+        {rotate: dockedRotation},
+      ];
 
   return (
-    <Animated.View
-      style={{
-        ...styles.missileContainer,
-        left,
-        top,
-        transform: [{rotate: `${rotation}deg`}],
-      }}>
-      <MissileIcon Icon={Icon} {...missileProps} />
+    <Animated.View style={[styles.missileContainer, {transform: containerTransform}]}>
+      <Animated.View
+        style={[styles.missile, {transform: [{translateY: missileAnim}]}]}>
+        <Icon style={styles.missile} />
+      </Animated.View>
     </Animated.View>
   );
 };

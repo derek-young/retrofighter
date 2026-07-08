@@ -11,11 +11,11 @@ const Speeder = (): JSX.Element => {
   return <EnemyCraft Icon={SpeederIcon} score={enemyPoints[Enemies.SPEEDER]} />;
 };
 
-export default (props: EnemyProps) => (
+export default React.memo((props: EnemyProps) => (
   <EnemyCraftContextProvider
     defaultCraftSpeed={craftPixelsPerSecond * 1.5}
     craftSpeedWhenLockedOn={craftPixelsPerSecond * 3}
     {...props}>
     <Speeder />
   </EnemyCraftContextProvider>
-);
+));

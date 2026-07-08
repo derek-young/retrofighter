@@ -7,22 +7,23 @@ export function animateCraft({
   animation,
   callback = () => {},
   craftSpeed = craftPixelsPerSecond,
-  pixelsToMove,
+  from,
   toValue,
 }: {
   animation: Animated.Value;
   callback?: (value: {finished: boolean}) => void;
   craftSpeed?: number;
-  pixelsToMove: number;
+  from: number;
   toValue: number;
 }) {
-  const durationMs = (pixelsToMove / craftSpeed) * 1000;
+  const durationMs = (Math.abs(toValue - from) / craftSpeed) * 1000;
 
+  animation.setValue(from);
   Animated.timing(animation, {
     toValue,
     duration: durationMs,
     easing: Easing.linear,
-    useNativeDriver: false,
+    useNativeDriver: true,
   }).start(callback);
 }
 

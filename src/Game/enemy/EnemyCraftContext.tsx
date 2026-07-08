@@ -1,37 +1,40 @@
-import React, {useCallback, useContext, useState} from 'react';
+import React, {useCallback, useContext, useMemo, useRef, useState} from 'react';
 import {Animated} from 'react-native';
 
 import {Facing} from 'Game/types';
-import {useMissileContext} from 'Game/Fighter/MissileContext';
+import {DEFAULT_FACING_ROTATION} from 'Game/Craft';
+import {Position} from 'Game/engine/Simulation';
 
-import useCollisionDetector from './useCollisionDetector';
-import useMissileImpactDetector from './useMissileImpactDetector';
 import useEnemyCraftAnimation from './useEnemyCraftAnimation';
 
 interface EnemyCraftContextValue {
   craftRotation: number;
-  setCraftRotation: (craftRotation: number) => void;
   facing: Facing;
+  frozenPosition: null | Position;
   isEliminated: boolean;
   isPlayerInLineOfSight: boolean;
   leftAnim: Animated.Value;
   topAnim: Animated.Value;
   onEliminationAnimationEnd: () => void;
-  onRotationChange: (p: {value: number}) => void;
+  onRotationEnd: (rotation: number) => void;
+  rotationAnim: Animated.Value;
+  simId: string;
 }
 
 const noop = () => {};
 
 const defaultValue: EnemyCraftContextValue = {
   craftRotation: 0,
-  setCraftRotation: noop,
   facing: 'S',
+  frozenPosition: null,
   isEliminated: false,
   isPlayerInLineOfSight: false,
   leftAnim: new Animated.Value(0),
   topAnim: new Animated.Value(0),
   onEliminationAnimationEnd: noop,
-  onRotationChange: noop,
+  onRotationEnd: noop,
+  rotationAnim: new Animated.Value(0),
+  simId: 'enemy-none',
 };
 
 export interface EnemyCraftContextProviderProps {
@@ -39,6 +42,8 @@ export interface EnemyCraftContextProviderProps {
   craftSpeedWhenLockedOn?: number;
   defaultCraftSpeed: number;
   defaultFacing?: Facing;
+  freezeWhenPlayerDetected?: boolean;
+  id: number;
   isEliminated: boolean;
   onEliminationAnimationEnd: () => void;
   onIsEliminated: () => void;
@@ -55,73 +60,72 @@ export const EnemyCraftContextProvider = ({
   craftSpeedWhenLockedOn,
   defaultCraftSpeed,
   defaultFacing = 'S',
+  freezeWhenPlayerDetected,
+  id,
   isEliminated,
   onEliminationAnimationEnd,
   onIsEliminated,
   startingTop = 0,
   startingLeft = 0,
 }: EnemyCraftContextProviderProps) => {
-  const playerMissiles = useMissileContext();
+  const simId = `enemy-${id}`;
+  // Updated once per completed turn (not per animation frame); gates enemy
+  // missile fire on the craft visually facing its travel direction.
   const [craftRotation, setCraftRotation] = useState(0);
+  const rotationAnim = useRef(
+    new Animated.Value(DEFAULT_FACING_ROTATION[defaultFacing]),
+  ).current;
 
-  const onRotationChange = useCallback(
-    ({value}: {value: number}) => setCraftRotation(Math.round(value)),
+  const onRotationEnd = useCallback(
+    (rotation: number) => setCraftRotation(rotation),
     [],
   );
 
-  const {facing, isPlayerInLineOfSight, leftAnim, topAnim} =
+  const {facing, frozenPosition, isPlayerInLineOfSight, leftAnim, topAnim} =
     useEnemyCraftAnimation({
       craftSpeedWhenLockedOn,
       defaultCraftSpeed,
       defaultFacing,
+      freezeWhenPlayerDetected,
       isEliminated,
+      onIsEliminated,
+      simId,
       startingLeft,
       startingTop,
     });
 
-  useMissileImpactDetector({
-    isTargetable: !isEliminated,
-    leftAnim,
-    topAnim,
-    missile: playerMissiles[0],
-    startingLeft,
-    startingTop,
-    onIsEliminated,
-  });
-
-  useMissileImpactDetector({
-    isTargetable: !isEliminated,
-    leftAnim,
-    topAnim,
-    missile: playerMissiles[1],
-    startingLeft,
-    startingTop,
-    onIsEliminated,
-  });
-
-  useCollisionDetector({
-    isEliminated,
-    leftAnim,
-    topAnim,
-    startingLeft,
-    startingTop,
-    onIsEliminated,
-  });
+  const value = useMemo(
+    () => ({
+      craftRotation,
+      facing,
+      frozenPosition,
+      isEliminated,
+      isPlayerInLineOfSight,
+      leftAnim,
+      topAnim,
+      onEliminationAnimationEnd,
+      onRotationEnd,
+      rotationAnim,
+      simId,
+    }),
+    [
+      craftRotation,
+      facing,
+      frozenPosition,
+      isEliminated,
+      isPlayerInLineOfSight,
+      leftAnim,
+      topAnim,
+      onEliminationAnimationEnd,
+      onRotationEnd,
+      rotationAnim,
+      simId,
+    ],
+  );
 
   return (
-    <EnemyCraftContext.Provider
-      children={children}
-      value={{
-        craftRotation,
-        setCraftRotation,
-        facing,
-        isEliminated,
-        isPlayerInLineOfSight,
-        leftAnim,
-        topAnim,
-        onEliminationAnimationEnd,
-        onRotationChange,
-      }}
-    />
+    <EnemyCraftContext.Provider value={value}>
+      {children}
+    </EnemyCraftContext.Provider>
   );
 };

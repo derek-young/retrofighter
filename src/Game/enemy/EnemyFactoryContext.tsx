@@ -1,4 +1,10 @@
-import React, {useCallback, useContext, useEffect, useState} from 'react';
+import React, {
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 
 import {useGameContext} from 'Game/GameContext';
 import {Enemies, startingEnemies} from 'Game/constants';
@@ -93,10 +99,22 @@ export const EnemyFactoryProvider = ({children}: EnemyFactoryProviderProps) => {
           return null;
         }
 
+        const hasEliminationAnimationEnded = !!animationEnded[i];
+        const isEliminated = !!eliminatedEnemies[i];
+
+        // Keep the same object when nothing changed so memoized enemy
+        // components skip re-rendering.
+        if (
+          enemy.hasEliminationAnimationEnded === hasEliminationAnimationEnded &&
+          enemy.isEliminated === isEliminated
+        ) {
+          return enemy;
+        }
+
         return {
           ...enemy,
-          hasEliminationAnimationEnded: animationEnded[i],
-          isEliminated: eliminatedEnemies[i],
+          hasEliminationAnimationEnded,
+          isEliminated,
         };
       }),
     );
@@ -126,14 +144,19 @@ export const EnemyFactoryProvider = ({children}: EnemyFactoryProviderProps) => {
     [],
   );
 
-  const areAllEnemiesEliminated = enemies.every(
-    e => e === null || e.isEliminated,
+  const value = useMemo(
+    () => ({
+      addEnemy,
+      areAllEnemiesEliminated: enemies.every(e => e === null || e.isEliminated),
+      enemies,
+      removeEnemy,
+    }),
+    [addEnemy, enemies, removeEnemy],
   );
 
   return (
-    <EnemyFactoryContext.Provider
-      children={children}
-      value={{addEnemy, areAllEnemiesEliminated, enemies, removeEnemy}}
-    />
+    <EnemyFactoryContext.Provider value={value}>
+      {children}
+    </EnemyFactoryContext.Provider>
   );
 };

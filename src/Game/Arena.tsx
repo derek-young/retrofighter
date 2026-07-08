@@ -103,7 +103,7 @@ const Seperators = () => (
           .fill(0)
           .map((x, j) => (
             <Seperator
-              key={i + j}
+              key={`${i}-${j}`}
               top={alleyWidth * (i + 1) + seperatorWidth * i}
               left={alleyWidth * (j + 1) + seperatorWidth * j}
               height={seperatorWidth}

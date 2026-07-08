@@ -1,4 +1,4 @@
-import React, {useEffect, useRef} from 'react';
+import React, {useEffect, useMemo, useRef} from 'react';
 import {
   Animated,
   Easing,
@@ -15,7 +15,7 @@ import IBMText from 'components/IBMText';
 import LifeIndicator from './LifeIndicator';
 
 import {useGameContext} from '../GameContext';
-import {useAnimationContext} from '../Fighter/AnimationContext';
+import {useHasPlayerMoved} from '../Fighter/AnimationContext';
 import {useEliminationContext} from '../Fighter/EliminationContext';
 import {useMissileContext} from '../Fighter/MissileContext';
 
@@ -54,6 +54,7 @@ const styles = StyleSheet.create({
     bottom: -4,
     left: -4,
     width: buttonSize,
+    height: buttonSize,
     position: 'absolute',
     zIndex: -1,
     backgroundColor: Colors.RED,
@@ -76,12 +77,12 @@ type ActionButtonProps = {
   onPress: () => void;
 };
 
-function animateButton(anim: Animated.Value) {
-  Animated.timing(anim, {
+function animateButton(progress: Animated.Value) {
+  Animated.timing(progress, {
     duration: missileDuration,
     easing: Easing.linear,
-    toValue: buttonSize,
-    useNativeDriver: false,
+    toValue: 1,
+    useNativeDriver: true,
   }).start();
 }
 
@@ -93,40 +94,60 @@ const ActionButton = ({
   onPress,
 }: ActionButtonProps): JSX.Element => {
   const {isPaused} = useGameContext();
-  const heightAnim = useRef(new Animated.Value(buttonSize)).current;
+  // 0 = just fired (cooldown fill empty), 1 = ready (fill covers button).
+  const progress = useRef(new Animated.Value(1)).current;
+
+  // The fill grows from the bottom edge: scaleY around the center combined
+  // with a translate that pins the bottom in place.
+  const fillTransform = useMemo(
+    () => [
+      {
+        translateY: progress.interpolate({
+          inputRange: [0, 1],
+          outputRange: [buttonSize / 2, 0],
+        }),
+      },
+      {scaleY: progress},
+    ],
+    [progress],
+  );
 
   useEffect(() => {
     if (isEliminated) {
-      heightAnim.stopAnimation();
-      heightAnim.setValue(buttonSize);
+      progress.stopAnimation();
+      progress.setValue(1);
     }
-  }, [heightAnim, isEliminated]);
+  }, [progress, isEliminated]);
 
   useEffect(() => {
     if (isPaused) {
-      heightAnim.stopAnimation();
+      progress.stopAnimation();
     } else {
-      animateButton(heightAnim);
+      animateButton(progress);
     }
-  }, [heightAnim, isPaused]);
+  }, [progress, isPaused]);
 
   useEffect(() => {
     if (hasMissileFired) {
-      heightAnim.setValue(0);
-      animateButton(heightAnim);
+      progress.setValue(0);
+      animateButton(progress);
     } else {
-      heightAnim.stopAnimation();
-      heightAnim.setValue(buttonSize);
+      progress.stopAnimation();
+      progress.setValue(1);
     }
-  }, [hasMissileFired, heightAnim]);
+  }, [hasMissileFired, progress]);
+
+  const background = (
+    <Animated.View
+      style={[styles.buttonBackground, {transform: fillTransform}]}
+    />
+  );
 
   if (disabled) {
     return (
       <View style={[styles.actionButton, styles.buttonDisabled]}>
         <Text style={styles.buttonText}>{children}</Text>
-        <Animated.View
-          style={{...styles.buttonBackground, height: heightAnim}}
-        />
+        {background}
       </View>
     );
   }
@@ -134,17 +155,17 @@ const ActionButton = ({
   return (
     <TouchableOpacity
       disabled={disabled}
-      onPress={onPress}
+      onPressIn={onPress}
       style={styles.actionButton}>
       <Text style={styles.buttonText}>{children}</Text>
-      <Animated.View style={{...styles.buttonBackground, height: heightAnim}} />
+      {background}
     </TouchableOpacity>
   );
 };
 
 const ButtonSet = (): JSX.Element => {
   const {remainingLives} = useGameContext();
-  const {hasPlayerMoved} = useAnimationContext();
+  const hasPlayerMoved = useHasPlayerMoved();
   const {isPlayerEliminated} = useEliminationContext();
   const [leftMissile, rightMissile] = useMissileContext();
 
