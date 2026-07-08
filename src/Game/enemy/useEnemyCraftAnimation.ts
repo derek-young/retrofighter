@@ -3,7 +3,7 @@ import {Animated} from 'react-native';
 
 import {Facing} from 'Game/types';
 import {animateCraft, isVerticalFacing} from 'Game/utils';
-import {totalWidth} from 'Game/constants';
+import {itemDetectionRange, totalWidth} from 'Game/constants';
 import {useGameContext} from 'Game/GameContext';
 import {PLAYER_ID, Position} from 'Game/engine/Simulation';
 import {useSimulationContext} from 'Game/engine/SimulationContext';
@@ -12,12 +12,41 @@ import {useEliminationContext} from 'Game/Fighter/EliminationContext';
 
 import {
   controlledAnimation,
+  dodgeAnimation,
   randomAnimation,
   getPixelsToMove,
   getShouldTrackToPlayerPosition,
 } from './animation';
+import type {AnimationProps} from './animation';
+
+export type AiClass = 'basic' | 'veteran';
+
+function getNearbyItem(
+  items: Array<{id: string; position: Position}>,
+  position: Position,
+) {
+  let nearest: {
+    item: {id: string; position: Position};
+    distance: number;
+  } | null = null;
+
+  for (const item of items) {
+    const distance =
+      Math.abs(item.position.top - position.top) +
+      Math.abs(item.position.left - position.left);
+
+    if (nearest === null || distance < nearest.distance) {
+      nearest = {item, distance};
+    }
+  }
+
+  return nearest !== null && nearest.distance <= itemDetectionRange
+    ? nearest.item
+    : null;
+}
 
 type CraftAnimationProps = {
+  aiClass?: AiClass;
   craftSpeedWhenLockedOn?: number;
   defaultCraftSpeed: number;
   defaultFacing: Facing;
@@ -30,6 +59,7 @@ type CraftAnimationProps = {
 };
 
 function useEnemyCraftAnimation({
+  aiClass = 'basic',
   defaultCraftSpeed,
   craftSpeedWhenLockedOn = defaultCraftSpeed,
   defaultFacing,
@@ -55,6 +85,8 @@ function useEnemyCraftAnimation({
   const controlledFacingRef = useRef<null | Facing>(null);
   const detectedPlayerFacingRef = useRef<null | Facing>(null);
   const detectedPlayerPositionRef = useRef<null | Position>(null);
+  const dodgeRef = useRef<(threatFacing: Facing) => void>(() => {});
+  const isDodgingRef = useRef(false);
   const isEliminatedRef = useRef(false);
   const isFrozenRef = useRef(false);
   const isPlayerEliminatedRef = useRef(isPlayerEliminated);
@@ -81,6 +113,10 @@ function useEnemyCraftAnimation({
       isCollidable: true,
       onEliminated: () => onIsEliminatedRef.current(),
       onLineOfSightChange: setIsPlayerInLineOfSight,
+      onThreatened:
+        aiClass === 'veteran'
+          ? ({facing: threatFacing}) => dodgeRef.current(threatFacing)
+          : undefined,
     });
 
     return () => simulation.removeCraft(simId);
@@ -97,7 +133,11 @@ function useEnemyCraftAnimation({
     (craftSpeed: number) => {
       craftSpeedRef.current = craftSpeed;
 
-      if (isEliminatedRef.current || isFrozenRef.current) {
+      if (
+        isEliminatedRef.current ||
+        isFrozenRef.current ||
+        isDodgingRef.current
+      ) {
         return;
       }
 
@@ -124,6 +164,8 @@ function useEnemyCraftAnimation({
       const detectedFacing =
         controlledFacingRef.current || detectedPlayerFacingRef.current;
 
+      const nearbyItem = getNearbyItem(simulation.getItems(), position);
+
       if (!isPlayerEliminatedRef.current && isPlayerInLineOfSightRef.current) {
         // Player spotted: chase them down their alley.
         nextAnimation = controlledAnimation({
@@ -147,6 +189,22 @@ function useEnemyCraftAnimation({
 
         controlledFacingRef.current = null;
         detectedPlayerPositionRef.current = null;
+      } else if (nearbyItem) {
+        // Race to a nearby uncollected item: align on its column first,
+        // then travel to its row. Each leg re-plans, so a taken item just
+        // falls through to wandering.
+        const columnGap = nearbyItem.position.left - position.left;
+
+        nextAnimation =
+          Math.abs(columnGap) >= 1
+            ? {
+                nextFacing: columnGap > 0 ? 'E' : 'W',
+                toValue: nearbyItem.position.left,
+              }
+            : {
+                nextFacing: nearbyItem.position.top > position.top ? 'S' : 'N',
+                toValue: nearbyItem.position.top,
+              };
       } else if (detectedFacing) {
         nextAnimation = randomAnimation({
           detectedFacing,
@@ -210,6 +268,105 @@ function useEnemyCraftAnimation({
     ],
   );
 
+  const runDodgeLegs = useCallback(
+    (legs: AnimationProps[]) => {
+      const [leg, ...remainingLegs] = legs;
+
+      if (!leg) {
+        isDodgingRef.current = false;
+        animate(
+          isPlayerInLineOfSightRef.current
+            ? craftSpeedWhenLockedOn
+            : defaultCraftSpeed,
+        );
+        return;
+      }
+
+      const position = simulation.getPosition(simId);
+
+      if (!position) {
+        isDodgingRef.current = false;
+        return;
+      }
+
+      const axis = isVerticalFacing(leg.nextFacing) ? 'top' : 'left';
+      const animation = axis === 'top' ? topAnim : leftAnim;
+
+      setFacing(leg.nextFacing);
+      simulation.setFacing(simId, leg.nextFacing);
+      simulation.setSegment(simId, {
+        axis,
+        to: leg.toValue,
+        speed: craftSpeedWhenLockedOn,
+      });
+
+      animateCraft({
+        animation,
+        callback: ({finished}) => {
+          if (isPausedRef.current) {
+            // Abandon the dodge; the resume effect restarts normal movement.
+            isDodgingRef.current = false;
+            controlledFacingRef.current = facingRef.current;
+          } else if (finished) {
+            runDodgeLegs(remainingLegs);
+          } else {
+            isDodgingRef.current = false;
+          }
+        },
+        craftSpeed: craftSpeedWhenLockedOn,
+        from: axis === 'top' ? position.top : position.left,
+        toValue: leg.toValue,
+      });
+    },
+    [
+      animate,
+      craftSpeedWhenLockedOn,
+      defaultCraftSpeed,
+      leftAnim,
+      simId,
+      simulation,
+      topAnim,
+    ],
+  );
+
+  const dodge = useCallback(
+    (threatFacing: Facing) => {
+      if (
+        isDodgingRef.current ||
+        isEliminatedRef.current ||
+        isFrozenRef.current ||
+        isPausedRef.current
+      ) {
+        return;
+      }
+
+      const position = simulation.getPosition(simId);
+
+      if (!position) {
+        return;
+      }
+
+      const legs = dodgeAnimation({
+        threatFacing,
+        currentFacing: facingRef.current,
+        top: position.top,
+        left: position.left,
+      });
+
+      if (legs.length === 0) {
+        return;
+      }
+
+      isDodgingRef.current = true;
+      leftAnim.stopAnimation();
+      topAnim.stopAnimation();
+      runDodgeLegs(legs);
+    },
+    [leftAnim, runDodgeLegs, simId, simulation, topAnim],
+  );
+
+  dodgeRef.current = dodge;
+
   const freeze = useCallback(() => {
     const position = simulation.getPosition(simId);
 
@@ -234,7 +391,12 @@ function useEnemyCraftAnimation({
   }, [hasInitialized, hasPlayerMoved]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
-    if (isPaused || isPlayerEliminated || isFrozenRef.current) {
+    if (
+      isPaused ||
+      isPlayerEliminated ||
+      isFrozenRef.current ||
+      isDodgingRef.current
+    ) {
       return;
     }
 

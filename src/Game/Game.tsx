@@ -27,6 +27,7 @@ import {AnimationProvider} from './Fighter/AnimationContext';
 import {EliminationProvider} from './Fighter/EliminationContext';
 import {MissileProvider} from './Fighter/MissileContext';
 import {EnemyFactoryProvider} from './enemy/EnemyFactoryContext';
+import {ItemFactoryProvider} from './items/ItemFactoryContext';
 
 const styles = StyleSheet.create({
   container: {
@@ -134,7 +135,9 @@ const Game = ({navigation, route}: GameProps): null | JSX.Element => {
               <EliminationProvider>
                 <MissileProvider>
                   <EnemyFactoryProvider>
-                    <GameView onResetBoard={onResetBoard} />
+                    <ItemFactoryProvider>
+                      <GameView onResetBoard={onResetBoard} />
+                    </ItemFactoryProvider>
                   </EnemyFactoryProvider>
                 </MissileProvider>
               </EliminationProvider>

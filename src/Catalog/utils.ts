@@ -28,11 +28,20 @@ const rankInsignia = [
   rank7Insignia,
 ];
 
+// Each rank is twice as hard to reach as the last. The Admiral threshold is
+// ~75% of the theoretical maximum total (all-level base points plus time
+// bonuses), so the top rank is demanding but not perfection-gated.
+const rankThresholds = [1125, 2250, 4500, 9000, 18000, 36000];
+
 export function getRankIndex(score: number): number {
-  const rankIndex = Math.min(
-    rankNames.length - 1,
-    score < 1000 ? 0 : Math.floor(Math.log2(score / 1000) + 1),
-  );
+  let rankIndex = 0;
+
+  while (
+    rankIndex < rankThresholds.length &&
+    score >= rankThresholds[rankIndex]
+  ) {
+    rankIndex++;
+  }
 
   return rankIndex;
 }

@@ -1,7 +1,15 @@
 import {Animated, Easing} from 'react-native';
 
 import {Facing} from './types';
-import {craftPixelsPerSecond, numColumns, totalWidth} from './constants';
+import {
+  Enemies,
+  craftPixelsPerSecond,
+  numColumns,
+  parSecondsPerEnemy,
+  startingEnemies,
+  timeBonusPointsPerSecond,
+  totalWidth,
+} from './constants';
 
 export function animateCraft({
   animation,
@@ -43,6 +51,26 @@ export function getNextAlley(position: number, direction: Facing) {
   }
 
   return Math.min(numColumns - 1, Math.ceil(nextAlley));
+}
+
+export function getParSeconds(epic: number) {
+  const enemyCount = startingEnemies[epic].reduce((count: number, enemy) => {
+    if (enemy === null) {
+      return count;
+    }
+
+    // A cargo ship converts into three speeders when it detects the player,
+    // so it takes three kills' worth of time to fully clear.
+    return count + (enemy === Enemies.CARGO_SHIP ? 3 : 1);
+  }, 0);
+
+  return enemyCount * parSecondsPerEnemy;
+}
+
+export function getTimeBonus(epic: number, elapsedSeconds: number) {
+  const secondsUnderPar = Math.max(0, getParSeconds(epic) - elapsedSeconds);
+
+  return Math.round((timeBonusPointsPerSecond * secondsUnderPar) / 10) * 10;
 }
 
 export function getIsThanksgivingDay() {

@@ -82,6 +82,10 @@ export const AnimationProvider = ({children}: {children: React.ReactNode}) => {
 
   useEffect(() => {
     simulation.setCollidable(PLAYER_ID, hasPlayerMoved);
+
+    if (hasPlayerMoved) {
+      simulation.startClock();
+    }
   }, [hasPlayerMoved, simulation]);
 
   useEffect(() => {
@@ -122,7 +126,11 @@ export const AnimationProvider = ({children}: {children: React.ReactNode}) => {
 
       const craftSpeed = getPlayerSpeed(thrustersEngagedRef.current);
 
-      simulation.setSegment(PLAYER_ID, {axis, to: toValue, speed: craftSpeed});
+      simulation.setSegment(PLAYER_ID, {
+        axis,
+        to: toValue,
+        speed: craftSpeed,
+      });
       animateCraft({
         animation: axis === 'top' ? topAnim : leftAnim,
         callback,

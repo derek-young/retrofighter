@@ -10,7 +10,9 @@ import Modal from 'components/Modal';
 import PressStartText from 'components/PressStartText';
 
 import {startingEnemies} from './constants';
+import {getTimeBonus} from './utils';
 import {useGameContext} from './GameContext';
+import {useSimulationContext} from './engine/SimulationContext';
 import {useEnemyFactoryContext} from './enemy/EnemyFactoryContext';
 import ExitLevelButton from './ExitLevelButton';
 import {useMissileContext} from './Fighter/MissileContext';
@@ -42,6 +44,12 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.6,
     shadowOffset: {width: 4, height: 4},
   },
+  timeBonus: {
+    color: Colors.GREEN,
+    fontSize: 12,
+    marginTop: 8,
+    textAlign: 'center',
+  },
   buttonHolder: {
     display: 'flex',
     flexDirection: 'row',
@@ -64,6 +72,7 @@ const LevelCompletePopup = ({
   const navigation = useNavigation<GameNavigationProp>();
   const {recordScores} = useAppContext();
   const {epic, scoreForLevel, setRemainingLives} = useGameContext();
+  const simulation = useSimulationContext();
   const {areAllEnemiesEliminated} = useEnemyFactoryContext();
   const [leftMissile, rightMissile] = useMissileContext();
   const fontAnimation = useRef(new Animated.Value(0));
@@ -71,20 +80,36 @@ const LevelCompletePopup = ({
   const [isOpen, setIsOpen] = useState(false);
   const [fontSize, setFontSize] = useState(0);
   const [score, setScore] = useState(0);
+  const [completion, setCompletion] = useState<null | {
+    elapsedSeconds: number;
+    timeBonus: number;
+  }>(null);
   const [haveAnimationsEnded, setHaveAnimationsEnded] = useState(false);
 
   useEffect(() => {
     if (
       areAllEnemiesEliminated &&
       !leftMissile.hasMissileFired &&
-      !rightMissile.hasMissileFired
+      !rightMissile.hasMissileFired &&
+      completion === null
     ) {
+      // Capture the clock now, not when the popup opens, so the celebration
+      // delay doesn't count against the time bonus.
+      const elapsedSeconds = simulation.getElapsedMs() / 1000;
+
+      setCompletion({
+        elapsedSeconds,
+        timeBonus: getTimeBonus(epic, elapsedSeconds),
+      });
       setTimeout(() => setIsOpen(true), 1000);
     }
   }, [
     areAllEnemiesEliminated,
+    completion,
+    epic,
     leftMissile.hasMissileFired,
     rightMissile.hasMissileFired,
+    simulation,
   ]);
 
   useEffect(() => {
@@ -108,16 +133,20 @@ const LevelCompletePopup = ({
       }).start();
 
       Animated.timing(scoreAnimation.current, {
-        toValue: scoreForLevel,
+        toValue: scoreForLevel + (completion?.timeBonus ?? 0),
         duration: 2000,
         useNativeDriver: true,
       }).start(onScoreAnimEnd);
     }
-  }, [isOpen, setRemainingLives, scoreForLevel]);
+  }, [isOpen, setRemainingLives, scoreForLevel, completion]);
 
   useEffect(() => {
-    if (haveAnimationsEnded && isOpen) {
-      recordScores(epic, scoreForLevel);
+    if (haveAnimationsEnded && isOpen && completion) {
+      recordScores(
+        epic,
+        scoreForLevel + completion.timeBonus,
+        completion.elapsedSeconds,
+      );
     }
   }, [haveAnimationsEnded, isOpen]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -144,6 +173,11 @@ const LevelCompletePopup = ({
         <View style={styles.scoreContainer}>
           {score !== 0 && (
             <PressStartText style={styles.score}>{score}</PressStartText>
+          )}
+          {score !== 0 && completion !== null && completion.timeBonus > 0 && (
+            <PressStartText style={styles.timeBonus}>
+              TIME BONUS +{completion.timeBonus}
+            </PressStartText>
           )}
         </View>
         <View style={styles.buttonHolder}>

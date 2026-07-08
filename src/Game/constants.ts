@@ -36,6 +36,8 @@ export enum Enemies {
   DUAL_FIGHTER,
   SPEEDER,
   UAV,
+  VETERAN_DUAL_FIGHTER,
+  VETERAN_UAV,
 }
 
 export const enemyPoints = {
@@ -43,7 +45,21 @@ export const enemyPoints = {
   [Enemies.DUAL_FIGHTER]: 300,
   [Enemies.SPEEDER]: 400,
   [Enemies.UAV]: 200,
+  [Enemies.VETERAN_DUAL_FIGHTER]: 450,
+  [Enemies.VETERAN_UAV]: 300,
 };
+
+export const parSecondsPerEnemy = 10;
+export const timeBonusPointsPerSecond = 20;
+
+// How far ahead (in flight time) a player missile warns a veteran craft.
+// Short enough that point-blank shots still connect.
+export const veteranDodgeWindowMs = 1000;
+
+export const cloakDurationMs = 30000;
+export const itemSpawnDelayMs = 15000;
+export const itemSpawnIntervalMs = 20000;
+export const itemDetectionRange = totalWidth * 3;
 
 export const startingEnemies: (Enemies | null)[][] = [
   [null, null, null, Enemies.UAV, null, Enemies.UAV, null, Enemies.UAV],

@@ -32,7 +32,7 @@ interface AppContextValue {
   onDeleteAcct: () => void;
   onSignOut: () => void;
   scores: number[];
-  recordScores: (level: number, score: number) => void;
+  recordScores: (level: number, score: number, elapsedSeconds: number) => void;
   totalScore: number;
   user: AuthUser;
   setUser: (user: AuthUser) => void;
@@ -45,6 +45,7 @@ export const useAppContext = () => useContext(AppContext);
 export const AppContextProvider = ({children}: {children: React.ReactNode}) => {
   const [user, setUser] = useState<AuthUser>(null);
   const [scores, setScores] = useState<number[]>([]);
+  const [levelTimes, setLevelTimes] = useState<number[]>([]);
   const navigation = useNavigation<CatalogNavigationProp>();
 
   const totalScore = useMemo(
@@ -53,24 +54,34 @@ export const AppContextProvider = ({children}: {children: React.ReactNode}) => {
   );
 
   const setRemoteScores = useCallback(
-    (nextScores: number[]) => {
+    (nextScores: number[], nextLevelTimes: number[]) => {
       if (user?.uid) {
-        userActions.set({scores: nextScores});
+        // userActions.set replaces the whole user record, so scores and
+        // levelTimes must always be written together.
+        userActions.set({scores: nextScores, levelTimes: nextLevelTimes});
       }
     },
     [user?.uid],
   );
 
   const recordScores = useCallback(
-    (level: number, score: number) => {
+    (level: number, score: number, elapsedSeconds: number) => {
       if ((scores[level] ?? 0) < score) {
         const nextScores = scores.slice();
         nextScores[level] = score;
+
+        // Backfill 0 ("time unknown") for levels beaten before times were
+        // tracked, so the array stays dense through the Firebase round-trip.
+        const nextLevelTimes = nextScores.map(
+          (_, i) => (i === level ? elapsedSeconds : levelTimes[i]) ?? 0,
+        );
+
         setScores(nextScores);
-        setRemoteScores(nextScores);
+        setLevelTimes(nextLevelTimes);
+        setRemoteScores(nextScores, nextLevelTimes);
       }
     },
-    [scores, setRemoteScores],
+    [levelTimes, scores, setRemoteScores],
   );
 
   const onDeleteConfirm = useCallback(async () => {
@@ -123,13 +134,18 @@ export const AppContextProvider = ({children}: {children: React.ReactNode}) => {
       userActions.get().then(dbUser => {
         if (dbUser?.scores) {
           setScores(dbUser.scores);
+          // Firebase returns sparse arrays as keyed objects; normalize.
+          setLevelTimes(Object.assign([], dbUser.levelTimes ?? []));
         } else {
-          userActions.set({scores: []});
+          userActions.set({scores: [], levelTimes: []});
         }
       });
     }
 
-    return () => setScores([]);
+    return () => {
+      setScores([]);
+      setLevelTimes([]);
+    };
   }, [user?.uid]);
 
   return (

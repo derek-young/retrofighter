@@ -101,6 +101,7 @@ const Missile = ({
       originLeft: position.left,
       originTop: position.top,
       facing,
+      ownerId,
       positionOffset,
       startValue: startingTop,
       targetKind,
@@ -154,7 +155,10 @@ const Missile = ({
     <Animated.View
       style={[styles.missileContainer, {transform: containerTransform}]}>
       <Animated.View
-        style={[styles.missileTravel, {transform: [{translateY: missileAnim}]}]}>
+        style={[
+          styles.missileTravel,
+          {transform: [{translateY: missileAnim}]},
+        ]}>
         <Icon style={missileIconStyle} />
       </Animated.View>
     </Animated.View>

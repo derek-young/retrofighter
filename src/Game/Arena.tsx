@@ -7,8 +7,11 @@ import DualFighter from './enemy/DualFighter';
 import EnemyCargoShip from './enemy/EnemyCargoShip';
 import EnemySpeeder from './enemy/EnemySpeeder';
 import EnemyUAV from './enemy/EnemyUAV';
+import VeteranDualFighter from './enemy/VeteranDualFighter';
+import VeteranUAV from './enemy/VeteranUAV';
 import {useGameContext} from './GameContext';
 import {useEnemyFactoryContext} from './enemy/EnemyFactoryContext';
+import ItemsView from './items/ItemsView';
 import {
   alleyWidth,
   arenaSize,
@@ -28,6 +31,10 @@ function getEnemyComponent(enemyName: Enemies) {
       return EnemySpeeder;
     case Enemies.UAV:
       return EnemyUAV;
+    case Enemies.VETERAN_DUAL_FIGHTER:
+      return VeteranDualFighter;
+    case Enemies.VETERAN_UAV:
+      return VeteranUAV;
   }
 }
 
@@ -145,6 +152,8 @@ const Arena = (): JSX.Element => {
   return (
     <View style={[styles.arena, {backgroundColor}]}>
       <Seperators />
+      {/* Before the crafts so they paint on top of uncollected items. */}
+      <ItemsView />
       <EnemiesView />
       <Fighter key={remainingLives} />
     </View>

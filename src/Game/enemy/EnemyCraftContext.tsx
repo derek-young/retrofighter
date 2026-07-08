@@ -5,7 +5,7 @@ import {Facing} from 'Game/types';
 import {DEFAULT_FACING_ROTATION} from 'Game/Craft';
 import {Position} from 'Game/engine/Simulation';
 
-import useEnemyCraftAnimation from './useEnemyCraftAnimation';
+import useEnemyCraftAnimation, {AiClass} from './useEnemyCraftAnimation';
 
 interface EnemyCraftContextValue {
   craftRotation: number;
@@ -38,6 +38,7 @@ const defaultValue: EnemyCraftContextValue = {
 };
 
 export interface EnemyCraftContextProviderProps {
+  aiClass?: AiClass;
   children: React.ReactNode;
   craftSpeedWhenLockedOn?: number;
   defaultCraftSpeed: number;
@@ -56,6 +57,7 @@ const EnemyCraftContext = React.createContext(defaultValue);
 export const useEnemyCraftContext = () => useContext(EnemyCraftContext);
 
 export const EnemyCraftContextProvider = ({
+  aiClass,
   children,
   craftSpeedWhenLockedOn,
   defaultCraftSpeed,
@@ -83,6 +85,7 @@ export const EnemyCraftContextProvider = ({
 
   const {facing, frozenPosition, isPlayerInLineOfSight, leftAnim, topAnim} =
     useEnemyCraftAnimation({
+      aiClass,
       craftSpeedWhenLockedOn,
       defaultCraftSpeed,
       defaultFacing,

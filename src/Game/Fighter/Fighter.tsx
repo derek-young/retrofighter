@@ -7,6 +7,8 @@ import {PLAYER_ID} from 'Game/engine/Simulation';
 
 import Craft, {DEFAULT_FACING_ROTATION} from '../Craft';
 import {defaultPlayerFacing} from '../constants';
+import {useItemFactoryContext} from '../items/ItemFactoryContext';
+import ShieldVisual from '../items/ShieldVisual';
 import FighterMissile from './FighterMissile';
 import {
   useAnimationContext,
@@ -31,6 +33,7 @@ const Fighter = (): null | JSX.Element => {
   const hasPlayerMoved = useHasPlayerMoved();
   const {hasEliminationAnimationEnded, isPlayerEliminated, onEliminationEnd} =
     useEliminationContext();
+  const {effects} = useItemFactoryContext();
   const [leftMissileProps, rightMissileProps] = useMissileContext();
   const rotationAnim = useRef(
     new Animated.Value(DEFAULT_FACING_ROTATION[defaultPlayerFacing]),
@@ -51,16 +54,26 @@ const Fighter = (): null | JSX.Element => {
     return null;
   }
 
-  const craftColor = hasPlayerMoved ? Colors.GREEN : `${Colors.GREEN}80`;
+  const playerEffects = effects[PLAYER_ID];
+  const craftColor = !hasPlayerMoved
+    ? `${Colors.GREEN}80`
+    : playerEffects?.isCloaked
+    ? `${Colors.GREEN}55` // cloaked: enemies can't see you, but you can
+    : Colors.GREEN;
+  // An armed cluster bomb tints the docked missiles.
+  const missileColor = playerEffects?.hasClusterBomb ? Colors.PINK : craftColor;
 
   // Missiles are mounted before the craft so the craft paints on top of
   // them (they used to rely on zIndex, which breaks native-driver
   // transforms on iOS).
   return (
     <>
+      {!isPlayerEliminated && playerEffects?.hasShield && (
+        <ShieldVisual facing={facing} left={leftAnim} top={topAnim} />
+      )}
       {(!isPlayerEliminated || leftMissileProps.hasMissileFired) && (
         <FighterMissile
-          craftColor={craftColor}
+          craftColor={missileColor}
           craftRotationAnim={rotationAnim}
           facing={facing}
           iconStyle={styles.missileLeft}
@@ -73,7 +86,7 @@ const Fighter = (): null | JSX.Element => {
       )}
       {(!isPlayerEliminated || rightMissileProps.hasMissileFired) && (
         <FighterMissile
-          craftColor={craftColor}
+          craftColor={missileColor}
           craftRotationAnim={rotationAnim}
           facing={facing}
           iconStyle={styles.missileRight}

@@ -15,7 +15,7 @@ function getRandomNumber([start, end]: number[]) {
   return end - Math.ceil(Math.random() * range);
 }
 
-function getValidFacings(top: number, left: number) {
+export function getValidFacings(top: number, left: number) {
   const directions: Facing[] = [];
 
   if (top !== minTop) {
