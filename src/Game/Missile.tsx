@@ -136,14 +136,11 @@ const Missile = ({
         {translateY: firedState.top},
         {rotate: `${DEFAULT_FACING_ROTATION[firedState.facing]}deg`},
       ]
-    : [
-        {translateX: leftAnim},
-        {translateY: topAnim},
-        {rotate: dockedRotation},
-      ];
+    : [{translateX: leftAnim}, {translateY: topAnim}, {rotate: dockedRotation}];
 
   return (
-    <Animated.View style={[styles.missileContainer, {transform: containerTransform}]}>
+    <Animated.View
+      style={[styles.missileContainer, {transform: containerTransform}]}>
       <Animated.View
         style={[styles.missile, {transform: [{translateY: missileAnim}]}]}>
         <Icon style={styles.missile} />

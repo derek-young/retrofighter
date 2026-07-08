@@ -123,17 +123,11 @@ const DPad = (): JSX.Element => {
   const xRef = useRef(0);
   const yRef = useRef(0);
   const hasGestureFiredRef = useRef(false);
-  const {
-    setHasPlayerMoved,
-    onDownPress,
-    onUpPress,
-    onLeftPress,
-    onRightPress,
-  } = useAnimationContext();
+  const {setHasPlayerMoved, onDownPress, onUpPress, onLeftPress, onRightPress} =
+    useAnimationContext();
   const {epic} = useGameContext();
 
-  // Fires as soon as the swipe crosses the threshold — during the gesture,
-  // not on finger lift — so turns feel immediate.
+  // Fires as soon as the swipe crosses the threshold
   const handleSwipe = (e: GestureResponderEvent) => {
     if (hasGestureFiredRef.current) {
       return;
@@ -142,7 +136,10 @@ const DPad = (): JSX.Element => {
     const xDiff = e.nativeEvent.pageX - xRef.current;
     const yDiff = e.nativeEvent.pageY - yRef.current;
 
-    if (Math.abs(xDiff) <= swipeThreshold && Math.abs(yDiff) <= swipeThreshold) {
+    if (
+      Math.abs(xDiff) <= swipeThreshold &&
+      Math.abs(yDiff) <= swipeThreshold
+    ) {
       return;
     }
 

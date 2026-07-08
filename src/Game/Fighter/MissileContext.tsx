@@ -68,5 +68,7 @@ export const MissileProvider = ({children}: {children: React.ReactNode}) => {
     ],
   );
 
-  return <MissileContext.Provider value={value}>{children}</MissileContext.Provider>;
+  return (
+    <MissileContext.Provider value={value}>{children}</MissileContext.Provider>
+  );
 };

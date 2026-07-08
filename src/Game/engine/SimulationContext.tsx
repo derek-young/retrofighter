@@ -1,6 +1,10 @@
 import React, {useContext, useEffect, useRef} from 'react';
 
-import {playerStartLeft, playerStartTop, defaultPlayerFacing} from 'Game/constants';
+import {
+  playerStartLeft,
+  playerStartTop,
+  defaultPlayerFacing,
+} from 'Game/constants';
 import {useGameContext} from 'Game/GameContext';
 
 import Simulation, {PLAYER_ID} from './Simulation';
