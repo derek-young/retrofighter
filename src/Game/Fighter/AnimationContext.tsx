@@ -151,7 +151,7 @@ export const AnimationProvider = ({children}: {children: React.ReactNode}) => {
   /**
    * A perpendicular turn first travels to the center of the next alley on
    * the current axis, then starts the requested move. Facing is unchanged
-   * until the turn actually happens, exactly like the original engine.
+   * until the turn actually happens.
    */
   const interceptToAlley = useCallback(
     (axis: Axis, onDone: () => void) => {

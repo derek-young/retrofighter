@@ -23,8 +23,6 @@ const FighterMissile = ({
   iconStyle,
   ...rest
 }: FighterMissileProps) => {
-  // Memoized so the icon keeps a stable component identity across renders;
-  // an inline component type would remount the SVG tree each render.
   const Icon = useMemo(
     () =>
       function FighterMissileIcon({style}: IconProps) {

@@ -81,7 +81,14 @@ export const GameProvider = ({children, epic}: GameProviderProps) => {
       setRemainingLives,
       scoreForLevel,
     }),
-    [adjustScore, epic, isPaused, remainingLives, resetGameContext, scoreForLevel],
+    [
+      adjustScore,
+      epic,
+      isPaused,
+      remainingLives,
+      resetGameContext,
+      scoreForLevel,
+    ],
   );
 
   return <GameContext.Provider value={value}>{children}</GameContext.Provider>;

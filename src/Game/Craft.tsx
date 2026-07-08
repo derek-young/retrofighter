@@ -156,9 +156,7 @@ const Craft = ({
   const {rotate, counterRotate, explosionScale, scoreScale} = useMemo(
     () => ({
       rotate: rotation.interpolate(rotationRange),
-      counterRotate: Animated.multiply(rotation, -1).interpolate(
-        rotationRange,
-      ),
+      counterRotate: Animated.multiply(rotation, -1).interpolate(rotationRange),
       explosionScale: elimAnim,
       scoreScale: elimAnim.interpolate({
         inputRange: [0, 0.32, 1],

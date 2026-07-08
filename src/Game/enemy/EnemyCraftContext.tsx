@@ -69,7 +69,7 @@ export const EnemyCraftContextProvider = ({
   startingLeft = 0,
 }: EnemyCraftContextProviderProps) => {
   const simId = `enemy-${id}`;
-  // Updated once per completed turn (not per animation frame); gates enemy
+  // Updated once per completed turn; gates enemy
   // missile fire on the craft visually facing its travel direction.
   const [craftRotation, setCraftRotation] = useState(0);
   const rotationAnim = useRef(
