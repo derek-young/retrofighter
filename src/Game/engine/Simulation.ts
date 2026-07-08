@@ -1,10 +1,5 @@
 import {Facing} from 'Game/types';
-import {
-  alleyWidth,
-  craftSize,
-  maxScreenSize,
-  missileSpeed,
-} from 'Game/constants';
+import {alleyWidth, craftSize, maxScreenSize, missileSpeed} from 'Game/constants';
 import {getIsPlayerInLineOfSight} from 'Game/enemy/animation';
 
 export const PLAYER_ID = 'player';
@@ -86,11 +81,11 @@ function isPointInBox(point: Position, box: Position) {
 }
 
 /**
- * The authoritative game state. All motion in the game is linear, so positions are derived
+ * The authoritative game state. All motion in the game is linear, positions are derived
  * arithmetically from each entity's movement segment (origin, target, speed,
  * start time). A fixed-interval tick runs the game rules (craft collisions,
  * missile impacts, line of sight) against those derived positions, leaving
- * the JS thread idle between ticks.
+ * the JS thread idle between ticks so touch events dispatch immediately.
  *
  * Visuals are rendered separately with native-driver Animated timings built
  * from the same parameters, so they stay in agreement with the simulation
@@ -240,7 +235,9 @@ class Simulation {
   getMissileValue(id: string, now = Date.now()): number | undefined {
     const missile = this.missiles.get(id);
 
-    return missile === undefined ? undefined : this.missileValue(missile, now);
+    return missile === undefined
+      ? undefined
+      : this.missileValue(missile, now);
   }
 
   pause(now = Date.now()): void {

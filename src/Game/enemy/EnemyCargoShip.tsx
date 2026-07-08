@@ -12,10 +12,7 @@ import {
 import Colors from 'types/colors';
 import {Position} from 'Game/engine/Simulation';
 
-import {
-  EnemyCraftContextProvider,
-  useEnemyCraftContext,
-} from './EnemyCraftContext';
+import {EnemyCraftContextProvider, useEnemyCraftContext} from './EnemyCraftContext';
 import EnemyCraft from './EnemyCraft';
 import {useEnemyFactoryContext} from './EnemyFactoryContext';
 import {EnemyProps} from './enemyProps';
@@ -114,6 +111,7 @@ const EnemyCargoShip = ({id}: {id: number}): JSX.Element | null => {
       </Animated.View>
       {frozenPosition && !hasWaveAnimationEnded && (
         <>
+          <RadarWave center={frozenPosition} waveAnim={waveAnim} waveOffset={0} />
           <RadarWave
             center={frozenPosition}
             waveAnim={waveAnim}
