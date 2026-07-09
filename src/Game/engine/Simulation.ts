@@ -50,8 +50,8 @@ interface CraftEntity extends CraftCallbacks {
     since: number | null;
     onEnded?: () => void;
   } | null;
-  hasClusterBomb: boolean;
-  onClusterBombFired?: () => void;
+  clusterBombCount: number;
+  onClusterBombCountChange?: (count: number) => void;
 }
 
 export interface CraftConfig extends CraftCallbacks {
@@ -247,7 +247,7 @@ class Simulation {
       isPlayerInLineOfSight: false,
       hasShield: false,
       cloak: null,
-      hasClusterBomb: false,
+      clusterBombCount: 0,
     });
   }
 
@@ -278,10 +278,10 @@ class Simulation {
         craft.cloak = null;
         onEnded?.();
       }
-      if (craft.hasClusterBomb) {
-        craft.hasClusterBomb = false;
-        craft.onClusterBombFired?.();
-        craft.onClusterBombFired = undefined;
+      if (craft.clusterBombCount > 0) {
+        craft.clusterBombCount = 0;
+        craft.onClusterBombCountChange?.(0);
+        craft.onClusterBombCountChange = undefined;
       }
     }
   }
@@ -362,12 +362,17 @@ class Simulation {
     return Boolean(this.crafts.get(id)?.cloak);
   }
 
-  armClusterBomb(id: string, onFired?: () => void): void {
+  armClusterBomb(id: string, onCountChange?: (count: number) => void): void {
     const craft = this.crafts.get(id);
 
     if (craft) {
-      craft.hasClusterBomb = true;
-      craft.onClusterBombFired = onFired;
+      craft.clusterBombCount += 1;
+
+      if (onCountChange) {
+        craft.onClusterBombCountChange = onCountChange;
+      }
+
+      craft.onClusterBombCountChange?.(craft.clusterBombCount);
     }
   }
 
@@ -437,15 +442,15 @@ class Simulation {
   }
 
   addMissile(id: string, config: MissileConfig, now = Date.now()): void {
-    // A cluster bomb is a dedicated missile: firing it spends the owner's
-    // armed bomb. Regular missiles never consume the bomb or pierce.
+    // A cluster bomb is a dedicated missile: firing it spends one of the
+    // owner's stockpiled bombs. Regular missiles never consume a bomb or
+    // pierce.
     if (config.isClusterBomb) {
       const owner = this.crafts.get(config.ownerId);
 
-      if (owner?.hasClusterBomb) {
-        owner.hasClusterBomb = false;
-        owner.onClusterBombFired?.();
-        owner.onClusterBombFired = undefined;
+      if (owner && owner.clusterBombCount > 0) {
+        owner.clusterBombCount -= 1;
+        owner.onClusterBombCountChange?.(owner.clusterBombCount);
       }
     }
 

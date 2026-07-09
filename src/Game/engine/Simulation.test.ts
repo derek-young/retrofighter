@@ -662,7 +662,7 @@ describe('cloak', () => {
 
 describe('cluster bombs', () => {
   it('pierces every craft in the line of fire', () => {
-    const onFired = jest.fn();
+    const onCountChange = jest.fn();
     const onImpact = jest.fn();
     const onFirstEliminated = jest.fn();
     const onSecondEliminated = jest.fn();
@@ -685,7 +685,9 @@ describe('cluster bombs', () => {
       onEliminated: onSecondEliminated,
     });
 
-    simulation.armClusterBomb(PLAYER_ID, onFired);
+    simulation.armClusterBomb(PLAYER_ID, onCountChange);
+    expect(onCountChange).toHaveBeenLastCalledWith(1);
+
     simulation.addMissile(
       'player-missile-cluster',
       {
@@ -702,7 +704,8 @@ describe('cluster bombs', () => {
       0,
     );
 
-    expect(onFired).toHaveBeenCalledTimes(1);
+    // Firing spends the bomb.
+    expect(onCountChange).toHaveBeenLastCalledWith(0);
 
     simulation.tick(1700);
     expect(onFirstEliminated).toHaveBeenCalledTimes(1);
@@ -718,7 +721,7 @@ describe('cluster bombs', () => {
   });
 
   it('is not consumed by a regular missile', () => {
-    const onFired = jest.fn();
+    const onCountChange = jest.fn();
     const onImpact = jest.fn();
     const onFirstEliminated = jest.fn();
     const onSecondEliminated = jest.fn();
@@ -741,7 +744,7 @@ describe('cluster bombs', () => {
       onEliminated: onSecondEliminated,
     });
 
-    simulation.armClusterBomb(PLAYER_ID, onFired);
+    simulation.armClusterBomb(PLAYER_ID, onCountChange);
     simulation.addMissile(
       'player-missile-left',
       {
@@ -757,15 +760,16 @@ describe('cluster bombs', () => {
       0,
     );
 
-    // The bomb stays armed, and the regular missile detonates on the first
-    // enemy instead of piercing.
-    expect(onFired).not.toHaveBeenCalled();
+    // The bomb stays armed (count unchanged since the arm), and the regular
+    // missile detonates on the first enemy instead of piercing.
+    expect(onCountChange).toHaveBeenCalledTimes(1);
+    expect(onCountChange).toHaveBeenLastCalledWith(1);
     simulation.tick(1700);
     expect(onFirstEliminated).toHaveBeenCalledTimes(1);
     expect(onImpact).toHaveBeenCalledTimes(1);
     expect(simulation.getMissileValue('player-missile-left')).toBeUndefined();
     expect(onSecondEliminated).not.toHaveBeenCalled();
-    expect(onFired).not.toHaveBeenCalled();
+    expect(onCountChange).toHaveBeenLastCalledWith(1);
 
     // The dedicated cluster missile then spends the bomb.
     simulation.addMissile(
@@ -784,11 +788,50 @@ describe('cluster bombs', () => {
       1700,
     );
 
-    expect(onFired).toHaveBeenCalledTimes(1);
+    expect(onCountChange).toHaveBeenLastCalledWith(0);
+  });
+
+  it('stockpiles bombs and spends one per shot', () => {
+    const onCountChange = jest.fn();
+    const simulation = createSimulationWithPlayer({top: 500, left: 100});
+
+    simulation.armClusterBomb(PLAYER_ID, onCountChange);
+    simulation.armClusterBomb(PLAYER_ID, onCountChange);
+    simulation.armClusterBomb(PLAYER_ID, onCountChange);
+    expect(onCountChange).toHaveBeenLastCalledWith(3);
+
+    const fireCluster = (id: string, now: number) =>
+      simulation.addMissile(
+        id,
+        {
+          ownerId: PLAYER_ID,
+          originTop: 500,
+          originLeft: 100 - 6,
+          facing: 'N',
+          positionOffset: 6,
+          startValue: 6,
+          targetKind: 'enemy',
+          isClusterBomb: true,
+          onImpact: () => {},
+        },
+        now,
+      );
+
+    fireCluster('cluster-a', 0);
+    expect(onCountChange).toHaveBeenLastCalledWith(2);
+    fireCluster('cluster-b', 1);
+    expect(onCountChange).toHaveBeenLastCalledWith(1);
+    fireCluster('cluster-c', 2);
+    expect(onCountChange).toHaveBeenLastCalledWith(0);
+
+    // With the stockpile empty, a further cluster shot changes nothing.
+    fireCluster('cluster-d', 3);
+    expect(onCountChange).toHaveBeenLastCalledWith(0);
+    expect(onCountChange).toHaveBeenCalledTimes(6);
   });
 
   it('lets an enemy fire a picked-up bomb at the player', () => {
-    const onFired = jest.fn();
+    const onCountChange = jest.fn();
     const onImpact = jest.fn();
     const onPlayerEliminated = jest.fn();
     const simulation = createSimulationWithPlayer({
@@ -805,7 +848,7 @@ describe('cluster bombs', () => {
       isCollidable: true,
     });
 
-    simulation.armClusterBomb('enemy-1', onFired);
+    simulation.armClusterBomb('enemy-1', onCountChange);
 
     // Facing south: missile top = originTop - value, value decreases, so the
     // missile travels toward larger tops.
@@ -825,7 +868,7 @@ describe('cluster bombs', () => {
       0,
     );
 
-    expect(onFired).toHaveBeenCalledTimes(1);
+    expect(onCountChange).toHaveBeenLastCalledWith(0);
 
     const msToTarget = ((500 - 200 + 12) / missileSpeed) * 1000;
     simulation.tick(msToTarget + 1);

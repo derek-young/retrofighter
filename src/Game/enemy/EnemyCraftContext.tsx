@@ -1,13 +1,19 @@
 import React, {useCallback, useContext, useMemo, useRef, useState} from 'react';
 import {Animated} from 'react-native';
 
-import {Facing} from 'Game/types';
+import {Facing, MissileProps} from 'Game/types';
 import {DEFAULT_FACING_ROTATION} from 'Game/Craft';
 import {Position} from 'Game/engine/Simulation';
+import {useMissilePropsState} from 'Game/useMissilePropsState';
 
+import {enemyMissileStartingTop} from './enemyConstants';
 import useEnemyCraftAnimation, {AiClass} from './useEnemyCraftAnimation';
 
 interface EnemyCraftContextValue {
+  // The cluster-bomb missile state lives here (not in EnemyMissileContext) so
+  // every enemy has it — even those with no regular missile — and so the
+  // regular missile provider can coordinate with it (fire one at a time).
+  clusterMissileProps: MissileProps;
   craftRotation: number;
   facing: Facing;
   frozenPosition: null | Position;
@@ -24,6 +30,13 @@ interface EnemyCraftContextValue {
 const noop = () => {};
 
 const defaultValue: EnemyCraftContextValue = {
+  clusterMissileProps: {
+    hasMissileFired: false,
+    missileAnim: new Animated.Value(enemyMissileStartingTop),
+    onFireAnimationEnded: noop,
+    onFireMissile: noop,
+    startingTop: enemyMissileStartingTop,
+  },
   craftRotation: 0,
   facing: 'S',
   frozenPosition: null,
@@ -82,6 +95,8 @@ export const EnemyCraftContextProvider = ({
     new Animated.Value(DEFAULT_FACING_ROTATION[defaultFacing]),
   ).current;
 
+  const clusterMissileProps = useMissilePropsState(enemyMissileStartingTop);
+
   const onRotationEnd = useCallback(
     (rotation: number) => setCraftRotation(rotation),
     [],
@@ -103,6 +118,7 @@ export const EnemyCraftContextProvider = ({
 
   const value = useMemo(
     () => ({
+      clusterMissileProps,
       craftRotation,
       facing,
       frozenPosition,
@@ -116,6 +132,7 @@ export const EnemyCraftContextProvider = ({
       simId,
     }),
     [
+      clusterMissileProps,
       craftRotation,
       facing,
       frozenPosition,

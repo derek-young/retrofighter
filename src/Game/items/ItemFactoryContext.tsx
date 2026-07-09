@@ -33,7 +33,7 @@ export interface ActiveItem {
 export interface CraftItemEffects {
   hasShield: boolean;
   isCloaked: boolean;
-  hasClusterBomb: boolean;
+  clusterBombCount: number;
 }
 
 interface ItemFactoryContextValue {
@@ -49,7 +49,7 @@ const defaultValue: ItemFactoryContextValue = {
 const noEffects: CraftItemEffects = {
   hasShield: false,
   isCloaked: false,
-  hasClusterBomb: false,
+  clusterBombCount: 0,
 };
 
 const ItemFactoryContext = React.createContext(defaultValue);
@@ -71,10 +71,19 @@ export const ItemFactoryProvider = ({
   itemsRef.current = items;
 
   const setEffect = useCallback(
-    (craftId: string, effect: keyof CraftItemEffects, value: boolean) =>
+    (craftId: string, effect: 'hasShield' | 'isCloaked', value: boolean) =>
       setEffects(prev => ({
         ...prev,
         [craftId]: {...noEffects, ...prev[craftId], [effect]: value},
+      })),
+    [],
+  );
+
+  const setClusterBombCount = useCallback(
+    (craftId: string, count: number) =>
+      setEffects(prev => ({
+        ...prev,
+        [craftId]: {...noEffects, ...prev[craftId], clusterBombCount: count},
       })),
     [],
   );
@@ -100,14 +109,15 @@ export const ItemFactoryProvider = ({
           setEffect(craftId, 'isCloaked', true);
           break;
         case 'clusterBomb':
-          simulation.armClusterBomb(craftId, () =>
-            setEffect(craftId, 'hasClusterBomb', false),
+          // Cluster bombs stockpile: arming raises the count, and the
+          // simulation reports every count change (pickup, fire, respawn).
+          simulation.armClusterBomb(craftId, count =>
+            setClusterBombCount(craftId, count),
           );
-          setEffect(craftId, 'hasClusterBomb', true);
           break;
       }
     },
-    [setEffect, simulation],
+    [setClusterBombCount, setEffect, simulation],
   );
 
   const onPickedUpRef = useRef(onPickedUp);

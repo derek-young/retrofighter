@@ -36,9 +36,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
   },
   middle: {
-    flexDirection: 'row',
+    flexDirection: 'column',
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  missileRow: {
+    flexDirection: 'row',
   },
   actionButton: {
     display: 'flex',
@@ -54,7 +57,28 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.GREY,
   },
   clusterBombButton: {
-    borderColor: `${Colors.PINK}99`,
+    borderColor: `${Colors.ORANGE}99`,
+  },
+  clusterButtonWrapper: {
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  countBadge: {
+    position: 'absolute',
+    top: 0,
+    right: 0,
+    minWidth: buttonSize / 2.4,
+    height: buttonSize / 2.4,
+    borderRadius: buttonSize / 4.8,
+    paddingHorizontal: 3,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: Colors.ORANGE,
+  },
+  countText: {
+    color: 'white',
+    fontSize: buttonSize / 4,
+    lineHeight: buttonSize / 2.4,
   },
   buttonDisabled: {
     opacity: 0.8,
@@ -127,22 +151,31 @@ const ActionButton = ({
   );
 
   useEffect(() => {
-    if (isEliminated) {
+    if (hasCooldown && isEliminated) {
       progress.stopAnimation();
       progress.setValue(1);
     }
-  }, [progress, isEliminated]);
+  }, [hasCooldown, progress, isEliminated]);
 
   useEffect(() => {
+    if (!hasCooldown) {
+      return;
+    }
+
     if (isPaused) {
       progress.stopAnimation();
     } else {
       animateButton(progress);
     }
-  }, [progress, isPaused]);
+  }, [hasCooldown, progress, isPaused]);
 
   useEffect(() => {
+    // A cooldown-less button (the cluster bomb) has no reload animation: it
+    // reads as charged (full fill) when armed and empty (grey base showing)
+    // when disabled, matching the recharging look of the missile buttons.
     if (!hasCooldown) {
+      progress.stopAnimation();
+      progress.setValue(disabled ? 0 : 1);
       return;
     }
 
@@ -153,7 +186,7 @@ const ActionButton = ({
       progress.stopAnimation();
       progress.setValue(1);
     }
-  }, [hasCooldown, hasMissileFired, progress]);
+  }, [disabled, hasCooldown, hasMissileFired, progress]);
 
   const background = (
     <Animated.View
@@ -189,7 +222,7 @@ const ButtonSet = (): JSX.Element => {
   const {isPlayerEliminated} = useEliminationContext();
   const {effects} = useItemFactoryContext();
   const [leftMissile, rightMissile, clusterBombMissile] = useMissileContext();
-  const hasClusterBomb = Boolean(effects[PLAYER_ID]?.hasClusterBomb);
+  const clusterBombCount = effects[PLAYER_ID]?.clusterBombCount ?? 0;
 
   return (
     <View style={styles.section}>
@@ -202,54 +235,65 @@ const ButtonSet = (): JSX.Element => {
         )}
       </View>
       <View style={[styles.section, styles.middle]}>
-        <ActionButton
-          disabled={
-            leftMissile.hasMissileFired || isPlayerEliminated || !hasPlayerMoved
-          }
-          hasMissileFired={leftMissile.hasMissileFired}
-          isEliminated={isPlayerEliminated}
-          onPress={leftMissile.onFireMissile}>
-          <MissileIcon
-            fill="white"
-            height={buttonIconSize}
-            width={buttonIconSize}
-            style={styles.missileIcon}
-          />
-        </ActionButton>
-        <ActionButton
-          disabled={
-            rightMissile.hasMissileFired ||
-            isPlayerEliminated ||
-            !hasPlayerMoved
-          }
-          hasMissileFired={rightMissile.hasMissileFired}
-          isEliminated={isPlayerEliminated}
-          onPress={rightMissile.onFireMissile}>
-          <MissileIcon
-            fill="white"
-            height={buttonIconSize}
-            width={buttonIconSize}
-            style={styles.missileIcon}
-          />
-        </ActionButton>
-        <ActionButton
-          disabled={
-            !hasClusterBomb ||
-            clusterBombMissile.hasMissileFired ||
-            isPlayerEliminated ||
-            !hasPlayerMoved
-          }
-          hasCooldown={false}
-          hasMissileFired={clusterBombMissile.hasMissileFired}
-          isEliminated={isPlayerEliminated}
-          onPress={clusterBombMissile.onFireMissile}
-          style={styles.clusterBombButton}>
-          <ClusterBombIcon
-            fill={Colors.PINK}
-            height={buttonIconSize}
-            width={buttonIconSize}
-          />
-        </ActionButton>
+        <View style={styles.clusterButtonWrapper}>
+          <ActionButton
+            disabled={
+              clusterBombCount === 0 ||
+              clusterBombMissile.hasMissileFired ||
+              isPlayerEliminated ||
+              !hasPlayerMoved
+            }
+            hasCooldown={false}
+            hasMissileFired={clusterBombMissile.hasMissileFired}
+            isEliminated={isPlayerEliminated}
+            onPress={clusterBombMissile.onFireMissile}
+            style={styles.clusterBombButton}>
+            <ClusterBombIcon
+              fill={Colors.ORANGE}
+              height={buttonIconSize}
+              width={buttonIconSize}
+            />
+          </ActionButton>
+          {clusterBombCount > 0 && (
+            <View style={styles.countBadge} pointerEvents="none">
+              <IBMText style={styles.countText}>{clusterBombCount}</IBMText>
+            </View>
+          )}
+        </View>
+        <View style={styles.missileRow}>
+          <ActionButton
+            disabled={
+              leftMissile.hasMissileFired ||
+              isPlayerEliminated ||
+              !hasPlayerMoved
+            }
+            hasMissileFired={leftMissile.hasMissileFired}
+            isEliminated={isPlayerEliminated}
+            onPress={leftMissile.onFireMissile}>
+            <MissileIcon
+              fill="white"
+              height={buttonIconSize}
+              width={buttonIconSize}
+              style={styles.missileIcon}
+            />
+          </ActionButton>
+          <ActionButton
+            disabled={
+              rightMissile.hasMissileFired ||
+              isPlayerEliminated ||
+              !hasPlayerMoved
+            }
+            hasMissileFired={rightMissile.hasMissileFired}
+            isEliminated={isPlayerEliminated}
+            onPress={rightMissile.onFireMissile}>
+            <MissileIcon
+              fill="white"
+              height={buttonIconSize}
+              width={buttonIconSize}
+              style={styles.missileIcon}
+            />
+          </ActionButton>
+        </View>
       </View>
       <View style={styles.section} />
     </View>

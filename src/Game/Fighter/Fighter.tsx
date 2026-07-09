@@ -101,10 +101,10 @@ const Fighter = (): null | JSX.Element => {
           positionOffset={18}
         />
       )}
-      {((playerEffects?.hasClusterBomb && !isPlayerEliminated) ||
+      {(((playerEffects?.clusterBombCount ?? 0) > 0 && !isPlayerEliminated) ||
         clusterMissileProps.hasMissileFired) && (
         <FighterMissile
-          craftColor={Colors.PINK}
+          craftColor={Colors.ORANGE}
           craftRotationAnim={rotationAnim}
           facing={facing}
           iconStyle={styles.missileCluster}

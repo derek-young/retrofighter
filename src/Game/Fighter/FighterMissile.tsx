@@ -3,6 +3,7 @@ import {Animated} from 'react-native';
 
 import {missileSize} from 'Game/constants';
 import Missile from 'Game/Missile';
+import ClusterBombIcon from 'icons/cluster-bomb.svg';
 import MissileIcon from 'icons/missile.svg';
 import {PLAYER_ID} from 'Game/engine/Simulation';
 import {IconProps, MissileAnimationProps} from 'Game/types';
@@ -21,31 +22,37 @@ const FighterMissile = ({
   craftColor,
   craftRotationAnim,
   iconStyle,
+  isClusterBomb,
   ...rest
 }: FighterMissileProps) => {
   const Icon = useMemo(
     () =>
       function FighterMissileIcon({style}: IconProps) {
+        // The cluster bomb has its own upright icon; missile.svg is drawn at
+        // 45° and needs straightening.
+        const IconGraphic = isClusterBomb ? ClusterBombIcon : MissileIcon;
+
         return (
-          <MissileIcon
+          <IconGraphic
             fill={craftColor}
             height={missileSize}
             width={missileSize}
             style={{
               ...(style as object),
               ...iconStyle,
-              transform: [{rotate: '-45deg'}],
+              transform: isClusterBomb ? undefined : [{rotate: '-45deg'}],
             }}
           />
         );
       },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [craftColor],
+    [craftColor, isClusterBomb],
   );
 
   return (
     <Missile
       Icon={Icon}
+      isClusterBomb={isClusterBomb}
       ownerId={PLAYER_ID}
       rotationAnim={craftRotationAnim}
       targetKind="enemy"

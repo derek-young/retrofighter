@@ -3,15 +3,12 @@ import React, {useEffect, useState} from 'react';
 import Colors from 'types/colors';
 import Craft from 'Game/Craft';
 import {useItemFactoryContext} from 'Game/items/ItemFactoryContext';
-import {useMissilePropsState} from 'Game/useMissilePropsState';
 import ShieldVisual from 'Game/items/ShieldVisual';
 
 import EnemyClusterBombMissile from './EnemyClusterBombMissile';
 import {useEnemyCraftContext} from './EnemyCraftContext';
 import {useEnemyMissileContext} from './EnemyMissileContext';
 import {IconProps} from 'Game/types';
-
-const enemyMissileStartingTop = 12;
 
 interface EnemyCraftProps {
   craftColor?: string;
@@ -25,6 +22,7 @@ const EnemyCraft = ({
   score,
 }: EnemyCraftProps): null | JSX.Element => {
   const {
+    clusterMissileProps,
     facing,
     isEliminated,
     leftAnim,
@@ -35,7 +33,6 @@ const EnemyCraft = ({
     simId,
   } = useEnemyCraftContext();
   const missileProps = useEnemyMissileContext();
-  const clusterMissileProps = useMissilePropsState(enemyMissileStartingTop);
   const {effects} = useItemFactoryContext();
   const [isAwaitingMissileAnimEnd, setIsAwaitingMissileAnimEnd] =
     useState(false);
@@ -57,7 +54,7 @@ const EnemyCraft = ({
       {!isEliminated && craftEffects?.hasShield && (
         <ShieldVisual facing={facing} left={leftAnim} top={topAnim} />
       )}
-      <EnemyClusterBombMissile missileProps={clusterMissileProps} />
+      <EnemyClusterBombMissile />
       <Craft
         Icon={Icon}
         isEliminated={isEliminated}

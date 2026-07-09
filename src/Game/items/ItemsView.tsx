@@ -1,23 +1,29 @@
 import React, {useEffect, useRef} from 'react';
 import {Animated, StyleSheet, View} from 'react-native';
+import {SvgProps} from 'react-native-svg';
 
 import Colors from 'types/colors';
 import ClusterBombIcon from 'icons/cluster-bomb.svg';
+import CloakIcon from 'icons/cloak.svg';
+import ShieldIcon from 'icons/shield.svg';
 import {craftSize} from 'Game/constants';
 import {ItemKind} from 'Game/engine/Simulation';
 
 import {ActiveItem, useItemFactoryContext} from './ItemFactoryContext';
 
-// TODO(Derek): replace the remaining placeholder dots with dedicated icons
-// (shield.svg, cloak.svg).
 const kindColors: Record<ItemKind, string> = {
   shield: Colors.SKY_BLUE,
-  cloak: Colors.GREY,
-  clusterBomb: Colors.PINK,
+  cloak: Colors.DAVY_GREY,
+  clusterBomb: Colors.ORANGE,
 };
 
-const dotSize = 12;
-const itemIconSize = 16;
+const kindIcons: Record<ItemKind, React.FC<SvgProps>> = {
+  shield: ShieldIcon,
+  cloak: CloakIcon,
+  clusterBomb: ClusterBombIcon,
+};
+
+const itemIconSize = 18;
 
 const styles = StyleSheet.create({
   // No zIndex (it breaks native-driver transforms on iOS); items render
@@ -31,18 +37,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  itemDot: {
-    height: dotSize,
-    width: dotSize,
-    borderRadius: dotSize / 2,
-    shadowColor: 'black',
-    shadowOffset: {width: 1, height: 1},
-    shadowOpacity: 0.4,
-  },
 });
 
 const ItemView = ({item}: {item: ActiveItem}) => {
   const pulseAnim = useRef(new Animated.Value(0.9)).current;
+  const Icon = kindIcons[item.kind];
 
   useEffect(() => {
     const pulse = Animated.loop(
@@ -77,17 +76,11 @@ const ItemView = ({item}: {item: ActiveItem}) => {
           ],
         },
       ]}>
-      {item.kind === 'clusterBomb' ? (
-        <ClusterBombIcon
-          fill={kindColors[item.kind]}
-          height={itemIconSize}
-          width={itemIconSize}
-        />
-      ) : (
-        <View
-          style={[styles.itemDot, {backgroundColor: kindColors[item.kind]}]}
-        />
-      )}
+      <Icon
+        fill={kindColors[item.kind]}
+        height={itemIconSize}
+        width={itemIconSize}
+      />
     </Animated.View>
   );
 };
