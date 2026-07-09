@@ -661,7 +661,63 @@ describe('cloak', () => {
 });
 
 describe('cluster bombs', () => {
-  it('arms the next missile to pierce every craft in the line of fire', () => {
+  it('pierces every craft in the line of fire', () => {
+    const onFired = jest.fn();
+    const onImpact = jest.fn();
+    const onFirstEliminated = jest.fn();
+    const onSecondEliminated = jest.fn();
+    const simulation = createSimulationWithPlayer({top: 500, left: 100});
+
+    simulation.addCraft('enemy-1', {
+      kind: 'enemy',
+      top: 300,
+      left: 100,
+      facing: 'S',
+      isCollidable: true,
+      onEliminated: onFirstEliminated,
+    });
+    simulation.addCraft('enemy-2', {
+      kind: 'enemy',
+      top: 200,
+      left: 100,
+      facing: 'S',
+      isCollidable: true,
+      onEliminated: onSecondEliminated,
+    });
+
+    simulation.armClusterBomb(PLAYER_ID, onFired);
+    simulation.addMissile(
+      'player-missile-cluster',
+      {
+        ownerId: PLAYER_ID,
+        originTop: 500,
+        originLeft: 100 - 6,
+        facing: 'N',
+        positionOffset: 6,
+        startValue: 6,
+        targetKind: 'enemy',
+        isClusterBomb: true,
+        onImpact,
+      },
+      0,
+    );
+
+    expect(onFired).toHaveBeenCalledTimes(1);
+
+    simulation.tick(1700);
+    expect(onFirstEliminated).toHaveBeenCalledTimes(1);
+    expect(onSecondEliminated).not.toHaveBeenCalled();
+    // The piercing missile flies on instead of detonating.
+    expect(onImpact).not.toHaveBeenCalled();
+    expect(simulation.getMissileValue('player-missile-cluster')).toBeDefined();
+
+    simulation.tick(2700);
+    expect(onSecondEliminated).toHaveBeenCalledTimes(1);
+    expect(onImpact).not.toHaveBeenCalled();
+    expect(simulation.getMissileValue('player-missile-cluster')).toBeDefined();
+  });
+
+  it('is not consumed by a regular missile', () => {
     const onFired = jest.fn();
     const onImpact = jest.fn();
     const onFirstEliminated = jest.fn();
@@ -701,19 +757,81 @@ describe('cluster bombs', () => {
       0,
     );
 
-    expect(onFired).toHaveBeenCalledTimes(1);
-
+    // The bomb stays armed, and the regular missile detonates on the first
+    // enemy instead of piercing.
+    expect(onFired).not.toHaveBeenCalled();
     simulation.tick(1700);
     expect(onFirstEliminated).toHaveBeenCalledTimes(1);
+    expect(onImpact).toHaveBeenCalledTimes(1);
+    expect(simulation.getMissileValue('player-missile-left')).toBeUndefined();
     expect(onSecondEliminated).not.toHaveBeenCalled();
-    // The piercing missile flies on instead of detonating.
-    expect(onImpact).not.toHaveBeenCalled();
-    expect(simulation.getMissileValue('player-missile-left')).toBeDefined();
+    expect(onFired).not.toHaveBeenCalled();
 
-    simulation.tick(2700);
-    expect(onSecondEliminated).toHaveBeenCalledTimes(1);
-    expect(onImpact).not.toHaveBeenCalled();
-    expect(simulation.getMissileValue('player-missile-left')).toBeDefined();
+    // The dedicated cluster missile then spends the bomb.
+    simulation.addMissile(
+      'player-missile-cluster',
+      {
+        ownerId: PLAYER_ID,
+        originTop: 500,
+        originLeft: 100 - 6,
+        facing: 'N',
+        positionOffset: 6,
+        startValue: 6,
+        targetKind: 'enemy',
+        isClusterBomb: true,
+        onImpact: () => {},
+      },
+      1700,
+    );
+
+    expect(onFired).toHaveBeenCalledTimes(1);
+  });
+
+  it('lets an enemy fire a picked-up bomb at the player', () => {
+    const onFired = jest.fn();
+    const onImpact = jest.fn();
+    const onPlayerEliminated = jest.fn();
+    const simulation = createSimulationWithPlayer({
+      top: 500,
+      left: 100,
+      onEliminated: onPlayerEliminated,
+    });
+
+    simulation.addCraft('enemy-1', {
+      kind: 'enemy',
+      top: 200,
+      left: 100,
+      facing: 'S',
+      isCollidable: true,
+    });
+
+    simulation.armClusterBomb('enemy-1', onFired);
+
+    // Facing south: missile top = originTop - value, value decreases, so the
+    // missile travels toward larger tops.
+    simulation.addMissile(
+      'enemy-1-cluster-missile',
+      {
+        ownerId: 'enemy-1',
+        originTop: 200,
+        originLeft: 100 - alleyWidth + 10,
+        facing: 'S',
+        positionOffset: 10,
+        startValue: 12,
+        targetKind: 'player',
+        isClusterBomb: true,
+        onImpact,
+      },
+      0,
+    );
+
+    expect(onFired).toHaveBeenCalledTimes(1);
+
+    const msToTarget = ((500 - 200 + 12) / missileSpeed) * 1000;
+    simulation.tick(msToTarget + 1);
+
+    expect(onPlayerEliminated).toHaveBeenCalledTimes(1);
+    expect(onImpact).toHaveBeenCalledTimes(1);
   });
 
   it('is stopped by a rear shield', () => {
@@ -734,7 +852,7 @@ describe('cluster bombs', () => {
     simulation.setShielded('enemy-1', true, onConsumed);
     simulation.armClusterBomb(PLAYER_ID);
     simulation.addMissile(
-      'player-missile-left',
+      'player-missile-cluster',
       {
         ownerId: PLAYER_ID,
         originTop: 500,
@@ -743,6 +861,7 @@ describe('cluster bombs', () => {
         positionOffset: 6,
         startValue: 6,
         targetKind: 'enemy',
+        isClusterBomb: true,
         onImpact: () => {},
       },
       0,
@@ -753,7 +872,9 @@ describe('cluster bombs', () => {
 
     expect(onConsumed).toHaveBeenCalledTimes(1);
     expect(onEnemyEliminated).not.toHaveBeenCalled();
-    expect(simulation.getMissileValue('player-missile-left')).toBeUndefined();
+    expect(
+      simulation.getMissileValue('player-missile-cluster'),
+    ).toBeUndefined();
   });
 });
 

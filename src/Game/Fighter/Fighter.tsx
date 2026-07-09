@@ -25,6 +25,9 @@ const styles = StyleSheet.create({
   missileRight: {
     left: 11,
   },
+  missileCluster: {
+    left: 4,
+  },
 });
 
 const Fighter = (): null | JSX.Element => {
@@ -34,7 +37,8 @@ const Fighter = (): null | JSX.Element => {
   const {hasEliminationAnimationEnded, isPlayerEliminated, onEliminationEnd} =
     useEliminationContext();
   const {effects} = useItemFactoryContext();
-  const [leftMissileProps, rightMissileProps] = useMissileContext();
+  const [leftMissileProps, rightMissileProps, clusterMissileProps] =
+    useMissileContext();
   const rotationAnim = useRef(
     new Animated.Value(DEFAULT_FACING_ROTATION[defaultPlayerFacing]),
   ).current;
@@ -42,7 +46,9 @@ const Fighter = (): null | JSX.Element => {
     useState(false);
 
   const hasFiredMissile =
-    leftMissileProps.hasMissileFired || rightMissileProps.hasMissileFired;
+    leftMissileProps.hasMissileFired ||
+    rightMissileProps.hasMissileFired ||
+    clusterMissileProps.hasMissileFired;
 
   useEffect(() => {
     if (isAwaitingMissileAnimEnd && !hasFiredMissile) {
@@ -60,8 +66,6 @@ const Fighter = (): null | JSX.Element => {
     : playerEffects?.isCloaked
     ? `${Colors.GREEN}55` // cloaked: enemies can't see you, but you can
     : Colors.GREEN;
-  // An armed cluster bomb tints the docked missiles.
-  const missileColor = playerEffects?.hasClusterBomb ? Colors.PINK : craftColor;
 
   // Missiles are mounted before the craft so the craft paints on top of
   // them (they used to rely on zIndex, which breaks native-driver
@@ -73,7 +77,7 @@ const Fighter = (): null | JSX.Element => {
       )}
       {(!isPlayerEliminated || leftMissileProps.hasMissileFired) && (
         <FighterMissile
-          craftColor={missileColor}
+          craftColor={craftColor}
           craftRotationAnim={rotationAnim}
           facing={facing}
           iconStyle={styles.missileLeft}
@@ -86,7 +90,7 @@ const Fighter = (): null | JSX.Element => {
       )}
       {(!isPlayerEliminated || rightMissileProps.hasMissileFired) && (
         <FighterMissile
-          craftColor={missileColor}
+          craftColor={craftColor}
           craftRotationAnim={rotationAnim}
           facing={facing}
           iconStyle={styles.missileRight}
@@ -95,6 +99,21 @@ const Fighter = (): null | JSX.Element => {
           missileId="player-missile-right"
           missileProps={rightMissileProps}
           positionOffset={18}
+        />
+      )}
+      {((playerEffects?.hasClusterBomb && !isPlayerEliminated) ||
+        clusterMissileProps.hasMissileFired) && (
+        <FighterMissile
+          craftColor={Colors.PINK}
+          craftRotationAnim={rotationAnim}
+          facing={facing}
+          iconStyle={styles.missileCluster}
+          isClusterBomb
+          leftAnim={leftAnim}
+          topAnim={topAnim}
+          missileId="player-missile-cluster"
+          missileProps={clusterMissileProps}
+          positionOffset={12.45}
         />
       )}
       <Craft

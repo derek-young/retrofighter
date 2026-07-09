@@ -70,6 +70,7 @@ export interface MissileConfig {
   positionOffset: number;
   startValue: number;
   targetKind: TargetKind;
+  isClusterBomb?: boolean;
   onImpact: () => void;
 }
 
@@ -436,16 +437,16 @@ class Simulation {
   }
 
   addMissile(id: string, config: MissileConfig, now = Date.now()): void {
-    const owner = this.crafts.get(config.ownerId);
-    let piercing = false;
+    // A cluster bomb is a dedicated missile: firing it spends the owner's
+    // armed bomb. Regular missiles never consume the bomb or pierce.
+    if (config.isClusterBomb) {
+      const owner = this.crafts.get(config.ownerId);
 
-    // An armed cluster bomb loads into the owner's next missile. The player
-    // fires a two-missile volley; only the first registered missile pierces.
-    if (owner?.hasClusterBomb) {
-      owner.hasClusterBomb = false;
-      piercing = true;
-      owner.onClusterBombFired?.();
-      owner.onClusterBombFired = undefined;
+      if (owner?.hasClusterBomb) {
+        owner.hasClusterBomb = false;
+        owner.onClusterBombFired?.();
+        owner.onClusterBombFired = undefined;
+      }
     }
 
     this.missiles.set(id, {
@@ -454,7 +455,7 @@ class Simulation {
       value: config.startValue,
       startedAt: this.isPaused ? null : now,
       threatenedCraftIds: new Set(),
-      piercing,
+      piercing: Boolean(config.isClusterBomb),
     });
   }
 

@@ -1,0 +1,9 @@
+<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+<path d="m24 3-8 11h8z"/>
+<path d="m40 3 8 11h-8z"/>
+<path d="m27 3h10v3h-10z"/>
+<path d="m23 8h18v20c0 7-4 13-9 13s-9-6-9-13z"/>
+<circle cx="15" cy="51" r="5"/>
+<circle cx="32" cy="56" r="5"/>
+<circle cx="49" cy="51" r="5"/>
+</svg>

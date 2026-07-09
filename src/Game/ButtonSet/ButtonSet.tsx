@@ -3,14 +3,18 @@ import {
   Animated,
   Easing,
   StyleSheet,
-  Text,
+  StyleProp,
   TouchableOpacity,
   View,
+  ViewStyle,
 } from 'react-native';
 
 import Colors from 'types/colors';
+import ClusterBombIcon from 'icons/cluster-bomb.svg';
+import MissileIcon from 'icons/missile.svg';
 import {maxScreenSize, missileDuration} from 'Game/constants';
 import IBMText from 'components/IBMText';
+import {PLAYER_ID} from 'Game/engine/Simulation';
 
 import LifeIndicator from './LifeIndicator';
 
@@ -18,8 +22,10 @@ import {useGameContext} from '../GameContext';
 import {useHasPlayerMoved} from '../Fighter/AnimationContext';
 import {useEliminationContext} from '../Fighter/EliminationContext';
 import {useMissileContext} from '../Fighter/MissileContext';
+import {useItemFactoryContext} from '../items/ItemFactoryContext';
 
 const buttonSize = Math.min(maxScreenSize / 12, 60);
+const buttonIconSize = buttonSize / 2;
 
 const styles = StyleSheet.create({
   section: {
@@ -47,6 +53,9 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     backgroundColor: Colors.GREY,
   },
+  clusterBombButton: {
+    borderColor: `${Colors.PINK}99`,
+  },
   buttonDisabled: {
     opacity: 0.8,
   },
@@ -58,9 +67,9 @@ const styles = StyleSheet.create({
     position: 'absolute',
     backgroundColor: Colors.RED,
   },
-  buttonText: {
-    color: 'white',
-    fontSize: 24,
+  missileIcon: {
+    // missile.svg is drawn at 45°; straighten it upright.
+    transform: [{rotate: '-45deg'}],
   },
   lives: {
     color: 'white',
@@ -69,11 +78,15 @@ const styles = StyleSheet.create({
 });
 
 type ActionButtonProps = {
-  children: string;
+  children: React.ReactNode;
   disabled: boolean;
+  // Buttons without a cooldown (the one-shot cluster bomb) skip the refill
+  // animation; they simply disable once their ammunition is spent.
+  hasCooldown?: boolean;
   hasMissileFired: boolean;
   isEliminated: boolean;
   onPress: () => void;
+  style?: StyleProp<ViewStyle>;
 };
 
 function animateButton(progress: Animated.Value) {
@@ -88,9 +101,11 @@ function animateButton(progress: Animated.Value) {
 const ActionButton = ({
   children,
   disabled,
+  hasCooldown = true,
   hasMissileFired,
   isEliminated,
   onPress,
+  style,
 }: ActionButtonProps): JSX.Element => {
   const {isPaused} = useGameContext();
   // 0 = just fired (cooldown fill empty), 1 = ready (fill covers button).
@@ -127,6 +142,10 @@ const ActionButton = ({
   }, [progress, isPaused]);
 
   useEffect(() => {
+    if (!hasCooldown) {
+      return;
+    }
+
     if (hasMissileFired) {
       progress.setValue(0);
       animateButton(progress);
@@ -134,7 +153,7 @@ const ActionButton = ({
       progress.stopAnimation();
       progress.setValue(1);
     }
-  }, [hasMissileFired, progress]);
+  }, [hasCooldown, hasMissileFired, progress]);
 
   const background = (
     <Animated.View
@@ -146,9 +165,9 @@ const ActionButton = ({
   // breaks native-driver transforms on iOS).
   if (disabled) {
     return (
-      <View style={[styles.actionButton, styles.buttonDisabled]}>
+      <View style={[styles.actionButton, style, styles.buttonDisabled]}>
         {background}
-        <Text style={styles.buttonText}>{children}</Text>
+        {children}
       </View>
     );
   }
@@ -157,9 +176,9 @@ const ActionButton = ({
     <TouchableOpacity
       disabled={disabled}
       onPressIn={onPress}
-      style={styles.actionButton}>
+      style={[styles.actionButton, style]}>
       {background}
-      <Text style={styles.buttonText}>{children}</Text>
+      {children}
     </TouchableOpacity>
   );
 };
@@ -168,7 +187,9 @@ const ButtonSet = (): JSX.Element => {
   const {remainingLives} = useGameContext();
   const hasPlayerMoved = useHasPlayerMoved();
   const {isPlayerEliminated} = useEliminationContext();
-  const [leftMissile, rightMissile] = useMissileContext();
+  const {effects} = useItemFactoryContext();
+  const [leftMissile, rightMissile, clusterBombMissile] = useMissileContext();
+  const hasClusterBomb = Boolean(effects[PLAYER_ID]?.hasClusterBomb);
 
   return (
     <View style={styles.section}>
@@ -188,7 +209,12 @@ const ButtonSet = (): JSX.Element => {
           hasMissileFired={leftMissile.hasMissileFired}
           isEliminated={isPlayerEliminated}
           onPress={leftMissile.onFireMissile}>
-          A
+          <MissileIcon
+            fill="white"
+            height={buttonIconSize}
+            width={buttonIconSize}
+            style={styles.missileIcon}
+          />
         </ActionButton>
         <ActionButton
           disabled={
@@ -199,7 +225,30 @@ const ButtonSet = (): JSX.Element => {
           hasMissileFired={rightMissile.hasMissileFired}
           isEliminated={isPlayerEliminated}
           onPress={rightMissile.onFireMissile}>
-          B
+          <MissileIcon
+            fill="white"
+            height={buttonIconSize}
+            width={buttonIconSize}
+            style={styles.missileIcon}
+          />
+        </ActionButton>
+        <ActionButton
+          disabled={
+            !hasClusterBomb ||
+            clusterBombMissile.hasMissileFired ||
+            isPlayerEliminated ||
+            !hasPlayerMoved
+          }
+          hasCooldown={false}
+          hasMissileFired={clusterBombMissile.hasMissileFired}
+          isEliminated={isPlayerEliminated}
+          onPress={clusterBombMissile.onFireMissile}
+          style={styles.clusterBombButton}>
+          <ClusterBombIcon
+            fill={Colors.PINK}
+            height={buttonIconSize}
+            width={buttonIconSize}
+          />
         </ActionButton>
       </View>
       <View style={styles.section} />

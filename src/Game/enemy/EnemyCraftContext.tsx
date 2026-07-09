@@ -71,9 +71,13 @@ export const EnemyCraftContextProvider = ({
   startingLeft = 0,
 }: EnemyCraftContextProviderProps) => {
   const simId = `enemy-${id}`;
-  // Updated once per completed turn; gates enemy
-  // missile fire on the craft visually facing its travel direction.
-  const [craftRotation, setCraftRotation] = useState(0);
+  // Updated once per completed turn; gates enemy missile fire on the craft
+  // visually facing its travel direction. Starts at the spawn facing's
+  // rotation (matching rotationAnim) so a craft that has never turned can
+  // still fire.
+  const [craftRotation, setCraftRotation] = useState(
+    DEFAULT_FACING_ROTATION[defaultFacing],
+  );
   const rotationAnim = useRef(
     new Animated.Value(DEFAULT_FACING_ROTATION[defaultFacing]),
   ).current;

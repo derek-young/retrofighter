@@ -15,6 +15,7 @@ export interface MissileProps {
 export interface MissileAnimationProps {
   facing: Facing;
   Icon: React.FC<IconProps>;
+  isClusterBomb?: boolean;
   leftAnim: Animated.Value;
   topAnim: Animated.Value;
   missileId: string;

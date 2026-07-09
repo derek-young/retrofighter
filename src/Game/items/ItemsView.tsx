@@ -2,13 +2,14 @@ import React, {useEffect, useRef} from 'react';
 import {Animated, StyleSheet, View} from 'react-native';
 
 import Colors from 'types/colors';
+import ClusterBombIcon from 'icons/cluster-bomb.svg';
 import {craftSize} from 'Game/constants';
 import {ItemKind} from 'Game/engine/Simulation';
 
 import {ActiveItem, useItemFactoryContext} from './ItemFactoryContext';
 
-// TODO(Derek): replace the placeholder dots with dedicated icons
-// (shield.svg, cloak.svg, cluster-bomb.svg).
+// TODO(Derek): replace the remaining placeholder dots with dedicated icons
+// (shield.svg, cloak.svg).
 const kindColors: Record<ItemKind, string> = {
   shield: Colors.SKY_BLUE,
   cloak: Colors.GREY,
@@ -16,6 +17,7 @@ const kindColors: Record<ItemKind, string> = {
 };
 
 const dotSize = 12;
+const itemIconSize = 16;
 
 const styles = StyleSheet.create({
   // No zIndex (it breaks native-driver transforms on iOS); items render
@@ -75,9 +77,17 @@ const ItemView = ({item}: {item: ActiveItem}) => {
           ],
         },
       ]}>
-      <View
-        style={[styles.itemDot, {backgroundColor: kindColors[item.kind]}]}
-      />
+      {item.kind === 'clusterBomb' ? (
+        <ClusterBombIcon
+          fill={kindColors[item.kind]}
+          height={itemIconSize}
+          width={itemIconSize}
+        />
+      ) : (
+        <View
+          style={[styles.itemDot, {backgroundColor: kindColors[item.kind]}]}
+        />
+      )}
     </Animated.View>
   );
 };
