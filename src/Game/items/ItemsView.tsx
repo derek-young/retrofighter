@@ -13,7 +13,7 @@ import {ActiveItem, useItemFactoryContext} from './ItemFactoryContext';
 
 const kindColors: Record<ItemKind, string> = {
   shield: Colors.SKY_BLUE,
-  cloak: Colors.DAVY_GREY,
+  cloak: Colors.DEEP_PURPLE,
   clusterBomb: Colors.ORANGE,
 };
 

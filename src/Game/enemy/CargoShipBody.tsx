@@ -1,24 +1,14 @@
 import React, {useEffect, useRef, useState} from 'react';
 import {Animated, Easing, StyleSheet} from 'react-native';
 
-import EnemyCargoShipIcon from 'icons/enemy-cargo.svg';
-import {
-  arenaSize,
-  craftPixelsPerSecond,
-  craftSize,
-  Enemies,
-  enemyPoints,
-} from 'Game/constants';
+import {arenaSize, craftSize, Enemies} from 'Game/constants';
 import Colors from 'types/colors';
 import {Position} from 'Game/engine/Simulation';
 
-import {
-  EnemyCraftContextProvider,
-  useEnemyCraftContext,
-} from './EnemyCraftContext';
 import EnemyCraft from './EnemyCraft';
+import {useEnemyCraftContext} from './EnemyCraftContext';
 import {useEnemyFactoryContext} from './EnemyFactoryContext';
-import {EnemyProps} from './enemyProps';
+import type {EnemyBodyProps} from './enemyClasses';
 
 const styles = StyleSheet.create({
   radarWave: {
@@ -64,7 +54,11 @@ const RadarWave = ({
   );
 };
 
-const EnemyCargoShip = ({id}: {id: number}): JSX.Element | null => {
+/**
+ * The cargo ship's bespoke render: it emits expanding radar waves when it
+ * detects the player, fades out, and spawns three speeders in its place.
+ */
+const CargoShipBody = ({enemyClass, id}: EnemyBodyProps): JSX.Element => {
   const {addEnemy, removeEnemy} = useEnemyFactoryContext();
   const {frozenPosition} = useEnemyCraftContext();
   const [hasWaveAnimationEnded, setHasWaveAnimationEnded] = useState(false);
@@ -93,10 +87,13 @@ const EnemyCargoShip = ({id}: {id: number}): JSX.Element | null => {
           startingLeft: frozenPosition?.left ?? 0,
           startingTop: frozenPosition?.top ?? 0,
         };
+        // Veteran cargo ships release veteran speeders; basic ones release
+        // basic speeders.
+        const spawn = enemyClass.spawns ?? Enemies.SPEEDER;
 
-        addEnemy(Enemies.SPEEDER, position);
-        setTimeout(() => addEnemy(Enemies.SPEEDER, position), 300);
-        setTimeout(() => addEnemy(Enemies.SPEEDER, position), 600);
+        addEnemy(spawn, position);
+        setTimeout(() => addEnemy(spawn, position), 300);
+        setTimeout(() => addEnemy(spawn, position), 600);
         setTimeout(() => removeEnemy(id), 600);
       });
     }
@@ -127,22 +124,10 @@ const EnemyCargoShip = ({id}: {id: number}): JSX.Element | null => {
         </>
       )}
       <Animated.View style={{opacity: craftOpacityAnim}}>
-        <EnemyCraft
-          Icon={EnemyCargoShipIcon}
-          score={enemyPoints[Enemies.CARGO_SHIP]}
-        />
+        <EnemyCraft Icon={enemyClass.Icon} score={enemyClass.score} />
       </Animated.View>
     </>
   );
 };
 
-export default React.memo((props: EnemyProps) => {
-  return (
-    <EnemyCraftContextProvider
-      defaultCraftSpeed={craftPixelsPerSecond * 0.6}
-      freezeWhenPlayerDetected
-      {...props}>
-      <EnemyCargoShip id={props.id} />
-    </EnemyCraftContextProvider>
-  );
-});
+export default CargoShipBody;

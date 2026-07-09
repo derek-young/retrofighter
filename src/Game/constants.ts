@@ -36,7 +36,9 @@ export enum Enemies {
   DUAL_FIGHTER,
   SPEEDER,
   UAV,
+  VETERAN_CARGO_SHIP,
   VETERAN_DUAL_FIGHTER,
+  VETERAN_SPEEDER,
   VETERAN_UAV,
 }
 
@@ -45,7 +47,9 @@ export const enemyPoints = {
   [Enemies.DUAL_FIGHTER]: 300,
   [Enemies.SPEEDER]: 400,
   [Enemies.UAV]: 200,
+  [Enemies.VETERAN_CARGO_SHIP]: 150,
   [Enemies.VETERAN_DUAL_FIGHTER]: 450,
+  [Enemies.VETERAN_SPEEDER]: 600,
   [Enemies.VETERAN_UAV]: 300,
 };
 

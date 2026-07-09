@@ -59,9 +59,12 @@ export function getParSeconds(epic: number) {
       return count;
     }
 
-    // A cargo ship converts into three speeders when it detects the player,
-    // so it takes three kills' worth of time to fully clear.
-    return count + (enemy === Enemies.CARGO_SHIP ? 3 : 1);
+    // A cargo ship (basic or veteran) converts into three speeders when it
+    // detects the player, so it takes three kills' worth of time to clear.
+    const isCargoShip =
+      enemy === Enemies.CARGO_SHIP || enemy === Enemies.VETERAN_CARGO_SHIP;
+
+    return count + (isCargoShip ? 3 : 1);
   }, 0);
 
   return enemyCount * parSecondsPerEnemy;

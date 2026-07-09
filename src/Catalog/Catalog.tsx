@@ -25,9 +25,11 @@ const styles = StyleSheet.create({
   },
 });
 
+// A cargo ship is worth its three released speeders, not its own value.
 const pointsForLevel = {
   ...enemyPoints,
-  [Enemies.CARGO_SHIP]: 1200,
+  [Enemies.CARGO_SHIP]: 3 * enemyPoints[Enemies.SPEEDER],
+  [Enemies.VETERAN_CARGO_SHIP]: 3 * enemyPoints[Enemies.VETERAN_SPEEDER],
 };
 
 const levels = startingEnemies.map(enemies =>
