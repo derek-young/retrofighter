@@ -157,24 +157,47 @@ const Missile = ({
     }
   }, [firedState, hasMissileFired, missileAnim, startingTop]);
 
-  const containerTransform = firedState
-    ? [
-        {translateX: firedState.left},
-        {translateY: firedState.top},
-        {rotate: `${DEFAULT_FACING_ROTATION[firedState.facing]}deg`},
-      ]
-    : [{translateX: leftAnim}, {translateY: topAnim}, {rotate: dockedRotation}];
-
-  return (
+  const travel = (
     <Animated.View
-      style={[styles.missileContainer, {transform: containerTransform}]}>
-      <Animated.View
-        style={[
-          styles.missileTravel,
-          {transform: [{translateY: missileAnim}]},
-        ]}>
-        <Icon style={missileIconStyle} />
-      </Animated.View>
+      style={[styles.missileTravel, {transform: [{translateY: missileAnim}]}]}>
+      <Icon style={missileIconStyle} />
+    </Animated.View>
+  );
+
+  // Docked and fired are separate keyed views so firing mounts a fresh
+  // native view. Reusing the docked view for flight let the craft's
+  // still-running native-driver rotation keep overriding the static launch
+  // transform, sending the icon off with the craft's mid-turn heading while
+  // the simulation missile flew the fire-time facing.
+  return firedState ? (
+    <Animated.View
+      key="fired"
+      style={[
+        styles.missileContainer,
+        {
+          transform: [
+            {translateX: firedState.left},
+            {translateY: firedState.top},
+            {rotate: `${DEFAULT_FACING_ROTATION[firedState.facing]}deg`},
+          ],
+        },
+      ]}>
+      {travel}
+    </Animated.View>
+  ) : (
+    <Animated.View
+      key="docked"
+      style={[
+        styles.missileContainer,
+        {
+          transform: [
+            {translateX: leftAnim},
+            {translateY: topAnim},
+            {rotate: dockedRotation},
+          ],
+        },
+      ]}>
+      {travel}
     </Animated.View>
   );
 };

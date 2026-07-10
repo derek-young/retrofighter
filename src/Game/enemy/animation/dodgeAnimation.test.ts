@@ -100,4 +100,59 @@ describe(dodgeAnimation.name, () => {
       }
     }
   });
+
+  it('keeps escape targets inside the arena from off-grid positions', () => {
+    // Sweep mid-alley positions across the whole arena, including right by
+    // the walls, and repeat to cover the random escape-direction choice.
+    const positions = [];
+
+    for (let alley = 0; alley < numColumns - 1; alley++) {
+      positions.push(alley * totalWidth + 12);
+    }
+    positions.push(2, 10, (numColumns - 1) * totalWidth - 2);
+
+    for (let i = 0; i < 25; i++) {
+      for (const position of positions) {
+        for (const threatFacing of [...verticalFacings, ...horizontalFacings]) {
+          const legs = dodgeAnimation({
+            threatFacing,
+            currentFacing: isVerticalFacing(threatFacing) ? 'S' : 'E',
+            top: position,
+            left: position,
+          });
+
+          for (const leg of legs) {
+            expect(leg.toValue).toBeGreaterThanOrEqual(0);
+            expect(leg.toValue).toBeLessThanOrEqual(
+              (numColumns - 1) * totalWidth,
+            );
+          }
+        }
+      }
+    }
+  });
+
+  it('dodges off-grid near the west wall without leaving the arena', () => {
+    // A craft between the wall and alley 1 escaping west lands in alley 0,
+    // never at a negative position.
+    for (let i = 0; i < 25; i++) {
+      const legs = dodgeAnimation({
+        threatFacing: 'N',
+        currentFacing: 'S',
+        top: 3 * totalWidth,
+        left: 10,
+      });
+
+      expect(legs.length).toBeGreaterThan(0);
+
+      const escapeLeg = legs[legs.length - 1];
+
+      if (escapeLeg.nextFacing === 'W') {
+        expect(escapeLeg.toValue).toBeCloseTo(0);
+      } else {
+        expect(escapeLeg.nextFacing).toBe('E');
+        expect(escapeLeg.toValue).toBeCloseTo(totalWidth);
+      }
+    }
+  });
 });

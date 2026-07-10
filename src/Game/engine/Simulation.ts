@@ -787,8 +787,9 @@ class Simulation {
   }
 
   /**
-   * Mirrors the facing-specific offsets the Missile component applies when
-   * rendering the missile inside its rotated container.
+   * The missile's position on screen: the local point (positionOffset,
+   * value) inside the craft-sized launch container, rotated about the
+   * container's center exactly as the Missile component renders it.
    */
   private missilePosition(missile: MissileEntity, value: number): Position {
     const {facing, originLeft, originTop, positionOffset} = missile;
@@ -797,16 +798,19 @@ class Simulation {
       case 'N':
         return {left: originLeft + positionOffset, top: originTop + value};
       case 'E':
-        return {left: originLeft - value, top: originTop + positionOffset};
+        return {
+          left: originLeft + craftSize - value,
+          top: originTop + positionOffset,
+        };
       case 'S':
         return {
-          left: originLeft + alleyWidth - positionOffset,
-          top: originTop - value,
+          left: originLeft + craftSize - positionOffset,
+          top: originTop + craftSize - value,
         };
       case 'W':
         return {
           left: originLeft + value,
-          top: originTop + alleyWidth - positionOffset,
+          top: originTop + craftSize - positionOffset,
         };
     }
   }

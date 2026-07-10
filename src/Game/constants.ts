@@ -63,8 +63,7 @@ export const earnablePoints = {
 };
 
 export const parSecondsPerEnemy = 10;
-// Veterans dodge missiles, so kills take roughly three times as long.
-export const veteranParSecondsPerEnemy = 30;
+export const veteranParSecondsPerEnemy = 20;
 export const timeBonusPointsPerSecond = 20;
 
 // How far ahead (in flight time) a player missile warns a veteran craft.

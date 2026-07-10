@@ -3,7 +3,7 @@ import React, {useEffect, useMemo} from 'react';
 import Colors from 'types/colors';
 import ClusterBombIcon from 'icons/cluster-bomb.svg';
 import Missile from 'Game/Missile';
-import {alleyWidth, missileSize} from 'Game/constants';
+import {craftSize, missileSize} from 'Game/constants';
 import {DEFAULT_FACING_ROTATION} from 'Game/Craft';
 import {IconProps} from 'Game/types';
 import {useItemFactoryContext} from 'Game/items/ItemFactoryContext';
@@ -97,7 +97,7 @@ const EnemyClusterBombMissile = (): null | JSX.Element => {
       missileId={`${simId}-cluster-missile`}
       missileProps={clusterMissileProps}
       ownerId={simId}
-      positionOffset={alleyWidth / 2}
+      positionOffset={craftSize / 2}
       rotationAnim={rotationAnim}
       targetKind="player"
     />

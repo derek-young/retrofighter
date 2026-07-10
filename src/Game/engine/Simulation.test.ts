@@ -1,4 +1,4 @@
-import {alleyWidth, craftSize, missileSpeed} from 'Game/constants';
+import {craftSize, missileSpeed} from 'Game/constants';
 import {Facing} from 'Game/types';
 
 import Simulation, {PLAYER_ID} from './Simulation';
@@ -264,14 +264,14 @@ describe('missiles', () => {
       isCollidable: true,
     });
 
-    // Facing south: missile top = originTop - value, value decreases, so the
-    // missile travels toward larger tops.
+    // Facing south: missile top = originTop + craftSize - value, and value
+    // decreases, so the missile travels toward larger tops.
     simulation.addMissile(
       'enemy-1-missile',
       {
         ownerId: 'enemy-1',
         originTop: 200,
-        originLeft: 100 - alleyWidth + 10,
+        originLeft: 100,
         facing: 'S',
         positionOffset: 10,
         startValue: 12,
@@ -281,7 +281,9 @@ describe('missiles', () => {
       0,
     );
 
-    const msToTarget = ((500 - 200 + 12) / missileSpeed) * 1000;
+    // Flight time to the middle of the player's box.
+    const msToTarget =
+      ((500 - 200 - craftSize + 12 + 10) / missileSpeed) * 1000;
     simulation.tick(msToTarget + 1);
 
     expect(onPlayerEliminated).toHaveBeenCalledTimes(1);
@@ -542,6 +544,93 @@ describe('missile queries', () => {
     expect(missiles[0].position.top).toBeCloseTo(500 + 6 - missileSpeed);
     expect(missiles[0].position.left).toBeCloseTo(100);
   });
+
+  it('mirrors the rendered rotation of the launch container per facing', () => {
+    // The local point (positionOffset, startValue) rotated about the center
+    // of the craft-sized container, exactly as the Missile component draws
+    // the fired missile.
+    const originTop = 500;
+    const originLeft = 100;
+    const positionOffset = 7;
+    const startValue = 6;
+    const expected = {
+      N: {left: originLeft + positionOffset, top: originTop + startValue},
+      E: {
+        left: originLeft + craftSize - startValue,
+        top: originTop + positionOffset,
+      },
+      S: {
+        left: originLeft + craftSize - positionOffset,
+        top: originTop + craftSize - startValue,
+      },
+      W: {
+        left: originLeft + startValue,
+        top: originTop + craftSize - positionOffset,
+      },
+    };
+
+    for (const facing of ['N', 'E', 'S', 'W'] as const) {
+      const simulation = createSimulationWithPlayer({top: 500, left: 100});
+
+      simulation.addMissile(
+        'player-missile-left',
+        {
+          ownerId: PLAYER_ID,
+          originTop,
+          originLeft,
+          facing,
+          positionOffset,
+          startValue,
+          targetKind: 'enemy',
+          onImpact: () => {},
+        },
+        0,
+      );
+
+      const [missile] = simulation.getMissiles('enemy', 0);
+
+      expect(missile.position.left).toBeCloseTo(expected[facing].left);
+      expect(missile.position.top).toBeCloseTo(expected[facing].top);
+    }
+  });
+
+  it('registers a backward shot on an enemy behind the player', () => {
+    const onEliminated = jest.fn();
+    const simulation = createSimulationWithPlayer({top: 500, left: 100});
+
+    // Enemy directly south of the player in the same column; the player's
+    // left missile (offset 6.9) fired south must land inside its box.
+    simulation.addCraft('enemy-1', {
+      kind: 'enemy',
+      top: 600,
+      left: 100,
+      facing: 'N',
+      isCollidable: true,
+      onEliminated,
+    });
+
+    simulation.addMissile(
+      'player-missile-left',
+      {
+        ownerId: PLAYER_ID,
+        originTop: 500,
+        originLeft: 100,
+        facing: 'S',
+        positionOffset: 6.9,
+        startValue: 6,
+        targetKind: 'enemy',
+        onImpact: () => {},
+      },
+      0,
+    );
+
+    simulation.tick(0);
+    expect(onEliminated).not.toHaveBeenCalled();
+
+    // At 900ms the missile is ~613px down: inside the enemy's box.
+    simulation.tick(900);
+    expect(onEliminated).toHaveBeenCalledTimes(1);
+  });
 });
 
 describe('items', () => {
@@ -648,7 +737,7 @@ describe('shields', () => {
       {
         ownerId: 'enemy-1',
         originTop: 100,
-        originLeft: 100 - alleyWidth + 10,
+        originLeft: 100,
         facing: 'S',
         positionOffset: 10,
         startValue: 6,
@@ -658,9 +747,9 @@ describe('shields', () => {
       0,
     );
 
-    // At 2s the missile is at top ~314: inside the player box, which sits in
-    // front of the trailing shield box.
-    simulation.tick(2000);
+    // At 1.8s the missile is at top ~312: inside the player box, which sits
+    // in front of the trailing shield box.
+    simulation.tick(1800);
 
     expect(onPlayerEliminated).toHaveBeenCalledTimes(1);
     expect(onConsumed).not.toHaveBeenCalled();
@@ -934,14 +1023,14 @@ describe('cluster bombs', () => {
 
     simulation.armClusterBomb('enemy-1', onCountChange);
 
-    // Facing south: missile top = originTop - value, value decreases, so the
-    // missile travels toward larger tops.
+    // Facing south: missile top = originTop + craftSize - value, and value
+    // decreases, so the missile travels toward larger tops.
     simulation.addMissile(
       'enemy-1-cluster-missile',
       {
         ownerId: 'enemy-1',
         originTop: 200,
-        originLeft: 100 - alleyWidth + 10,
+        originLeft: 100,
         facing: 'S',
         positionOffset: 10,
         startValue: 12,
@@ -954,7 +1043,9 @@ describe('cluster bombs', () => {
 
     expect(onCountChange).toHaveBeenLastCalledWith(0);
 
-    const msToTarget = ((500 - 200 + 12) / missileSpeed) * 1000;
+    // Flight time to the middle of the player's box.
+    const msToTarget =
+      ((500 - 200 - craftSize + 12 + 10) / missileSpeed) * 1000;
     simulation.tick(msToTarget + 1);
 
     expect(onPlayerEliminated).toHaveBeenCalledTimes(1);

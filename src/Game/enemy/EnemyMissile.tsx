@@ -1,5 +1,5 @@
 import React, {useMemo} from 'react';
-import {alleyWidth, missileSize} from 'Game/constants';
+import {craftSize, missileSize} from 'Game/constants';
 import {getIsThanksgivingDay} from 'Game/utils';
 import Missile from 'Game/Missile';
 import {IconProps} from 'Game/types';
@@ -58,7 +58,7 @@ const EnemyMissile = (): null | JSX.Element => {
       missileId={`${simId}-missile`}
       missileProps={missileProps}
       ownerId={simId}
-      positionOffset={alleyWidth / 2}
+      positionOffset={craftSize / 2}
       rotationAnim={rotationAnim}
       targetKind="player"
     />
