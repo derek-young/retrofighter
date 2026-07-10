@@ -4,9 +4,11 @@ import {
   craftSize,
   maxScreenSize,
   missileSpeed,
+  veteranDodgeMinimumMs,
   veteranDodgeWindowMs,
 } from 'Game/constants';
 import {getIsPlayerInLineOfSight} from 'Game/enemy/animation';
+import {isVerticalFacing} from 'Game/utils';
 
 export const PLAYER_ID = 'player';
 export const SIMULATION_TICK_MS = 33;
@@ -120,47 +122,85 @@ function isPointInBox(point: Position, box: Position) {
 }
 
 /**
- * A missile threatens a craft when it is heading toward the craft's alley
- * line and will arrive within the dodge window. This mirrors the
+ * A missile threatens a craft when it approaches from the craft's front or
+ * rear and its true time-to-impact — accounting for the craft's own motion
+ * toward or away from the missile — falls within the dodge window, but not
+ * so soon that the craft has no time to react. This mirrors the
  * line-of-sight test from the missile's perspective, widened by half the
- * craft's box since the missile is a point.
+ * craft's box since the missile is a point. Missiles crossing the craft's
+ * alley from a side corridor are invisible to it.
  */
 function getIsMissileThreat(
   missilePos: Position,
   missileFacing: Facing,
   craftPos: Position,
+  craftFacing: Facing,
+  craftVelocity: {top: number; left: number},
 ) {
+  if (isVerticalFacing(missileFacing) !== isVerticalFacing(craftFacing)) {
+    return false;
+  }
+
   const centerTop = craftPos.top + craftSize / 2;
   const centerLeft = craftPos.left + craftSize / 2;
   const lateralTolerance = alleyWidth / 2 + craftSize / 2;
 
   let distanceAhead: number;
   let lateralOffset: number;
+  let closingSpeed: number;
 
   switch (missileFacing) {
     case 'N':
       distanceAhead = missilePos.top - centerTop;
       lateralOffset = Math.abs(missilePos.left - centerLeft);
+      closingSpeed = missileSpeed + craftVelocity.top;
       break;
     case 'S':
       distanceAhead = centerTop - missilePos.top;
       lateralOffset = Math.abs(missilePos.left - centerLeft);
+      closingSpeed = missileSpeed - craftVelocity.top;
       break;
     case 'E':
       distanceAhead = centerLeft - missilePos.left;
       lateralOffset = Math.abs(missilePos.top - centerTop);
+      closingSpeed = missileSpeed - craftVelocity.left;
       break;
     case 'W':
       distanceAhead = missilePos.left - centerLeft;
       lateralOffset = Math.abs(missilePos.top - centerTop);
+      closingSpeed = missileSpeed + craftVelocity.left;
       break;
   }
+
+  if (closingSpeed <= 0) {
+    return false;
+  }
+
+  const arrivalMs = (distanceAhead / closingSpeed) * 1000;
 
   return (
     distanceAhead > 0 &&
     lateralOffset < lateralTolerance &&
-    (distanceAhead / missileSpeed) * 1000 <= veteranDodgeWindowMs
+    arrivalMs >= veteranDodgeMinimumMs &&
+    arrivalMs <= veteranDodgeWindowMs
   );
+}
+
+/**
+ * The craft's velocity in px/s, positive toward increasing top/left. Zero
+ * when idle (advanceCraft clears finished segments before this runs) or
+ * while the simulation is paused.
+ */
+function getCraftVelocity(craft: CraftEntity): {top: number; left: number} {
+  const velocity = {top: 0, left: 0};
+  const segment = craft.segment;
+
+  if (segment && segment.startedAt !== null) {
+    velocity[segment.axis] =
+      Math.sign(segment.to - segment.from) * segment.speed;
+  }
+
+  return velocity;
 }
 
 /**
@@ -680,7 +720,13 @@ class Simulation {
         if (
           craft.onThreatened &&
           !missile.threatenedCraftIds.has(craft.id) &&
-          getIsMissileThreat(missilePos, missile.facing, craftPos)
+          getIsMissileThreat(
+            missilePos,
+            missile.facing,
+            craftPos,
+            craft.facing,
+            getCraftVelocity(craft),
+          )
         ) {
           missile.threatenedCraftIds.add(craft.id);
           craft.onThreatened({facing: missile.facing});

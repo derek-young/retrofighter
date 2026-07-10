@@ -116,8 +116,9 @@ const Missile = ({
 
   useEffect(() => {
     if (!hasMissileFired) {
+      // Halt the in-flight timing but leave the value put; the docked offset
+      // is restored by the effect below only once firedState has cleared.
       missileAnim.stopAnimation();
-      missileAnim.setValue(startingTop);
       return;
     }
 
@@ -144,6 +145,17 @@ const Missile = ({
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [hasMissileFired, isPaused]);
+
+  // Return the missile to its docked travel offset only after firedState has
+  // cleared — i.e. once the container is back on the craft. Resetting while
+  // the container is still pinned at the launch origin (native setValue lands
+  // a frame before the firedState=null re-render) flashes the missile back to
+  // where it was fired.
+  useEffect(() => {
+    if (!hasMissileFired && firedState === null) {
+      missileAnim.setValue(startingTop);
+    }
+  }, [firedState, hasMissileFired, missileAnim, startingTop]);
 
   const containerTransform = firedState
     ? [

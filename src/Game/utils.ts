@@ -4,11 +4,13 @@ import {Facing} from './types';
 import {
   Enemies,
   craftPixelsPerSecond,
+  earnablePoints,
   numColumns,
   parSecondsPerEnemy,
   startingEnemies,
   timeBonusPointsPerSecond,
   totalWidth,
+  veteranParSecondsPerEnemy,
 } from './constants';
 
 export function animateCraft({
@@ -53,27 +55,52 @@ export function getNextAlley(position: number, direction: Facing) {
   return Math.min(numColumns - 1, Math.ceil(nextAlley));
 }
 
+const veteranEnemies = new Set([
+  Enemies.VETERAN_CARGO_SHIP,
+  Enemies.VETERAN_DUAL_FIGHTER,
+  Enemies.VETERAN_SPEEDER,
+  Enemies.VETERAN_UAV,
+]);
+
 export function getParSeconds(epic: number) {
-  const enemyCount = startingEnemies[epic].reduce((count: number, enemy) => {
+  return startingEnemies[epic].reduce((seconds: number, enemy) => {
     if (enemy === null) {
-      return count;
+      return seconds;
     }
 
-    // A cargo ship (basic or veteran) converts into three speeders when it
-    // detects the player, so it takes three kills' worth of time to clear.
+    // A cargo ship (basic or veteran) converts into three speeders of its
+    // tier when it detects the player, so it takes three kills' worth of
+    // time to clear.
     const isCargoShip =
       enemy === Enemies.CARGO_SHIP || enemy === Enemies.VETERAN_CARGO_SHIP;
+    const secondsPerKill = veteranEnemies.has(enemy)
+      ? veteranParSecondsPerEnemy
+      : parSecondsPerEnemy;
 
-    return count + (isCargoShip ? 3 : 1);
+    return seconds + (isCargoShip ? 3 : 1) * secondsPerKill;
   }, 0);
-
-  return enemyCount * parSecondsPerEnemy;
 }
 
 export function getTimeBonus(epic: number, elapsedSeconds: number) {
   const secondsUnderPar = Math.max(0, getParSeconds(epic) - elapsedSeconds);
 
   return Math.round((timeBonusPointsPerSecond * secondsUnderPar) / 10) * 10;
+}
+
+/**
+ * The theoretical maximum total score: every enemy slot's earnable points
+ * plus the full time bonus (a par-time-zero finish) on every level.
+ */
+export function getMaxPossibleScore() {
+  return startingEnemies.reduce((total, enemies, epic) => {
+    const killPoints = enemies.reduce(
+      (points: number, enemy) =>
+        enemy === null ? points : points + earnablePoints[enemy],
+      0,
+    );
+
+    return total + killPoints + getParSeconds(epic) * timeBonusPointsPerSecond;
+  }, 0);
 }
 
 export function getIsThanksgivingDay() {

@@ -1,4 +1,5 @@
 import {alleyWidth, craftSize, missileSpeed} from 'Game/constants';
+import {Facing} from 'Game/types';
 
 import Simulation, {PLAYER_ID} from './Simulation';
 
@@ -327,13 +328,17 @@ describe('missile threats', () => {
   function addThreatenedEnemy(
     simulation: Simulation,
     onThreatened: (threat: {facing: string}) => void,
-    {top = 100, left = 100} = {},
+    {
+      top = 100,
+      left = 100,
+      facing = 'S',
+    }: {top?: number; left?: number; facing?: Facing} = {},
   ) {
     simulation.addCraft('enemy-1', {
       kind: 'enemy',
       top,
       left,
-      facing: 'S',
+      facing,
       isCollidable: true,
       onThreatened,
     });
@@ -399,6 +404,85 @@ describe('missile threats', () => {
 
     simulation.tick(0);
     simulation.tick(2500);
+
+    expect(onThreatened).not.toHaveBeenCalled();
+  });
+
+  it('ignores missiles approaching from the side', () => {
+    const onThreatened = jest.fn();
+    const simulation = createSimulationWithPlayer({top: 500, left: 100});
+
+    // Enemy facing east can't see the north-bound missile crossing its alley.
+    addThreatenedEnemy(simulation, onThreatened, {facing: 'E'});
+    addPlayerMissile(simulation);
+
+    simulation.tick(0);
+    simulation.tick(2800);
+
+    expect(onThreatened).not.toHaveBeenCalled();
+  });
+
+  it('ignores point-blank missiles that arrive before the reaction minimum', () => {
+    const onThreatened = jest.fn();
+    const simulation = createSimulationWithPlayer({top: 500, left: 100});
+
+    addThreatenedEnemy(simulation, onThreatened);
+    // Missile top starts at 124 + 6 = 130: 20px from the enemy's center,
+    // ~181ms of flight time — under the 250ms reaction minimum.
+    addPlayerMissile(simulation, {originTop: 124});
+
+    simulation.tick(0);
+    simulation.tick(100);
+
+    expect(onThreatened).not.toHaveBeenCalled();
+  });
+
+  it('ignores close shots at a craft charging the missile head-on', () => {
+    const onThreatened = jest.fn();
+    const simulation = createSimulationWithPlayer({top: 500, left: 100});
+
+    addThreatenedEnemy(simulation, onThreatened);
+    // Enemy charges south at 150px/s into the north-bound missile: closing
+    // speed 260px/s. Missile top starts at 204 + 6 = 210, 100px from the
+    // enemy's center: 909ms by missile speed alone, but only ~385ms of true
+    // flight time — under the reaction minimum.
+    simulation.setSegment('enemy-1', {axis: 'top', to: 400, speed: 150}, 0);
+    addPlayerMissile(simulation, {originTop: 204});
+
+    simulation.tick(0);
+    simulation.tick(100);
+
+    expect(onThreatened).not.toHaveBeenCalled();
+  });
+
+  it('warns a charging craft at distances beyond the missile-only window', () => {
+    const onThreatened = jest.fn();
+    const simulation = createSimulationWithPlayer({top: 500, left: 100});
+
+    addThreatenedEnemy(simulation, onThreatened);
+    // 200px out is 1818ms by missile speed alone (outside the window), but
+    // the 260px/s closing speed makes true impact ~769ms away.
+    simulation.setSegment('enemy-1', {axis: 'top', to: 400, speed: 150}, 0);
+    addPlayerMissile(simulation, {originTop: 304});
+
+    simulation.tick(0);
+
+    expect(onThreatened).toHaveBeenCalledTimes(1);
+    expect(onThreatened).toHaveBeenCalledWith({facing: 'N'});
+  });
+
+  it('ignores missiles that cannot catch a fleeing craft', () => {
+    const onThreatened = jest.fn();
+    const simulation = createSimulationWithPlayer({top: 500, left: 100});
+
+    addThreatenedEnemy(simulation, onThreatened, {facing: 'N'});
+    // Enemy outruns the missile northward at 150px/s vs 110px/s: the 100px
+    // gap (in the window by missile speed alone) only ever grows.
+    simulation.setSegment('enemy-1', {axis: 'top', to: 0, speed: 150}, 0);
+    addPlayerMissile(simulation, {originTop: 204});
+
+    simulation.tick(0);
+    simulation.tick(500);
 
     expect(onThreatened).not.toHaveBeenCalled();
   });

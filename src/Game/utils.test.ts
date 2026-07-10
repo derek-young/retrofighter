@@ -6,6 +6,7 @@ import {
 } from 'Game/constants';
 import {
   getIsThanksgivingDay,
+  getMaxPossibleScore,
   getNextAlley,
   getParSeconds,
   getTimeBonus,
@@ -28,8 +29,9 @@ describe(getNextAlley.name, () => {
 
 describe(getParSeconds.name, () => {
   // Enemy counts per level with each cargo ship counting as three kills
-  // (it converts into three speeders).
-  const expectedParSeconds = [30, 50, 70, 90, 100, 90, 120, 140, 160, 180];
+  // (it converts into three speeders of its tier), 10s per basic kill and
+  // 30s per veteran kill.
+  const expectedParSeconds = [30, 50, 70, 110, 180, 130, 200, 240, 360, 540];
 
   expectedParSeconds.forEach((parSeconds, epic) => {
     it(`returns ${parSeconds}s for level ${epic}`, () => {
@@ -60,6 +62,15 @@ describe(getTimeBonus.name, () => {
   it('rounds to a multiple of ten', () => {
     expect(getTimeBonus(0, 20.7)).toEqual(190);
     expect(getTimeBonus(0, 29.9) % 10).toEqual(0);
+  });
+});
+
+describe(getMaxPossibleScore.name, () => {
+  it('totals every level’s earnable points and full time bonus', () => {
+    // 38,500 earnable points (cargo ships as three speeders of their tier)
+    // plus 1,910 total par seconds at 20 points each. Recompute if levels
+    // or scoring change; a surprise failure here means scoring drifted.
+    expect(getMaxPossibleScore()).toEqual(76700);
   });
 });
 

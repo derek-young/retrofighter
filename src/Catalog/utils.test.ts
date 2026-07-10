@@ -1,3 +1,5 @@
+import {getMaxPossibleScore} from 'Game/utils';
+
 import {getDisplayName, getRankIndex} from './utils';
 
 describe(getDisplayName.name, () => {
@@ -20,34 +22,27 @@ describe(getDisplayName.name, () => {
 });
 
 describe(getRankIndex.name, () => {
-  const tests = [
-    [0, 0],
-    [1, 0],
-    [1124, 0],
-    [1125, 1],
-    [1126, 1],
-    [2249, 1],
-    [2250, 2],
-    [2251, 2],
-    [4499, 2],
-    [4500, 3],
-    [4501, 3],
-    [8999, 3],
-    [9000, 4],
-    [9001, 4],
-    [17999, 4],
-    [18000, 5],
-    [18001, 5],
-    [35999, 5],
-    [36000, 6],
-    [36001, 6],
-    [999999, 6],
-  ];
+  // Mirrors the threshold rule: Admiral at 90% of the theoretical maximum,
+  // each lower rank half as hard, all rounded to the nearest 10.
+  const admiralThreshold = Math.round((getMaxPossibleScore() * 0.9) / 10) * 10;
+  const thresholds = [32, 16, 8, 4, 2, 1].map(
+    divisor => Math.round(admiralThreshold / divisor / 10) * 10,
+  );
 
-  for (let i = 0; i < tests.length; i++) {
-    const [score, expectedRankIndex] = tests[i];
-    it(`for score ${score}, expected rank index of ${expectedRankIndex}`, () => {
-      expect(getRankIndex(score)).toEqual(expectedRankIndex);
+  it('starts at the lowest rank', () => {
+    expect(getRankIndex(0)).toEqual(0);
+    expect(getRankIndex(1)).toEqual(0);
+  });
+
+  thresholds.forEach((threshold, index) => {
+    it(`promotes to rank index ${index + 1} at exactly ${threshold}`, () => {
+      expect(getRankIndex(threshold - 1)).toEqual(index);
+      expect(getRankIndex(threshold)).toEqual(index + 1);
+      expect(getRankIndex(threshold + 1)).toEqual(index + 1);
     });
-  }
+  });
+
+  it('caps at the highest rank', () => {
+    expect(getRankIndex(999999)).toEqual(6);
+  });
 });

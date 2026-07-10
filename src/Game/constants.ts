@@ -53,12 +53,26 @@ export const enemyPoints = {
   [Enemies.VETERAN_UAV]: 300,
 };
 
+// The points an enemy slot actually yields: a cargo ship converts into
+// three speeders of its tier when it detects the player, so clearing the
+// slot earns the speeders' points rather than the ship's own.
+export const earnablePoints = {
+  ...enemyPoints,
+  [Enemies.CARGO_SHIP]: 3 * enemyPoints[Enemies.SPEEDER],
+  [Enemies.VETERAN_CARGO_SHIP]: 3 * enemyPoints[Enemies.VETERAN_SPEEDER],
+};
+
 export const parSecondsPerEnemy = 10;
+// Veterans dodge missiles, so kills take roughly three times as long.
+export const veteranParSecondsPerEnemy = 30;
 export const timeBonusPointsPerSecond = 20;
 
 // How far ahead (in flight time) a player missile warns a veteran craft.
-// Short enough that point-blank shots still connect.
 export const veteranDodgeWindowMs = 1000;
+// Minimum true time-to-impact (missile and craft closing speeds combined) a
+// veteran needs to react: missiles that will arrive sooner than this were
+// fired point-blank and always connect.
+export const veteranDodgeMinimumMs = 400;
 
 export const cloakDurationMs = 30000;
 export const itemSpawnDelayMs = 15000;
@@ -94,79 +108,79 @@ export const startingEnemies: (Enemies | null)[][] = [
     Enemies.UAV,
     Enemies.DUAL_FIGHTER,
     Enemies.DUAL_FIGHTER,
-    Enemies.DUAL_FIGHTER,
+    Enemies.VETERAN_DUAL_FIGHTER,
     Enemies.DUAL_FIGHTER,
     Enemies.DUAL_FIGHTER,
     Enemies.UAV,
     Enemies.UAV,
   ],
   [
+    Enemies.VETERAN_UAV,
     Enemies.DUAL_FIGHTER,
     Enemies.DUAL_FIGHTER,
     Enemies.DUAL_FIGHTER,
+    Enemies.VETERAN_DUAL_FIGHTER,
+    Enemies.VETERAN_DUAL_FIGHTER,
     Enemies.DUAL_FIGHTER,
     Enemies.DUAL_FIGHTER,
     Enemies.DUAL_FIGHTER,
+    Enemies.VETERAN_UAV,
+  ],
+  [
+    null,
+    null,
     Enemies.DUAL_FIGHTER,
-    Enemies.DUAL_FIGHTER,
-    Enemies.DUAL_FIGHTER,
+    Enemies.UAV,
+    Enemies.VETERAN_UAV,
+    Enemies.CARGO_SHIP,
+    Enemies.VETERAN_UAV,
+    Enemies.UAV,
     Enemies.DUAL_FIGHTER,
   ],
   [
     null,
-    null,
+    Enemies.VETERAN_UAV,
+    Enemies.VETERAN_UAV,
     Enemies.DUAL_FIGHTER,
-    Enemies.UAV,
-    Enemies.UAV,
     Enemies.CARGO_SHIP,
-    Enemies.UAV,
-    Enemies.UAV,
+    Enemies.CARGO_SHIP,
     Enemies.DUAL_FIGHTER,
+    Enemies.VETERAN_UAV,
+    Enemies.VETERAN_UAV,
   ],
   [
     null,
-    Enemies.UAV,
-    Enemies.UAV,
-    Enemies.DUAL_FIGHTER,
+    Enemies.VETERAN_UAV,
+    Enemies.VETERAN_DUAL_FIGHTER,
     Enemies.CARGO_SHIP,
+    Enemies.VETERAN_DUAL_FIGHTER,
     Enemies.CARGO_SHIP,
-    Enemies.DUAL_FIGHTER,
-    Enemies.UAV,
-    Enemies.UAV,
+    Enemies.VETERAN_DUAL_FIGHTER,
+    Enemies.CARGO_SHIP,
+    Enemies.VETERAN_DUAL_FIGHTER,
   ],
   [
-    null,
-    Enemies.UAV,
-    Enemies.DUAL_FIGHTER,
+    Enemies.VETERAN_UAV,
+    Enemies.VETERAN_UAV,
     Enemies.CARGO_SHIP,
-    Enemies.DUAL_FIGHTER,
+    Enemies.VETERAN_DUAL_FIGHTER,
+    Enemies.VETERAN_CARGO_SHIP,
+    Enemies.VETERAN_DUAL_FIGHTER,
     Enemies.CARGO_SHIP,
-    Enemies.DUAL_FIGHTER,
-    Enemies.CARGO_SHIP,
-    Enemies.DUAL_FIGHTER,
+    Enemies.VETERAN_DUAL_FIGHTER,
+    Enemies.VETERAN_UAV,
+    Enemies.VETERAN_UAV,
   ],
   [
-    Enemies.UAV,
-    Enemies.UAV,
-    Enemies.CARGO_SHIP,
-    Enemies.DUAL_FIGHTER,
-    Enemies.CARGO_SHIP,
-    Enemies.DUAL_FIGHTER,
-    Enemies.CARGO_SHIP,
-    Enemies.DUAL_FIGHTER,
-    Enemies.UAV,
-    Enemies.UAV,
-  ],
-  [
-    Enemies.DUAL_FIGHTER,
-    Enemies.CARGO_SHIP,
-    Enemies.DUAL_FIGHTER,
-    Enemies.CARGO_SHIP,
-    Enemies.DUAL_FIGHTER,
-    Enemies.DUAL_FIGHTER,
-    Enemies.CARGO_SHIP,
-    Enemies.DUAL_FIGHTER,
-    Enemies.CARGO_SHIP,
-    Enemies.DUAL_FIGHTER,
+    Enemies.VETERAN_DUAL_FIGHTER,
+    Enemies.VETERAN_CARGO_SHIP,
+    Enemies.VETERAN_DUAL_FIGHTER,
+    Enemies.VETERAN_CARGO_SHIP,
+    Enemies.VETERAN_DUAL_FIGHTER,
+    Enemies.VETERAN_DUAL_FIGHTER,
+    Enemies.VETERAN_CARGO_SHIP,
+    Enemies.VETERAN_DUAL_FIGHTER,
+    Enemies.VETERAN_CARGO_SHIP,
+    Enemies.VETERAN_DUAL_FIGHTER,
   ],
 ];

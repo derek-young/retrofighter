@@ -4,7 +4,7 @@ import {useNavigation} from '@react-navigation/native';
 
 import {useAppContext} from 'AppContext';
 import {CatalogNavigationProp} from 'types/app';
-import {Enemies, enemyPoints, startingEnemies} from 'Game/constants';
+import {earnablePoints, startingEnemies} from 'Game/constants';
 import pyramidsImage from 'images/backdrop_catalog.jpg';
 import TransparentSafeAreaView from 'components/TransparentSafeAreaView';
 
@@ -25,20 +25,13 @@ const styles = StyleSheet.create({
   },
 });
 
-// A cargo ship is worth its three released speeders, not its own value.
-const pointsForLevel = {
-  ...enemyPoints,
-  [Enemies.CARGO_SHIP]: 3 * enemyPoints[Enemies.SPEEDER],
-  [Enemies.VETERAN_CARGO_SHIP]: 3 * enemyPoints[Enemies.VETERAN_SPEEDER],
-};
-
 const levels = startingEnemies.map(enemies =>
   enemies.reduce((totalPointsPossible, enemyName) => {
     if (enemyName === null) {
       return totalPointsPossible;
     }
 
-    return totalPointsPossible + pointsForLevel[enemyName];
+    return totalPointsPossible + earnablePoints[enemyName];
   }, 0),
 );
 
