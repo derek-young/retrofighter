@@ -6,17 +6,21 @@ import {useItemFactoryContext} from 'Game/items/ItemFactoryContext';
 import ShieldVisual from 'Game/items/ShieldVisual';
 
 import EnemyClusterBombMissile from './EnemyClusterBombMissile';
+import {aiClassInsignia} from './aiClassInsignia';
 import {useEnemyCraftContext} from './EnemyCraftContext';
 import {useEnemyMissileContext} from './EnemyMissileContext';
+import {AiClass} from './useEnemyCraftAnimation';
 import {IconProps} from 'Game/types';
 
 interface EnemyCraftProps {
+  aiClass?: AiClass;
   craftColor?: string;
   Icon: React.FC<IconProps>;
   score: number;
 }
 
 const EnemyCraft = ({
+  aiClass,
   craftColor = Colors.RED,
   Icon,
   score,
@@ -40,6 +44,7 @@ const EnemyCraft = ({
   // A cloaked enemy is nearly invisible to the player; the simulation still
   // treats it as a full threat.
   const fill = craftEffects?.isCloaked ? `${craftColor}26` : craftColor;
+  const Insignia = aiClass ? aiClassInsignia[aiClass] : undefined;
   const hasMissileFired =
     missileProps.hasMissileFired || clusterMissileProps.hasMissileFired;
 
@@ -60,6 +65,7 @@ const EnemyCraft = ({
         isEliminated={isEliminated}
         facing={facing}
         fill={fill}
+        insignia={Insignia ? <Insignia fill={fill} /> : undefined}
         left={leftAnim}
         top={topAnim}
         onEliminationEnd={() => {

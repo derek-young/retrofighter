@@ -111,6 +111,7 @@ export type CraftProps = {
   isEliminated: boolean;
   facing: Facing;
   fill: string;
+  insignia?: React.ReactNode;
   onEliminationEnd: () => void;
   top: number | Animated.Value;
   left: number | Animated.Value;
@@ -125,6 +126,7 @@ const Craft = ({
   isEliminated,
   facing,
   fill,
+  insignia,
   onEliminationEnd,
   left,
   top,
@@ -234,6 +236,7 @@ const Craft = ({
         <>
           <Icon fill={fill} />
           <Icon fill="#00000040" style={{...styles.shadow, ...shadow}} />
+          {insignia}
         </>
       )}
       <Animated.View

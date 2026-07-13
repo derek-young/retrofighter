@@ -124,7 +124,11 @@ const CargoShipBody = ({enemyClass, id}: EnemyBodyProps): JSX.Element => {
         </>
       )}
       <Animated.View style={{opacity: craftOpacityAnim}}>
-        <EnemyCraft Icon={enemyClass.Icon} score={enemyClass.score} />
+        <EnemyCraft
+          aiClass={enemyClass.aiClass}
+          Icon={enemyClass.Icon}
+          score={enemyClass.score}
+        />
       </Animated.View>
     </>
   );

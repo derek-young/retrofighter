@@ -17,6 +17,7 @@ function StandardEnemyBody({enemyClass}: EnemyBodyProps): JSX.Element {
     <>
       {enemyClass.hasMissile && <EnemyMissile />}
       <EnemyCraft
+        aiClass={enemyClass.aiClass}
         craftColor={enemyClass.craftColor}
         Icon={enemyClass.Icon}
         score={enemyClass.score}

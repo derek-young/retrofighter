@@ -12,8 +12,9 @@ import {
   itemSpawnDelayMs,
   itemSpawnIntervalMs,
 } from 'Game/constants';
-import {ItemKind} from 'Game/engine/Simulation';
+import {ItemKind, PLAYER_ID} from 'Game/engine/Simulation';
 import {useSimulationContext} from 'Game/engine/SimulationContext';
+import {useGameContext} from 'Game/GameContext';
 
 import {getItemSpawnPosition} from './itemUtils';
 
@@ -62,6 +63,7 @@ export const ItemFactoryProvider = ({
   children: React.ReactNode;
 }) => {
   const simulation = useSimulationContext();
+  const {consumeCarriedEffects} = useGameContext();
   const [items, setItems] = useState<ActiveItem[]>([]);
   const [effects, setEffects] = useState<Record<string, CraftItemEffects>>({});
   const itemsRef = useRef(items);
@@ -88,41 +90,81 @@ export const ItemFactoryProvider = ({
     [],
   );
 
+  // Effects activate through these grants; the simulation invokes the end
+  // callback when the effect is spent, expires, or the craft respawns.
+  const grantShield = useCallback(
+    (craftId: string) => {
+      simulation.setShielded(craftId, true, () =>
+        setEffect(craftId, 'hasShield', false),
+      );
+      setEffect(craftId, 'hasShield', true);
+    },
+    [setEffect, simulation],
+  );
+
+  const grantCloak = useCallback(
+    (craftId: string, durationMs: number) => {
+      simulation.setCloaked(craftId, durationMs, () =>
+        setEffect(craftId, 'isCloaked', false),
+      );
+      setEffect(craftId, 'isCloaked', true);
+    },
+    [setEffect, simulation],
+  );
+
+  // Cluster bombs stockpile: arming raises the count, and the simulation
+  // reports every count change (pickup, fire, respawn).
+  const grantClusterBomb = useCallback(
+    (craftId: string) =>
+      simulation.armClusterBomb(craftId, count =>
+        setClusterBombCount(craftId, count),
+      ),
+    [setClusterBombCount, simulation],
+  );
+
   const onPickedUp = useCallback(
     (key: number, kind: ItemKind, craftId: string) => {
       setItems(prev => prev.filter(item => item.key !== key));
 
-      // Items auto-activate for whoever grabs them; the simulation invokes
-      // the end callback when the effect is spent, expires, or the craft
-      // respawns.
       switch (kind) {
         case 'shield':
-          simulation.setShielded(craftId, true, () =>
-            setEffect(craftId, 'hasShield', false),
-          );
-          setEffect(craftId, 'hasShield', true);
+          grantShield(craftId);
           break;
         case 'cloak':
-          simulation.setCloaked(craftId, cloakDurationMs, () =>
-            setEffect(craftId, 'isCloaked', false),
-          );
-          setEffect(craftId, 'isCloaked', true);
+          grantCloak(craftId, cloakDurationMs);
           break;
         case 'clusterBomb':
-          // Cluster bombs stockpile: arming raises the count, and the
-          // simulation reports every count change (pickup, fire, respawn).
-          simulation.armClusterBomb(craftId, count =>
-            setClusterBombCount(craftId, count),
-          );
+          grantClusterBomb(craftId);
           break;
       }
     },
-    [setClusterBombCount, setEffect, simulation],
+    [grantClusterBomb, grantCloak, grantShield],
   );
 
   const onPickedUpRef = useRef(onPickedUp);
 
   onPickedUpRef.current = onPickedUp;
+
+  // Power-ups the player carried over from the previous level are re-applied
+  // to this level's fresh simulation on mount.
+  useEffect(() => {
+    const carried = consumeCarriedEffects();
+
+    if (!carried) {
+      return;
+    }
+
+    if (carried.hasShield) {
+      grantShield(PLAYER_ID);
+    }
+    if (carried.cloakRemainingMs > 0) {
+      grantCloak(PLAYER_ID, carried.cloakRemainingMs);
+    }
+    for (let i = 0; i < carried.clusterBombCount; i++) {
+      grantClusterBomb(PLAYER_ID);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     const intervalId = setInterval(() => {

@@ -12,6 +12,7 @@ import PressStartText from 'components/PressStartText';
 import {startingEnemies} from './constants';
 import {getTimeBonus} from './utils';
 import {useGameContext} from './GameContext';
+import {PLAYER_ID} from './engine/Simulation';
 import {useSimulationContext} from './engine/SimulationContext';
 import {useEnemyFactoryContext} from './enemy/EnemyFactoryContext';
 import ExitLevelButton from './ExitLevelButton';
@@ -71,7 +72,8 @@ const LevelCompletePopup = ({
 }: LevelCompletePopupProps) => {
   const navigation = useNavigation<GameNavigationProp>();
   const {recordScores} = useAppContext();
-  const {epic, scoreForLevel, setRemainingLives} = useGameContext();
+  const {carryEffects, epic, scoreForLevel, setRemainingLives} =
+    useGameContext();
   const simulation = useSimulationContext();
   const {areAllEnemiesEliminated} = useEnemyFactoryContext();
   const [leftMissile, rightMissile] = useMissileContext();
@@ -193,6 +195,9 @@ const LevelCompletePopup = ({
               {epic < startingEnemies.length - 1 && (
                 <Button
                   onPress={() => {
+                    // Unused power-ups travel with the player; the next
+                    // level's item provider re-applies them on mount.
+                    carryEffects(simulation.getItemEffects(PLAYER_ID));
                     navigation.navigate('Game', {epic: epic + 1});
                     onResetBoard();
                   }}

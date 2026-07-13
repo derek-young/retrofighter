@@ -833,6 +833,53 @@ describe('cloak', () => {
   });
 });
 
+describe('item effect snapshots', () => {
+  it('returns no effects for an unknown craft', () => {
+    const simulation = createSimulationWithPlayer({top: 500, left: 100});
+
+    expect(simulation.getItemEffects('missing-craft')).toEqual({
+      hasShield: false,
+      cloakRemainingMs: 0,
+      clusterBombCount: 0,
+    });
+  });
+
+  it('captures a shield and stockpiled cluster bombs', () => {
+    const simulation = createSimulationWithPlayer({top: 500, left: 100});
+
+    simulation.setShielded(PLAYER_ID, true);
+    simulation.armClusterBomb(PLAYER_ID);
+    simulation.armClusterBomb(PLAYER_ID);
+
+    expect(simulation.getItemEffects(PLAYER_ID)).toEqual({
+      hasShield: true,
+      cloakRemainingMs: 0,
+      clusterBombCount: 2,
+    });
+  });
+
+  it('reports the cloak time left at the moment of the snapshot', () => {
+    const simulation = createSimulationWithPlayer({top: 500, left: 100});
+
+    simulation.setCloaked(PLAYER_ID, 30000, undefined, 0);
+
+    expect(simulation.getItemEffects(PLAYER_ID, 12000).cloakRemainingMs).toBe(
+      18000,
+    );
+  });
+
+  it('does not burn cloak time while paused', () => {
+    const simulation = createSimulationWithPlayer({top: 500, left: 100});
+
+    simulation.setCloaked(PLAYER_ID, 30000, undefined, 0);
+    simulation.pause(10000);
+
+    expect(simulation.getItemEffects(PLAYER_ID, 60000).cloakRemainingMs).toBe(
+      20000,
+    );
+  });
+});
+
 describe('cluster bombs', () => {
   it('pierces every craft in the line of fire', () => {
     const onCountChange = jest.fn();

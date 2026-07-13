@@ -1,6 +1,5 @@
 import React from 'react';
 
-import Colors from 'types/colors';
 import DualFighterIcon from 'icons/dual-fighter.svg';
 import EnemyCargoShipIcon from 'icons/enemy-cargo.svg';
 import EnemyUAVIcon from 'icons/enemy-uav.svg';
@@ -74,7 +73,6 @@ export const enemyClasses: Record<Enemies, EnemyClass> = {
     defaultCraftSpeed: craftPixelsPerSecond,
     craftSpeedWhenLockedOn: craftPixelsPerSecond * 1.2,
     aiClass: 'veteran',
-    craftColor: Colors.PURPLE,
     hasMissile: true,
   },
   [Enemies.UAV]: {
@@ -89,7 +87,6 @@ export const enemyClasses: Record<Enemies, EnemyClass> = {
     defaultCraftSpeed: craftPixelsPerSecond,
     craftSpeedWhenLockedOn: craftPixelsPerSecond * 1.6,
     aiClass: 'veteran',
-    craftColor: Colors.PURPLE,
   },
   [Enemies.SPEEDER]: {
     Icon: SpeederIcon,
@@ -103,7 +100,6 @@ export const enemyClasses: Record<Enemies, EnemyClass> = {
     defaultCraftSpeed: craftPixelsPerSecond * 1.5,
     craftSpeedWhenLockedOn: craftPixelsPerSecond * 3,
     aiClass: 'veteran',
-    craftColor: Colors.PURPLE,
   },
   [Enemies.CARGO_SHIP]: {
     Icon: EnemyCargoShipIcon,
@@ -118,7 +114,6 @@ export const enemyClasses: Record<Enemies, EnemyClass> = {
     score: enemyPoints[Enemies.VETERAN_CARGO_SHIP],
     defaultCraftSpeed: craftPixelsPerSecond * 0.6,
     aiClass: 'veteran',
-    craftColor: Colors.PURPLE,
     freezeWhenPlayerDetected: true,
     Body: CargoShipBody,
     spawns: Enemies.VETERAN_SPEEDER,

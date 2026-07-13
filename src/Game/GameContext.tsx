@@ -3,15 +3,20 @@ import React, {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from 'react';
 import {useNavigation} from '@react-navigation/native';
 import {GameNavigationProp} from 'types/app';
 
+import {ItemEffectsSnapshot} from './engine/Simulation';
+
 const noop = () => {};
 
 const defaultValue: GameContextValue = {
   adjustScore: noop,
+  carryEffects: noop,
+  consumeCarriedEffects: () => null,
   epic: 0,
   isPaused: false,
   setIsPaused: noop,
@@ -23,6 +28,8 @@ const defaultValue: GameContextValue = {
 
 interface GameContextValue {
   adjustScore: (score: number) => void;
+  carryEffects: (effects: ItemEffectsSnapshot) => void;
+  consumeCarriedEffects: () => null | ItemEffectsSnapshot;
   epic: number;
   isPaused: boolean;
   setIsPaused: (isPaused: boolean) => void;
@@ -46,6 +53,22 @@ export const GameProvider = ({children, epic}: GameProviderProps) => {
   const [isPaused, setIsPaused] = useState(false);
   const [remainingLives, setRemainingLives] = useState(1);
   const [scoreForLevel, setScoreForLevel] = useState(0);
+  // The player's item effects carried into the next level. Lives here
+  // because the provider survives the level swap that remounts the
+  // simulation and item providers.
+  const carriedEffectsRef = useRef<null | ItemEffectsSnapshot>(null);
+
+  const carryEffects = useCallback((effects: ItemEffectsSnapshot) => {
+    carriedEffectsRef.current = effects;
+  }, []);
+
+  const consumeCarriedEffects = useCallback(() => {
+    const effects = carriedEffectsRef.current;
+
+    carriedEffectsRef.current = null;
+
+    return effects;
+  }, []);
 
   const resetGameContext = useCallback(() => {
     setRemainingLives(1);
@@ -65,6 +88,7 @@ export const GameProvider = ({children, epic}: GameProviderProps) => {
     const unsubscribe = navigation?.addListener('blur', () => {
       setRemainingLives(1);
       setScoreForLevel(0);
+      carriedEffectsRef.current = null;
     });
 
     return unsubscribe;
@@ -73,6 +97,8 @@ export const GameProvider = ({children, epic}: GameProviderProps) => {
   const value = useMemo(
     () => ({
       adjustScore,
+      carryEffects,
+      consumeCarriedEffects,
       epic,
       isPaused,
       setIsPaused,
@@ -83,6 +109,8 @@ export const GameProvider = ({children, epic}: GameProviderProps) => {
     }),
     [
       adjustScore,
+      carryEffects,
+      consumeCarriedEffects,
       epic,
       isPaused,
       remainingLives,

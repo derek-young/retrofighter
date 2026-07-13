@@ -86,6 +86,12 @@ interface MissileEntity extends MissileConfig {
 
 export type ItemKind = 'shield' | 'cloak' | 'clusterBomb';
 
+export interface ItemEffectsSnapshot {
+  hasShield: boolean;
+  cloakRemainingMs: number;
+  clusterBombCount: number;
+}
+
 export interface ItemConfig {
   kind: ItemKind;
   top: number;
@@ -400,6 +406,31 @@ class Simulation {
 
   isCloaked(id: string): boolean {
     return Boolean(this.crafts.get(id)?.cloak);
+  }
+
+  /**
+   * A snapshot of a craft's active item effects, e.g. for carrying the
+   * player's power-ups over into the next level's fresh simulation.
+   */
+  getItemEffects(id: string, now = Date.now()): ItemEffectsSnapshot {
+    const craft = this.crafts.get(id);
+
+    if (!craft) {
+      return {hasShield: false, cloakRemainingMs: 0, clusterBombCount: 0};
+    }
+
+    const cloakElapsedMs =
+      craft.cloak === null || craft.cloak.since === null
+        ? 0
+        : now - craft.cloak.since;
+
+    return {
+      hasShield: craft.hasShield,
+      cloakRemainingMs: craft.cloak
+        ? Math.max(0, craft.cloak.remainingMs - cloakElapsedMs)
+        : 0,
+      clusterBombCount: craft.clusterBombCount,
+    };
   }
 
   armClusterBomb(id: string, onCountChange?: (count: number) => void): void {
