@@ -116,8 +116,9 @@ const Missile = ({
 
   useEffect(() => {
     if (!hasMissileFired) {
-      // Halt the in-flight timing but leave the value put; the docked offset
-      // is restored by the effect below only once firedState has cleared.
+      // Halt the in-flight timing. The frozen value is harmless: the docked
+      // view uses a static offset, and the next launch re-seeds missileAnim
+      // below before flight resumes.
       missileAnim.stopAnimation();
       return;
     }
@@ -146,29 +147,16 @@ const Missile = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [hasMissileFired, isPaused]);
 
-  // Return the missile to its docked travel offset only after firedState has
-  // cleared — i.e. once the container is back on the craft. Resetting while
-  // the container is still pinned at the launch origin (native setValue lands
-  // a frame before the firedState=null re-render) flashes the missile back to
-  // where it was fired.
-  useEffect(() => {
-    if (!hasMissileFired && firedState === null) {
-      missileAnim.setValue(startingTop);
-    }
-  }, [firedState, hasMissileFired, missileAnim, startingTop]);
-
-  const travel = (
-    <Animated.View
-      style={[styles.missileTravel, {transform: [{translateY: missileAnim}]}]}>
-      <Icon style={missileIconStyle} />
-    </Animated.View>
-  );
-
-  // Docked and fired are separate keyed views so firing mounts a fresh
-  // native view. Reusing the docked view for flight let the craft's
-  // still-running native-driver rotation keep overriding the static launch
-  // transform, sending the icon off with the craft's mid-turn heading while
-  // the simulation missile flew the fire-time facing.
+  // Docked and fired are separate keyed views so firing mounts a fresh native
+  // view. Reusing the docked view for flight let the craft's still-running
+  // native-driver rotation keep overriding the static launch transform,
+  // sending the icon off with the craft's mid-turn heading while the
+  // simulation missile flew the fire-time facing.
+  //
+  // Only the fired view reads the live travel value: missileAnim animates from
+  // startValue toward -maxScreenSize during flight, and on impact
+  // stopAnimation() freezes it at an on-screen value. The docked view therefore uses a static
+  // startingTop offset, independent of missileAnim.
   return firedState ? (
     <Animated.View
       key="fired"
@@ -182,7 +170,13 @@ const Missile = ({
           ],
         },
       ]}>
-      {travel}
+      <Animated.View
+        style={[
+          styles.missileTravel,
+          {transform: [{translateY: missileAnim}]},
+        ]}>
+        <Icon style={missileIconStyle} />
+      </Animated.View>
     </Animated.View>
   ) : (
     <Animated.View
@@ -197,7 +191,10 @@ const Missile = ({
           ],
         },
       ]}>
-      {travel}
+      <Animated.View
+        style={[styles.missileTravel, {transform: [{translateY: startingTop}]}]}>
+        <Icon style={missileIconStyle} />
+      </Animated.View>
     </Animated.View>
   );
 };
