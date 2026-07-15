@@ -24,7 +24,10 @@ export interface EnemyClass {
   score: number;
   defaultCraftSpeed: number;
   craftSpeedWhenLockedOn?: number;
-  aiClass?: AiClass;
+  // The AI traits this class has, composed independently: 'veteran' dodges
+  // player missiles, 'commander' alerts the whole board on sight. An empty or
+  // absent list is a plain ("basic") enemy; a class can be both.
+  aiClasses?: AiClass[];
   craftColor?: string; // defaults to Colors.RED in EnemyCraft
   defaultFacing?: Facing;
   freezeWhenPlayerDetected?: boolean;
@@ -72,7 +75,7 @@ export const enemyClasses: Record<Enemies, EnemyClass> = {
     score: enemyPoints[Enemies.VETERAN_DUAL_FIGHTER],
     defaultCraftSpeed: craftPixelsPerSecond,
     craftSpeedWhenLockedOn: craftPixelsPerSecond * 1.2,
-    aiClass: 'veteran',
+    aiClasses: ['veteran'],
     hasMissile: true,
   },
   [Enemies.UAV]: {
@@ -86,7 +89,7 @@ export const enemyClasses: Record<Enemies, EnemyClass> = {
     score: enemyPoints[Enemies.VETERAN_UAV],
     defaultCraftSpeed: craftPixelsPerSecond,
     craftSpeedWhenLockedOn: craftPixelsPerSecond * 1.6,
-    aiClass: 'veteran',
+    aiClasses: ['veteran'],
   },
   [Enemies.SPEEDER]: {
     Icon: SpeederIcon,
@@ -99,7 +102,7 @@ export const enemyClasses: Record<Enemies, EnemyClass> = {
     score: enemyPoints[Enemies.VETERAN_SPEEDER],
     defaultCraftSpeed: craftPixelsPerSecond * 1.5,
     craftSpeedWhenLockedOn: craftPixelsPerSecond * 3,
-    aiClass: 'veteran',
+    aiClasses: ['veteran'],
   },
   [Enemies.CARGO_SHIP]: {
     Icon: EnemyCargoShipIcon,
@@ -113,9 +116,24 @@ export const enemyClasses: Record<Enemies, EnemyClass> = {
     Icon: EnemyCargoShipIcon,
     score: enemyPoints[Enemies.VETERAN_CARGO_SHIP],
     defaultCraftSpeed: craftPixelsPerSecond * 0.6,
-    aiClass: 'veteran',
+    aiClasses: ['veteran'],
     freezeWhenPlayerDetected: true,
     Body: CargoShipBody,
     spawns: Enemies.VETERAN_SPEEDER,
+  },
+  [Enemies.COMMANDER_DUAL_FIGHTER]: {
+    Icon: RotatedDualFighterIcon,
+    score: enemyPoints[Enemies.COMMANDER_DUAL_FIGHTER],
+    defaultCraftSpeed: craftPixelsPerSecond,
+    aiClasses: ['commander'],
+    hasMissile: true,
+  },
+  [Enemies.VETERAN_COMMANDER_DUAL_FIGHTER]: {
+    Icon: RotatedDualFighterIcon,
+    score: enemyPoints[Enemies.VETERAN_COMMANDER_DUAL_FIGHTER],
+    defaultCraftSpeed: craftPixelsPerSecond,
+    craftSpeedWhenLockedOn: craftPixelsPerSecond * 1.2,
+    aiClasses: ['veteran', 'commander'],
+    hasMissile: true,
   },
 };

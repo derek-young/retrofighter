@@ -51,7 +51,7 @@ const defaultValue: EnemyCraftContextValue = {
 };
 
 export interface EnemyCraftContextProviderProps {
-  aiClass?: AiClass;
+  aiClasses?: AiClass[];
   children: React.ReactNode;
   craftSpeedWhenLockedOn?: number;
   defaultCraftSpeed: number;
@@ -70,7 +70,7 @@ const EnemyCraftContext = React.createContext(defaultValue);
 export const useEnemyCraftContext = () => useContext(EnemyCraftContext);
 
 export const EnemyCraftContextProvider = ({
-  aiClass,
+  aiClasses,
   children,
   craftSpeedWhenLockedOn,
   defaultCraftSpeed,
@@ -104,7 +104,7 @@ export const EnemyCraftContextProvider = ({
 
   const {facing, frozenPosition, isPlayerInLineOfSight, leftAnim, topAnim} =
     useEnemyCraftAnimation({
-      aiClass,
+      aiClasses,
       craftSpeedWhenLockedOn,
       defaultCraftSpeed,
       defaultFacing,

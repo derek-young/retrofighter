@@ -5,8 +5,8 @@ import Svg, {Polyline} from 'react-native-svg';
 import {craftSize} from 'Game/constants';
 
 // A stack of rank chevrons painted across the middle of the hull, pointing
-// toward the nose. This is the veteran marker: veterans share the normal enemy
-// red, so the chevrons — not colour — are what set them apart.
+// toward the nose. This is the commander marker: commanders share the normal
+// enemy red, so the chevrons — not colour — are what set them apart.
 const chevronColor = '#C0C0C0'; // silver
 const chevronCount = 2;
 const chevronWidth = 8;
@@ -64,7 +64,7 @@ function Chevrons({fill}: {fill: string}) {
 // the hull and turn with it, like insignia painted on the ship. The chevrons
 // keep their silver hue but take their opacity from the craft's `fill`, so a
 // cloaked craft (`#RRGGBB26`) fades its insignia in lockstep with the hull.
-function VeteranChevrons({fill}: {fill: string}): JSX.Element {
+function CommanderChevrons({fill}: {fill: string}): JSX.Element {
   const opacity = fill.length === 9 ? parseInt(fill.slice(7), 16) / 255 : 1;
 
   return (
@@ -77,4 +77,4 @@ function VeteranChevrons({fill}: {fill: string}): JSX.Element {
   );
 }
 
-export default VeteranChevrons;
+export default CommanderChevrons;

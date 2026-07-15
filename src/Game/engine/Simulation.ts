@@ -34,6 +34,8 @@ export interface CraftCallbacks {
   onEliminated?: () => void;
   onLineOfSightChange?: (isPlayerInLineOfSight: boolean) => void;
   onThreatened?: (threat: {facing: Facing}) => void;
+  // Fired on every other enemy when a commander first spots the player.
+  onCommanderAlert?: (playerPosition: Position) => void;
 }
 
 interface CraftEntity extends CraftCallbacks {
@@ -44,6 +46,7 @@ interface CraftEntity extends CraftCallbacks {
   facing: Facing;
   segment: Segment | null;
   isCollidable: boolean;
+  isCommander: boolean;
   isPlayerInLineOfSight: boolean;
   hasShield: boolean;
   onShieldConsumed?: () => void;
@@ -62,6 +65,7 @@ export interface CraftConfig extends CraftCallbacks {
   left: number;
   facing: Facing;
   isCollidable: boolean;
+  isCommander?: boolean;
 }
 
 export interface MissileConfig {
@@ -290,6 +294,7 @@ class Simulation {
       ...config,
       id,
       segment: null,
+      isCommander: config.isCommander ?? false,
       isPlayerInLineOfSight: false,
       hasShield: false,
       cloak: null,
@@ -682,6 +687,16 @@ class Simulation {
         if (isInSight !== craft.isPlayerInLineOfSight) {
           craft.isPlayerInLineOfSight = isInSight;
           craft.onLineOfSightChange(isInSight);
+
+          // A commander spotting the player alerts every other enemy on the
+          // board (edge-triggered, so once per acquisition).
+          if (isInSight && craft.isCommander && playerPos) {
+            this.crafts.forEach(other => {
+              if (other.id !== craft.id && other.kind === 'enemy') {
+                other.onCommanderAlert?.(playerPos);
+              }
+            });
+          }
         }
       }
 

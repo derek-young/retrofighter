@@ -60,6 +60,7 @@ const veteranEnemies = new Set([
   Enemies.VETERAN_DUAL_FIGHTER,
   Enemies.VETERAN_SPEEDER,
   Enemies.VETERAN_UAV,
+  Enemies.VETERAN_COMMANDER_DUAL_FIGHTER,
 ]);
 
 export function getParSeconds(epic: number) {

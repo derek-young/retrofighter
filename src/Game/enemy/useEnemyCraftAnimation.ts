@@ -19,7 +19,7 @@ import {
 } from './animation';
 import type {AnimationProps} from './animation';
 
-export type AiClass = 'basic' | 'veteran';
+export type AiClass = 'veteran' | 'commander';
 
 function getNearbyItem(
   items: Array<{id: string; position: Position}>,
@@ -46,7 +46,7 @@ function getNearbyItem(
 }
 
 type CraftAnimationProps = {
-  aiClass?: AiClass;
+  aiClasses?: AiClass[];
   craftSpeedWhenLockedOn?: number;
   defaultCraftSpeed: number;
   defaultFacing: Facing;
@@ -59,7 +59,7 @@ type CraftAnimationProps = {
 };
 
 function useEnemyCraftAnimation({
-  aiClass = 'basic',
+  aiClasses = [],
   defaultCraftSpeed,
   craftSpeedWhenLockedOn = defaultCraftSpeed,
   defaultFacing,
@@ -86,6 +86,9 @@ function useEnemyCraftAnimation({
   const detectedPlayerFacingRef = useRef<null | Facing>(null);
   const detectedPlayerPositionRef = useRef<null | Position>(null);
   const dodgeRef = useRef<(threatFacing: Facing) => void>(() => {});
+  const commanderAlertRef = useRef<(playerPosition: Position) => void>(
+    () => {},
+  );
   const isDodgingRef = useRef(false);
   const isEliminatedRef = useRef(false);
   const isFrozenRef = useRef(false);
@@ -113,10 +116,12 @@ function useEnemyCraftAnimation({
       isCollidable: true,
       onEliminated: () => onIsEliminatedRef.current(),
       onLineOfSightChange: setIsPlayerInLineOfSight,
-      onThreatened:
-        aiClass === 'veteran'
-          ? ({facing: threatFacing}) => dodgeRef.current(threatFacing)
-          : undefined,
+      onThreatened: aiClasses.includes('veteran')
+        ? ({facing: threatFacing}) => dodgeRef.current(threatFacing)
+        : undefined,
+      isCommander: aiClasses.includes('commander'),
+      onCommanderAlert: playerPosition =>
+        commanderAlertRef.current(playerPosition),
     });
 
     return () => simulation.removeCraft(simId);
@@ -382,6 +387,70 @@ function useEnemyCraftAnimation({
     topAnim.setValue(position.top);
     setFrozenPosition(position);
   }, [leftAnim, simId, simulation, topAnim]);
+
+  // A commander that spots the player alerts the whole board. Each other enemy
+  // reacts here: cargo ships release their speeders (the same freeze path as
+  // seeing the player), and everyone else takes one move toward the player's
+  // reported position by reusing the last-known-position tracking.
+  const handleCommanderAlert = useCallback(
+    (playerPosition: Position) => {
+      if (
+        isEliminatedRef.current ||
+        isFrozenRef.current ||
+        isDodgingRef.current ||
+        isPausedRef.current ||
+        isPlayerEliminatedRef.current ||
+        isPlayerInLineOfSightRef.current
+      ) {
+        return;
+      }
+
+      if (freezeWhenPlayerDetected) {
+        freeze();
+        return;
+      }
+
+      const position = simulation.getPosition(simId);
+
+      if (!position) {
+        return;
+      }
+
+      // Face the reported position, not the player's own facing: that facing
+      // drives the escape-pursuit guess ("follow where they went"), which only
+      // makes sense for a craft that was already chasing. An alerted craft may
+      // face anywhere, so pick the axis with the wider gap to the player —
+      // otherwise the tracking gate in `animate` cancels and the move
+      // degenerates to a random wander.
+      const columnGap = playerPosition.left - position.left;
+      const rowGap = playerPosition.top - position.top;
+
+      detectedPlayerFacingRef.current =
+        Math.abs(columnGap) >= Math.abs(rowGap)
+          ? columnGap > 0
+            ? 'E'
+            : 'W'
+          : rowGap > 0
+          ? 'S'
+          : 'N';
+      detectedPlayerPositionRef.current = playerPosition;
+      leftAnim.stopAnimation();
+      topAnim.stopAnimation();
+      animate(craftSpeedWhenLockedOn);
+    },
+    [
+      animate,
+      craftSpeedWhenLockedOn,
+      freeze,
+      freezeWhenPlayerDetected,
+      leftAnim,
+      simId,
+      simulation,
+      topAnim,
+    ],
+  );
+
+  commanderAlertRef.current = handleCommanderAlert;
 
   useEffect(() => {
     if (hasPlayerMoved && !hasInitialized) {

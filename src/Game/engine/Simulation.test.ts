@@ -1188,3 +1188,92 @@ describe('line of sight', () => {
     expect(onLineOfSightChange).not.toHaveBeenCalled();
   });
 });
+
+describe('commander alert', () => {
+  it('alerts every other enemy with the player position when a commander spots the player', () => {
+    const commanderAlert = jest.fn();
+    const otherAlert = jest.fn();
+    const simulation = createSimulationWithPlayer({top: 500, left: 100});
+
+    simulation.addCraft('enemy-commander', {
+      kind: 'enemy',
+      top: 200,
+      left: 100,
+      facing: 'S',
+      isCollidable: true,
+      isCommander: true,
+      onLineOfSightChange: () => {},
+      onCommanderAlert: commanderAlert,
+    });
+    simulation.addCraft('enemy-2', {
+      kind: 'enemy',
+      top: 800,
+      left: 700,
+      facing: 'N',
+      isCollidable: true,
+      onCommanderAlert: otherAlert,
+    });
+
+    simulation.tick(0);
+
+    expect(otherAlert).toHaveBeenCalledWith({top: 500, left: 100});
+    // A commander never alerts itself.
+    expect(commanderAlert).not.toHaveBeenCalled();
+  });
+
+  it('alerts only once per acquisition, not every tick the player stays in sight', () => {
+    const otherAlert = jest.fn();
+    const simulation = createSimulationWithPlayer({top: 500, left: 100});
+
+    simulation.addCraft('enemy-commander', {
+      kind: 'enemy',
+      top: 200,
+      left: 100,
+      facing: 'S',
+      isCollidable: true,
+      isCommander: true,
+      onLineOfSightChange: () => {},
+      onCommanderAlert: () => {},
+    });
+    simulation.addCraft('enemy-2', {
+      kind: 'enemy',
+      top: 800,
+      left: 700,
+      facing: 'N',
+      isCollidable: true,
+      onCommanderAlert: otherAlert,
+    });
+
+    simulation.tick(0);
+    simulation.tick(100);
+
+    expect(otherAlert).toHaveBeenCalledTimes(1);
+  });
+
+  it('does not alert the board when a non-commander spots the player', () => {
+    const otherAlert = jest.fn();
+    const simulation = createSimulationWithPlayer({top: 500, left: 100});
+
+    simulation.addCraft('enemy-1', {
+      kind: 'enemy',
+      top: 200,
+      left: 100,
+      facing: 'S',
+      isCollidable: true,
+      onLineOfSightChange: () => {},
+      onCommanderAlert: () => {},
+    });
+    simulation.addCraft('enemy-2', {
+      kind: 'enemy',
+      top: 800,
+      left: 700,
+      facing: 'N',
+      isCollidable: true,
+      onCommanderAlert: otherAlert,
+    });
+
+    simulation.tick(0);
+
+    expect(otherAlert).not.toHaveBeenCalled();
+  });
+});

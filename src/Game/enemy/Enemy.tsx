@@ -17,7 +17,7 @@ function StandardEnemyBody({enemyClass}: EnemyBodyProps): JSX.Element {
     <>
       {enemyClass.hasMissile && <EnemyMissile />}
       <EnemyCraft
-        aiClass={enemyClass.aiClass}
+        aiClasses={enemyClass.aiClasses}
         craftColor={enemyClass.craftColor}
         Icon={enemyClass.Icon}
         score={enemyClass.score}
@@ -40,7 +40,7 @@ const Enemy = ({
 
   return (
     <EnemyCraftContextProvider
-      aiClass={enemyClass.aiClass}
+      aiClasses={enemyClass.aiClasses}
       craftSpeedWhenLockedOn={enemyClass.craftSpeedWhenLockedOn}
       defaultCraftSpeed={enemyClass.defaultCraftSpeed}
       defaultFacing={enemyClass.defaultFacing}

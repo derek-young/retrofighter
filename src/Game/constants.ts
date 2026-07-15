@@ -40,15 +40,19 @@ export enum Enemies {
   VETERAN_DUAL_FIGHTER,
   VETERAN_SPEEDER,
   VETERAN_UAV,
+  COMMANDER_DUAL_FIGHTER,
+  VETERAN_COMMANDER_DUAL_FIGHTER,
 }
 
 export const enemyPoints = {
   [Enemies.CARGO_SHIP]: 100,
   [Enemies.DUAL_FIGHTER]: 300,
+  [Enemies.COMMANDER_DUAL_FIGHTER]: 300,
   [Enemies.SPEEDER]: 400,
   [Enemies.UAV]: 200,
   [Enemies.VETERAN_CARGO_SHIP]: 150,
   [Enemies.VETERAN_DUAL_FIGHTER]: 450,
+  [Enemies.VETERAN_COMMANDER_DUAL_FIGHTER]: 450,
   [Enemies.VETERAN_SPEEDER]: 600,
   [Enemies.VETERAN_UAV]: 300,
 };
@@ -79,7 +83,7 @@ export const itemSpawnIntervalMs = 20000;
 export const itemDetectionRange = totalWidth * 3;
 
 export const startingEnemies: (Enemies | null)[][] = [
-  [null, null, null, Enemies.UAV, null, Enemies.UAV, null, Enemies.UAV],
+  [Enemies.UAV, Enemies.UAV, Enemies.UAV, Enemies.UAV, null, Enemies.VETERAN_COMMANDER_DUAL_FIGHTER, null, Enemies.UAV],
   [
     null,
     null,
@@ -140,7 +144,7 @@ export const startingEnemies: (Enemies | null)[][] = [
     null,
     Enemies.VETERAN_UAV,
     Enemies.VETERAN_UAV,
-    Enemies.DUAL_FIGHTER,
+    Enemies.COMMANDER_DUAL_FIGHTER,
     Enemies.CARGO_SHIP,
     Enemies.CARGO_SHIP,
     Enemies.DUAL_FIGHTER,
@@ -162,7 +166,7 @@ export const startingEnemies: (Enemies | null)[][] = [
     Enemies.VETERAN_UAV,
     Enemies.VETERAN_UAV,
     Enemies.CARGO_SHIP,
-    Enemies.VETERAN_DUAL_FIGHTER,
+    Enemies.VETERAN_COMMANDER_DUAL_FIGHTER,
     Enemies.VETERAN_CARGO_SHIP,
     Enemies.VETERAN_DUAL_FIGHTER,
     Enemies.CARGO_SHIP,
