@@ -13,7 +13,12 @@ import Colors from 'types/colors';
 import Button from 'components/Button';
 import IBMText from 'components/IBMText';
 
-import {getDisplayName, getRank, getRankInsignia} from './utils';
+import {
+  formatScore,
+  getDisplayName,
+  getRank,
+  getRankInsignia,
+} from './utils';
 
 const topHeight = 56;
 const bottomHeight = 102;
@@ -77,7 +82,8 @@ const styles = StyleSheet.create({
 });
 
 const DogTag = () => {
-  const {onDeleteAcct, onSignOut, user, totalScore} = useAppContext();
+  const {onDeleteAcct, onSignOut, user, totalScore} =
+    useAppContext();
   const [isExpanded, setIsExpanded] = useState(false);
   const {height, width} = useWindowDimensions();
   const isPortrait = height > width;
@@ -113,9 +119,7 @@ const DogTag = () => {
             </View>
             <View style={styles.right}>
               <IBMText>High Score</IBMText>
-              <IBMText>
-                {totalScore.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
-              </IBMText>
+              <IBMText>{formatScore(totalScore)}</IBMText>
             </View>
           </View>
           {user?.uid ? (

@@ -11,7 +11,13 @@ import {useNavigation} from '@react-navigation/native';
 import {GoogleSignin} from '@react-native-google-signin/google-signin';
 import {appleAuth} from '@invertase/react-native-apple-authentication';
 
-import {userActions} from 'database';
+import {leaderboardActions, userActions} from 'database';
+import {
+  UserRecords,
+  getTotalScore,
+  mergeLevelCompletion,
+} from 'database/records';
+import {getDisplayName} from 'Catalog/utils';
 import {CatalogNavigationProp} from 'types/app';
 
 const noop = () => {};
@@ -19,20 +25,26 @@ const noop = () => {};
 export type AuthUser = null | FirebaseAuthTypes.User;
 
 const defaultValue: AppContextValue = {
+  bestTimes: [],
   onDeleteAcct: noop,
   onSignOut: noop,
   scores: [],
-  recordScores: noop,
+  recordLevelCompletion: noop,
   totalScore: 0,
   user: null,
   setUser: noop,
 };
 
 interface AppContextValue {
+  bestTimes: number[];
   onDeleteAcct: () => void;
   onSignOut: () => void;
   scores: number[];
-  recordScores: (level: number, score: number, elapsedSeconds: number) => void;
+  recordLevelCompletion: (
+    level: number,
+    score: number,
+    elapsedSeconds: number,
+  ) => void;
   totalScore: number;
   user: AuthUser;
   setUser: (user: AuthUser) => void;
@@ -46,42 +58,44 @@ export const AppContextProvider = ({children}: {children: React.ReactNode}) => {
   const [user, setUser] = useState<AuthUser>(null);
   const [scores, setScores] = useState<number[]>([]);
   const [levelTimes, setLevelTimes] = useState<number[]>([]);
+  const [bestTimes, setBestTimes] = useState<number[]>([]);
   const navigation = useNavigation<CatalogNavigationProp>();
 
-  const totalScore = useMemo(
-    () => scores.reduce((acc, score) => acc + score, 0),
-    [scores],
-  );
+  const totalScore = useMemo(() => getTotalScore(scores), [scores]);
 
-  const setRemoteScores = useCallback(
-    (nextScores: number[], nextLevelTimes: number[]) => {
+  const setRemoteRecords = useCallback(
+    (next: UserRecords) => {
       if (user?.uid) {
-        // userActions.set replaces the whole user record, so scores and
-        // levelTimes must always be written together.
-        userActions.set({scores: nextScores, levelTimes: nextLevelTimes});
+        // userActions.set replaces the whole user record, so all three
+        // record arrays must always be written together.
+        userActions.set(next);
+        leaderboardActions.set({
+          displayName: getDisplayName(user),
+          totalScore: getTotalScore(next.scores),
+          bestTimes: next.bestTimes,
+        });
       }
     },
-    [user?.uid],
+    [user],
   );
 
-  const recordScores = useCallback(
+  const recordLevelCompletion = useCallback(
     (level: number, score: number, elapsedSeconds: number) => {
-      if ((scores[level] ?? 0) < score) {
-        const nextScores = scores.slice();
-        nextScores[level] = score;
+      const next = mergeLevelCompletion(
+        {scores, levelTimes, bestTimes},
+        level,
+        score,
+        elapsedSeconds,
+      );
 
-        // Backfill 0 ("time unknown") for levels beaten before times were
-        // tracked, so the array stays dense through the Firebase round-trip.
-        const nextLevelTimes = nextScores.map(
-          (_, i) => (i === level ? elapsedSeconds : levelTimes[i]) ?? 0,
-        );
-
-        setScores(nextScores);
-        setLevelTimes(nextLevelTimes);
-        setRemoteScores(nextScores, nextLevelTimes);
+      if (next) {
+        setScores(next.scores);
+        setLevelTimes(next.levelTimes);
+        setBestTimes(next.bestTimes);
+        setRemoteRecords(next);
       }
     },
-    [levelTimes, scores, setRemoteScores],
+    [bestTimes, levelTimes, scores, setRemoteRecords],
   );
 
   const onDeleteConfirm = useCallback(async () => {
@@ -105,6 +119,9 @@ export const AppContextProvider = ({children}: {children: React.ReactNode}) => {
 
       if (credential) {
         await user?.reauthenticateWithCredential(credential);
+        // The leaderboard entry is readable by other players, so it must be
+        // removed while this uid can still write its own node.
+        await leaderboardActions.remove();
         await user?.delete();
         navigation.navigate('Login');
       }
@@ -133,11 +150,32 @@ export const AppContextProvider = ({children}: {children: React.ReactNode}) => {
     if (user?.uid) {
       userActions.get().then(dbUser => {
         if (dbUser?.scores) {
-          setScores(dbUser.scores);
           // Firebase returns sparse arrays as keyed objects; normalize.
+          // Accounts predating bestTimes are seeded from levelTimes (its 0
+          // fillers carry through as "no time").
+          const nextBestTimes: number[] = Object.assign(
+            [],
+            dbUser.bestTimes ?? dbUser.levelTimes ?? [],
+          );
+
+          setScores(dbUser.scores);
           setLevelTimes(Object.assign([], dbUser.levelTimes ?? []));
+          setBestTimes(nextBestTimes);
+
+          // Refresh the public mirror every login: it keeps the display name
+          // current and seeds entries for accounts predating the leaderboard.
+          leaderboardActions.set({
+            displayName: getDisplayName(user),
+            totalScore: getTotalScore(dbUser.scores),
+            bestTimes: nextBestTimes,
+          });
         } else {
-          userActions.set({scores: [], levelTimes: []});
+          userActions.set({scores: [], levelTimes: [], bestTimes: []});
+          leaderboardActions.set({
+            displayName: getDisplayName(user),
+            totalScore: 0,
+            bestTimes: [],
+          });
         }
       });
     }
@@ -145,16 +183,21 @@ export const AppContextProvider = ({children}: {children: React.ReactNode}) => {
     return () => {
       setScores([]);
       setLevelTimes([]);
+      setBestTimes([]);
     };
-  }, [user?.uid]);
+    // Keyed on the uid, not the user object: auth can hand back new user
+    // references for the same account, and reloading then would blank the
+    // local records mid-session.
+  }, [user?.uid]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <AppContext.Provider
       children={children}
       value={{
+        bestTimes,
         onDeleteAcct,
         onSignOut,
-        recordScores,
+        recordLevelCompletion,
         scores,
         totalScore,
         user,

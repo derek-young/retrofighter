@@ -1,11 +1,14 @@
 import auth from '@react-native-firebase/auth';
 import database from '@react-native-firebase/database';
 
-interface DbUser {
+export interface DbUser {
   scores?: number[];
   // Elapsed seconds of the run that set each level's high score, so scores
   // can be recomputed if the time-bonus formula changes.
   levelTimes?: number[];
+  // Fastest completion in seconds per level, regardless of score; 0 = no
+  // recorded time.
+  bestTimes?: number[];
 }
 
 class User {

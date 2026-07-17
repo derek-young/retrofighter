@@ -71,7 +71,7 @@ const LevelCompletePopup = ({
   onResetLevel,
 }: LevelCompletePopupProps) => {
   const navigation = useNavigation<GameNavigationProp>();
-  const {recordScores} = useAppContext();
+  const {recordLevelCompletion} = useAppContext();
   const {carryEffects, epic, scoreForLevel, setRemainingLives} =
     useGameContext();
   const simulation = useSimulationContext();
@@ -144,7 +144,7 @@ const LevelCompletePopup = ({
 
   useEffect(() => {
     if (haveAnimationsEnded && isOpen && completion) {
-      recordScores(
+      recordLevelCompletion(
         epic,
         scoreForLevel + completion.timeBonus,
         completion.elapsedSeconds,

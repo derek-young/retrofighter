@@ -1,6 +1,33 @@
 import {getMaxPossibleScore} from 'Game/utils';
 
-import {getDisplayName, getRankIndex} from './utils';
+import {
+  formatScore,
+  formatTime,
+  getDisplayName,
+  getRankIndex,
+} from './utils';
+
+describe(formatScore.name, () => {
+  it('adds comma separators', () => {
+    expect(formatScore(0)).toEqual('0');
+    expect(formatScore(950)).toEqual('950');
+    expect(formatScore(12500)).toEqual('12,500');
+    expect(formatScore(1250000)).toEqual('1,250,000');
+  });
+});
+
+describe(formatTime.name, () => {
+  it('formats seconds as m:ss', () => {
+    expect(formatTime(0)).toEqual('0:00');
+    expect(formatTime(9)).toEqual('0:09');
+    expect(formatTime(61)).toEqual('1:01');
+    expect(formatTime(600)).toEqual('10:00');
+  });
+
+  it('floors fractional seconds', () => {
+    expect(formatTime(78.4)).toEqual('1:18');
+  });
+});
 
 describe(getDisplayName.name, () => {
   it('returns first initial dot last if both exist', () => {

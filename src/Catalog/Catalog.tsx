@@ -1,15 +1,18 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {ImageBackground, ScrollView, StyleSheet, View} from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 
 import {useAppContext} from 'AppContext';
 import {CatalogNavigationProp} from 'types/app';
 import {earnablePoints, startingEnemies} from 'Game/constants';
+import {getParSeconds} from 'Game/utils';
 import pyramidsImage from 'images/backdrop_catalog.jpg';
+import Button from 'components/Button';
 import TransparentSafeAreaView from 'components/TransparentSafeAreaView';
 
 import CatalogButton from './CatalogButton';
 import DogTag from './DogTag';
+import LeaderboardModal from './LeaderboardModal';
 
 const styles = StyleSheet.create({
   background: {
@@ -22,6 +25,10 @@ const styles = StyleSheet.create({
     display: 'flex',
     alignItems: 'center',
     flexGrow: 1,
+  },
+  leaderboardButton: {
+    alignSelf: 'center',
+    marginBottom: 12,
   },
 });
 
@@ -36,8 +43,9 @@ const levels = startingEnemies.map(enemies =>
 );
 
 const Catalog = (): JSX.Element => {
-  const {scores} = useAppContext();
+  const {bestTimes, scores, user} = useAppContext();
   const navigation = useNavigation<CatalogNavigationProp>();
+  const [isLeaderboardOpen, setIsLeaderboardOpen] = useState(false);
 
   return (
     <ImageBackground
@@ -46,6 +54,13 @@ const Catalog = (): JSX.Element => {
       style={styles.background}>
       <TransparentSafeAreaView />
       <DogTag />
+      {user?.uid ? (
+        <Button
+          onPress={() => setIsLeaderboardOpen(true)}
+          style={styles.leaderboardButton}>
+          Leaderboard
+        </Button>
+      ) : null}
       <View style={styles.container}>
         <ScrollView contentContainerStyle={styles.scrollContainer}>
           {levels.map((pointsPossible, level) => {
@@ -56,10 +71,12 @@ const Catalog = (): JSX.Element => {
             return (
               <CatalogButton
                 key={level}
+                bestTime={bestTimes[level] ?? 0}
                 disabled={!hasCompletedPreviousLevel}
                 earned={earned}
                 level={level}
                 onPress={() => navigation.navigate('Game', {epic: level})}
+                parSeconds={getParSeconds(level)}
                 possible={pointsPossible}
               />
             );
@@ -67,6 +84,10 @@ const Catalog = (): JSX.Element => {
         </ScrollView>
       </View>
       <TransparentSafeAreaView />
+      <LeaderboardModal
+        onClose={() => setIsLeaderboardOpen(false)}
+        open={isLeaderboardOpen}
+      />
     </ImageBackground>
   );
 };

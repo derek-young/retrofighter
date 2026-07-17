@@ -12,8 +12,10 @@ import IBMText from 'components/IBMText';
 import PressStartText from 'components/PressStartText';
 import silverStarImage from 'images/silver-star.png';
 
+import {formatTime} from './utils';
+
 const BUTTON_WIDTH = 160;
-const BUTTON_HEIGHT = 64;
+const BUTTON_HEIGHT = 76;
 
 const styles = StyleSheet.create({
   buttonContainer: {
@@ -27,7 +29,7 @@ const styles = StyleSheet.create({
     width: BUTTON_WIDTH - 12,
     height: BUTTON_HEIGHT - 12,
     borderRadius: 4,
-    paddingBottom: 8,
+    paddingBottom: 24,
   },
   buttonBackground: {
     backgroundColor: `${Colors.PURPLE}90`,
@@ -35,15 +37,22 @@ const styles = StyleSheet.create({
     height: BUTTON_HEIGHT,
     borderRadius: 8,
   },
-  score: {
+  stats: {
     display: 'flex',
-    flexDirection: 'row',
     alignItems: 'center',
     position: 'absolute',
     bottom: 6,
   },
+  score: {
+    display: 'flex',
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
   scoreText: {
     fontSize: 12,
+  },
+  timeText: {
+    fontSize: 10,
   },
   star: {
     height: 10,
@@ -52,18 +61,23 @@ const styles = StyleSheet.create({
 });
 
 type CatalogButtonProps = {
+  // 0 means no recorded time.
+  bestTime?: number;
   disabled: boolean;
   earned: number;
   level: number;
   onPress: () => void;
+  parSeconds: number;
   possible: number;
 };
 
 const CatalogButton = ({
+  bestTime = 0,
   disabled = false,
   earned,
   level,
   onPress,
+  parSeconds,
   possible,
 }: CatalogButtonProps): JSX.Element => {
   const containerStyles = {
@@ -85,16 +99,29 @@ const CatalogButton = ({
         onPress={onPress}
         style={[styles.buttonContainer, styles.button]}>
         <PressStartText>{`Level ${level + 1}`}</PressStartText>
-        <View style={styles.score}>
-          {earned >= possible && (
-            <Image source={silverStarImage} style={styles.star} />
-          )}
-          <IBMText style={styles.scoreText}>
-            {earned}/{possible}
-          </IBMText>
-          {earned >= possible && (
-            <Image source={silverStarImage} style={styles.star} />
-          )}
+        <View style={styles.stats}>
+          <View style={styles.score}>
+            {earned >= possible && (
+              <Image source={silverStarImage} style={styles.star} />
+            )}
+            <IBMText style={styles.scoreText}>
+              {earned}/{possible}
+            </IBMText>
+            {earned >= possible && (
+              <Image source={silverStarImage} style={styles.star} />
+            )}
+          </View>
+          {bestTime > 0 ? 
+            <IBMText
+              style={styles.timeText}>
+              {formatTime(bestTime)} · par {formatTime(parSeconds)}
+            </IBMText>
+            :
+            <IBMText
+              style={styles.timeText}>
+              par {formatTime(parSeconds)}
+            </IBMText>
+          }
         </View>
       </ButtonComponent>
     </View>
