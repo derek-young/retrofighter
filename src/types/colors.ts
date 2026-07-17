@@ -9,6 +9,7 @@ enum Colors {
   PINK = '#FE75FE',
   PURPLE = '#7A04EB',
   RED = '#FF124F',
+  VIVID_YELLOW = '#FFD60A',
   SKY_BLUE = '#65DEF1',
   VIOLET = '#B15CFF',
 }

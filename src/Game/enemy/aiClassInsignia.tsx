@@ -2,12 +2,10 @@ import React from 'react';
 
 import {AiClass} from './useEnemyCraftAnimation';
 import CommanderChevrons from './CommanderChevrons';
-import VeteranRadarPulse from './VeteranRadarPulse';
 
-// The hull insignia for each AI trait. A craft renders one per trait it has, so
-// a veteran-commander shows both. Adding a trait's marker is a one-line entry
-// here — no new booleans threaded through the render tree.
-export const aiClassInsignia: Record<AiClass, React.FC<{fill: string}>> = {
-  veteran: VeteranRadarPulse,
+// The hull insignia for AI traits that have one; a craft renders one per
+// trait. Veterans have no insignia — they are distinguished by their red hull
+// colour (see EnemyCraft).
+export const aiClassInsignia: Partial<Record<AiClass, React.FC<{fill: string}>>> = {
   commander: CommanderChevrons,
 };

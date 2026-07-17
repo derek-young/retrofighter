@@ -21,7 +21,7 @@ interface EnemyCraftProps {
 
 const EnemyCraft = ({
   aiClasses,
-  craftColor = Colors.RED,
+  craftColor = aiClasses?.includes('veteran') ? Colors.RED : Colors.VIVID_YELLOW,
   Icon,
   score,
 }: EnemyCraftProps): null | JSX.Element => {
@@ -41,15 +41,12 @@ const EnemyCraft = ({
   const [isAwaitingMissileAnimEnd, setIsAwaitingMissileAnimEnd] =
     useState(false);
   const craftEffects = effects[simId];
-  // A cloaked enemy is nearly invisible to the player; the simulation still
-  // treats it as a full threat.
   const fill = craftEffects?.isCloaked ? `${craftColor}26` : craftColor;
-  // One marker per AI trait, so a veteran-commander shows both.
   const insignia = aiClasses?.length ? (
     <>
       {aiClasses.map(cls => {
         const Insignia = aiClassInsignia[cls];
-        return <Insignia key={cls} fill={fill} />;
+        return Insignia ? <Insignia key={cls} fill={fill} /> : null;
       })}
     </>
   ) : undefined;

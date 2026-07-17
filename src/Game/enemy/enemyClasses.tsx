@@ -28,7 +28,7 @@ export interface EnemyClass {
   // player missiles, 'commander' alerts the whole board on sight. An empty or
   // absent list is a plain ("basic") enemy; a class can be both.
   aiClasses?: AiClass[];
-  craftColor?: string; // defaults to Colors.RED in EnemyCraft
+  craftColor?: string;
   defaultFacing?: Facing;
   freezeWhenPlayerDetected?: boolean;
   hasMissile?: boolean;
