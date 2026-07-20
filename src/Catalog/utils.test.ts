@@ -1,4 +1,9 @@
-import {getMaxPossibleScore} from 'Game/utils';
+import {
+  getCumulativeKillPoints,
+  getFullClearScore,
+  getHalfParTimeBonus,
+  getLevelCount,
+} from 'Game/utils';
 
 import {
   formatScore,
@@ -49,12 +54,24 @@ describe(getDisplayName.name, () => {
 });
 
 describe(getRankIndex.name, () => {
-  // Mirrors the threshold rule: Admiral at 90% of the theoretical maximum,
-  // each lower rank half as hard, all rounded to the nearest 10.
-  const admiralThreshold = Math.round((getMaxPossibleScore() * 0.9) / 10) * 10;
-  const thresholds = [32, 16, 8, 4, 2, 1].map(
-    divisor => Math.round(admiralThreshold / divisor / 10) * 10,
-  );
+  // Mirrors the threshold rule: Lieutenant … Captain at 1/5 … 4/5 level
+  // completion, Fleet Captain at a full clear, Admiral at a full clear with
+  // every level at half par. All rounded to the nearest 10.
+  const roundToTen = (score: number) => Math.round(score / 10) * 10;
+  const levelCount = getLevelCount();
+  const thresholds = [
+    ...[1, 2, 3, 4].map(step =>
+      roundToTen(
+        getCumulativeKillPoints(Math.round((step / 5) * levelCount) - 1),
+      ),
+    ),
+    roundToTen(getFullClearScore()),
+    roundToTen(getFullClearScore() + getHalfParTimeBonus()),
+  ];
+
+  it('anchors Fleet Captain at a full clear and Admiral at half par', () => {
+    expect(thresholds).toEqual([1700, 6200, 12600, 23000, 40250, 53100]);
+  });
 
   it('starts at the lowest rank', () => {
     expect(getRankIndex(0)).toEqual(0);

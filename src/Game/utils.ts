@@ -88,20 +88,55 @@ export function getTimeBonus(epic: number, elapsedSeconds: number) {
   return Math.round((timeBonusPointsPerSecond * secondsUnderPar) / 10) * 10;
 }
 
+export function getLevelCount() {
+  return startingEnemies.length;
+}
+
+/** Points earned by clearing every enemy slot on a single level. */
+export function getLevelKillPoints(epic: number) {
+  return startingEnemies[epic].reduce(
+    (points: number, enemy) =>
+      enemy === null ? points : points + earnablePoints[enemy],
+    0,
+  );
+}
+
+/** Kill points earned by clearing levels 0 through throughEpic, inclusive. */
+export function getCumulativeKillPoints(throughEpic: number) {
+  let total = 0;
+
+  for (let epic = 0; epic <= throughEpic; epic++) {
+    total += getLevelKillPoints(epic);
+  }
+
+  return total;
+}
+
+/** Kill points earned by clearing every level (a full, par-time run). */
+export function getFullClearScore() {
+  return getCumulativeKillPoints(getLevelCount() - 1);
+}
+
+/** Total time bonus for finishing every level at half its par time. */
+export function getHalfParTimeBonus() {
+  return startingEnemies.reduce(
+    (total, _enemies, epic) => total + getTimeBonus(epic, getParSeconds(epic) / 2),
+    0,
+  );
+}
+
 /**
  * The theoretical maximum total score: every enemy slot's earnable points
  * plus the full time bonus (a par-time-zero finish) on every level.
  */
 export function getMaxPossibleScore() {
-  return startingEnemies.reduce((total, enemies, epic) => {
-    const killPoints = enemies.reduce(
-      (points: number, enemy) =>
-        enemy === null ? points : points + earnablePoints[enemy],
-      0,
-    );
-
-    return total + killPoints + getParSeconds(epic) * timeBonusPointsPerSecond;
-  }, 0);
+  return startingEnemies.reduce(
+    (total, _enemies, epic) =>
+      total +
+      getLevelKillPoints(epic) +
+      getParSeconds(epic) * timeBonusPointsPerSecond,
+    0,
+  );
 }
 
 export function getIsThanksgivingDay() {
