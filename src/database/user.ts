@@ -12,33 +12,30 @@ export interface DbUser {
 }
 
 class User {
-  constructor() {
-    auth().onAuthStateChanged(user => {
-      this.userId = user?.uid ?? null;
-    });
+  // Resolve the uid from Firebase's authoritative current user at call time.
+  // A cached value populated by a separate onAuthStateChanged listener can be
+  // stale/null depending on listener ordering, sending reads/writes to
+  // /users/null — which the security rules reject.
+  private ref() {
+    return database().ref(`/users/${auth().currentUser?.uid}`);
   }
 
-  userId: null | string = null;
-
   get() {
-    return database()
-      .ref(`/users/${this.userId}`)
+    return this.ref()
       .once('value')
       .then(snapshot => snapshot.val());
   }
 
   set(nextValue: Partial<DbUser>) {
-    return database().ref(`/users/${this.userId}`).set(nextValue);
+    return this.ref().set(nextValue);
   }
 
   on(callback: (user: DbUser) => void) {
-    return database()
-      .ref(`/users/${this.userId}`)
-      .on('value', snapshot => callback(snapshot.val()));
+    return this.ref().on('value', snapshot => callback(snapshot.val()));
   }
 
   off(callback: any) {
-    return database().ref(`/users/${this.userId}`).off('value', callback);
+    return this.ref().off('value', callback);
   }
 }
 

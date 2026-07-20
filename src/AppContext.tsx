@@ -153,7 +153,7 @@ export const AppContextProvider = ({children}: {children: React.ReactNode}) => {
 
   useEffect(() => {
     if (user?.uid) {
-      userActions.get().then(dbUser => {
+      const promise = userActions.get().then(dbUser => {
         if (dbUser?.scores) {
           // Firebase returns sparse arrays as keyed objects; normalize.
           // Accounts predating bestTimes are seeded from levelTimes (its 0
@@ -183,6 +183,9 @@ export const AppContextProvider = ({children}: {children: React.ReactNode}) => {
           });
         }
       });
+      // Never let a failed read fall through silently: that would leave scores
+      // at 0 and look like the save never happened.
+      promise.catch(e => console.log('Failed to load user records', e));
     }
 
     return () => {

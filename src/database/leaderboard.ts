@@ -10,13 +10,11 @@ export interface LeaderboardEntry {
 }
 
 class Leaderboard {
-  constructor() {
-    auth().onAuthStateChanged(user => {
-      this.userId = user?.uid ?? null;
-    });
+  // See User.ref(): resolve the uid at call time so writes never land on
+  // /leaderboard/null when a cached listener value hasn't caught up.
+  private entryRef() {
+    return database().ref(`/leaderboard/${auth().currentUser?.uid}`);
   }
-
-  userId: null | string = null;
 
   getAll(): Promise<null | Record<string, LeaderboardEntry>> {
     return database()
@@ -26,11 +24,11 @@ class Leaderboard {
   }
 
   set(entry: LeaderboardEntry) {
-    return database().ref(`/leaderboard/${this.userId}`).set(entry);
+    return this.entryRef().set(entry);
   }
 
   remove() {
-    return database().ref(`/leaderboard/${this.userId}`).remove();
+    return this.entryRef().remove();
   }
 }
 
