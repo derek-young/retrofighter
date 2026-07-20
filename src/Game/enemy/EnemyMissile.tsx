@@ -25,7 +25,7 @@ const MissileIcon: React.FC<IconProps> = isThanksgivingDay
   : EnemyMissileIcon;
 
 const EnemyMissile = (): null | JSX.Element => {
-  const {facing, leftAnim, rotationAnim, simId, topAnim} =
+  const {facing, isEliminated, leftAnim, rotationAnim, simId, topAnim} =
     useEnemyCraftContext();
   const missileProps = useEnemyMissileContext();
   const {effects} = useItemFactoryContext();
@@ -48,6 +48,10 @@ const EnemyMissile = (): null | JSX.Element => {
       },
     [fill],
   );
+
+  if (isEliminated && !missileProps.hasMissileFired) {
+    return null;
+  }
 
   return (
     <Missile
