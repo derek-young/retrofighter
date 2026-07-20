@@ -1,6 +1,7 @@
 import {Facing} from 'Game/types';
 import {
   alleyWidth,
+  craftPixelsPerSecond,
   craftSize,
   maxScreenSize,
   missileSpeed,
@@ -547,9 +548,11 @@ class Simulation {
   }
 
   /**
-   * The owner's speed along the line of fire at launch. Missiles inherit it
+   * How much the owner's speed along the line of fire at launch exceeds the
+   * normal craft speed. Missiles keep their usual margin over that excess,
    * so a craft firing while charging — a locked-on speeder with a cluster
-   * bomb moves faster than a base missile — can never outrun its own shot.
+   * bomb moves faster than a base missile — can never outrun its own shot,
+   * while a craft at normal speed fires at the base missile speed.
    */
   private getLaunchSpeedBonus(
     owner: CraftEntity | undefined,
@@ -562,17 +565,24 @@ class Simulation {
 
     this.advanceCraft(owner, now);
     const velocity = getCraftVelocity(owner);
+    let forwardSpeed: number;
 
     switch (facing) {
       case 'N':
-        return Math.max(0, -velocity.top);
+        forwardSpeed = -velocity.top;
+        break;
       case 'S':
-        return Math.max(0, velocity.top);
+        forwardSpeed = velocity.top;
+        break;
       case 'E':
-        return Math.max(0, velocity.left);
+        forwardSpeed = velocity.left;
+        break;
       case 'W':
-        return Math.max(0, -velocity.left);
+        forwardSpeed = -velocity.left;
+        break;
     }
+
+    return Math.max(0, forwardSpeed - craftPixelsPerSecond);
   }
 
   removeMissile(id: string): void {

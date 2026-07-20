@@ -3,7 +3,6 @@ import {StyleSheet} from 'react-native';
 import {
   GoogleSignin,
   GoogleSigninButton,
-  statusCodes,
 } from '@react-native-google-signin/google-signin';
 import auth from '@react-native-firebase/auth';
 
@@ -34,19 +33,23 @@ const SigninButton = () => {
       setAuthStatus(STATUS.PENDING);
 
       await GoogleSignin.hasPlayServices();
-      const {idToken} = await GoogleSignin.signIn();
-      const googleCredential = auth.GoogleAuthProvider.credential(idToken);
+      const response = await GoogleSignin.signIn();
+
+      if (response.type === 'cancelled') {
+        setAuthStatus(STATUS.IDLE);
+        return;
+      }
+
+      const googleCredential = auth.GoogleAuthProvider.credential(
+        response.data.idToken,
+      );
       const resFromSignin = await auth().signInWithCredential(googleCredential);
 
       setUser(resFromSignin.user);
       setAuthStatus(STATUS.SUCCESS);
     } catch (error) {
-      if (error?.code === statusCodes.SIGN_IN_CANCELLED) {
-        setAuthStatus(STATUS.IDLE);
-      } else {
-        console.log('error', error);
-        setAuthStatus(STATUS.FAILED);
-      }
+      console.log('error', error);
+      setAuthStatus(STATUS.FAILED);
     }
   };
 

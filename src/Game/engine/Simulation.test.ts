@@ -1,4 +1,4 @@
-import {craftSize, missileSpeed} from 'Game/constants';
+import {craftPixelsPerSecond, craftSize, missileSpeed} from 'Game/constants';
 import {Facing} from 'Game/types';
 
 import Simulation, {PLAYER_ID} from './Simulation';
@@ -290,7 +290,7 @@ describe('missiles', () => {
     expect(onImpact).toHaveBeenCalledTimes(1);
   });
 
-  it('inherits the owner forward speed at launch', () => {
+  it('adds the owner speed above normal craft speed at launch', () => {
     const simulation = createSimulationWithPlayer();
 
     simulation.addCraft('speeder', {
@@ -300,8 +300,8 @@ describe('missiles', () => {
       facing: 'S',
       isCollidable: true,
     });
-    // A locked-on speeder charges faster than a base missile flies; its
-    // shot must still pull ahead of it.
+    // A locked-on speeder charges at 150px/s, 100px/s over the normal craft
+    // speed; its shot keeps the base missile's margin over that excess.
     simulation.setSegment('speeder', {axis: 'top', to: 600, speed: 150}, 0);
 
     simulation.addMissile(
@@ -321,11 +321,45 @@ describe('missiles', () => {
     );
 
     expect(simulation.getMissileSpeed('speeder-cluster-missile')).toEqual(
-      missileSpeed + 150,
+      missileSpeed + (150 - craftPixelsPerSecond),
     );
     expect(
       simulation.getMissileValue('speeder-cluster-missile', 1000),
-    ).toEqual(12 - (missileSpeed + 150));
+    ).toEqual(12 - (missileSpeed + (150 - craftPixelsPerSecond)));
+  });
+
+  it('gets no launch bonus at normal craft speed', () => {
+    const simulation = createSimulationWithPlayer();
+
+    simulation.addCraft('enemy-1', {
+      kind: 'enemy',
+      top: 0,
+      left: 100,
+      facing: 'S',
+      isCollidable: true,
+    });
+    simulation.setSegment(
+      'enemy-1',
+      {axis: 'top', to: 600, speed: craftPixelsPerSecond},
+      0,
+    );
+
+    simulation.addMissile(
+      'enemy-1-missile',
+      {
+        ownerId: 'enemy-1',
+        originTop: 0,
+        originLeft: 100,
+        facing: 'S',
+        positionOffset: 10,
+        startValue: 12,
+        targetKind: 'player',
+        onImpact: () => {},
+      },
+      0,
+    );
+
+    expect(simulation.getMissileSpeed('enemy-1-missile')).toEqual(missileSpeed);
   });
 
   it('gets no launch bonus when the owner moves away from the line of fire', () => {

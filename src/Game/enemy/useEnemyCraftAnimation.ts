@@ -415,6 +415,10 @@ function useEnemyCraftAnimation({
     };
 
     isFrozenRef.current = true;
+    // Once a cargo ship commits to deploying, it can no longer be shot down.
+    // A hit here would eliminate it before its speeders are registered, and
+    // the board would read as clear — ending the level as the speeders spawn.
+    simulation.setCollidable(simId, false);
     simulation.setPosition(simId, snappedPosition);
     leftAnim.stopAnimation();
     topAnim.stopAnimation();

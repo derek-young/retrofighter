@@ -235,7 +235,12 @@ const Craft = ({
       {hasEliminationEnded ? null : (
         <>
           <Icon fill={fill} />
-          <Icon fill="#00000040" style={{...styles.shadow, ...shadow}} />
+          <Icon
+            fill="#00000040"
+            width={craftSize}
+            height={craftSize}
+            style={{...styles.shadow, ...shadow}}
+          />
           {insignia}
         </>
       )}

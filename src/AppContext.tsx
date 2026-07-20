@@ -105,8 +105,13 @@ export const AppContextProvider = ({children}: {children: React.ReactNode}) => {
 
       if (providerId === 'google.com') {
         await GoogleSignin.hasPlayServices();
-        const {idToken} = await GoogleSignin.signIn();
-        credential = auth.GoogleAuthProvider.credential(idToken);
+        const response = await GoogleSignin.signIn();
+
+        if (response.type === 'cancelled') {
+          return;
+        }
+
+        credential = auth.GoogleAuthProvider.credential(response.data.idToken);
       } else if (providerId === 'apple.com') {
         const appleAuthRequestResponse = await appleAuth.performRequest({
           requestedOperation: appleAuth.Operation.LOGIN,
