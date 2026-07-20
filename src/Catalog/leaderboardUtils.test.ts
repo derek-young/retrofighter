@@ -43,8 +43,8 @@ describe(rankByTotalScore.name, () => {
 describe(rankByBestTime.name, () => {
   it('ranks players by time on the given level, ascending', () => {
     expect(rankByBestTime(entries, 0)).toEqual([
-      {uid: 'uidAmy', displayName: 'A.Amy', value: 25},
-      {uid: 'uidBob', displayName: 'B.Bob', value: 30},
+      {uid: 'uidAmy', displayName: 'A.Amy', value: 25, totalScore: 900},
+      {uid: 'uidBob', displayName: 'B.Bob', value: 30, totalScore: 1200},
     ]);
   });
 
@@ -55,8 +55,8 @@ describe(rankByBestTime.name, () => {
 
   it('reads sparse bestTimes objects as returned by Firebase', () => {
     expect(rankByBestTime(entries, 2)).toEqual([
-      {uid: 'uidCal', displayName: 'C.Cal', value: 70},
-      {uid: 'uidAmy', displayName: 'A.Amy', value: 80},
+      {uid: 'uidCal', displayName: 'C.Cal', value: 70, totalScore: 900},
+      {uid: 'uidAmy', displayName: 'A.Amy', value: 80, totalScore: 900},
     ]);
   });
 

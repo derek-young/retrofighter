@@ -1,6 +1,7 @@
 import React, {useCallback, useEffect, useState} from 'react';
 import {
   ActivityIndicator,
+  Image,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -17,7 +18,7 @@ import IBMText from 'components/IBMText';
 import Modal from 'components/Modal';
 import PressStartText from 'components/PressStartText';
 
-import {formatScore, formatTime} from './utils';
+import {formatScore, formatTime, getRankInsignia} from './utils';
 import {rankByBestTime, rankByTotalScore} from './leaderboardUtils';
 
 const styles = StyleSheet.create({
@@ -94,13 +95,29 @@ const styles = StyleSheet.create({
   row: {
     display: 'flex',
     flexDirection: 'row',
+    alignItems: 'center',
     justifyContent: 'space-between',
     paddingVertical: 4,
+  },
+  rowLeft: {
+    display: 'flex',
+    flexDirection: 'row',
+    alignItems: 'center',
+    flexShrink: 1,
+    marginRight: 16,
+  },
+  rowPosition: {
+    color: 'white',
+    width: 28,
+  },
+  insignia: {
+    height: 20,
+    width: 20,
+    marginRight: 8,
   },
   rowName: {
     color: 'white',
     flexShrink: 1,
-    marginRight: 16,
   },
   rowValue: {
     color: 'white',
@@ -186,11 +203,25 @@ function LeaderboardModal({onClose, open}: LeaderboardModalProps) {
 
           return (
             <View key={row.uid} style={styles.row}>
-              <IBMText
-                numberOfLines={1}
-                style={[styles.rowName, isCurrentUser && styles.currentUser]}>
-                {index + 1}. {row.displayName}
-              </IBMText>
+              <View style={styles.rowLeft}>
+                <IBMText
+                  style={[
+                    styles.rowPosition,
+                    isCurrentUser && styles.currentUser,
+                  ]}>
+                  {index + 1}.
+                </IBMText>
+                <Image
+                  resizeMode="contain"
+                  source={getRankInsignia(row.totalScore)}
+                  style={styles.insignia}
+                />
+                <IBMText
+                  numberOfLines={1}
+                  style={[styles.rowName, isCurrentUser && styles.currentUser]}>
+                  {row.displayName}
+                </IBMText>
+              </View>
               <IBMText
                 style={[styles.rowValue, isCurrentUser && styles.currentUser]}>
                 {tab === 'scores'

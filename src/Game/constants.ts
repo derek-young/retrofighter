@@ -67,7 +67,7 @@ export const earnablePoints = {
 };
 
 export const parSecondsPerEnemy = 10;
-export const veteranParSecondsPerEnemy = 20;
+export const veteranParSecondsPerEnemy = 15;
 export const timeBonusPointsPerSecond = 20;
 
 // How far ahead (in flight time) a player missile warns a veteran craft.

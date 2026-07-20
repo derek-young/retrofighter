@@ -2,7 +2,7 @@ import {useCallback, useEffect, useRef, useState} from 'react';
 import {Animated} from 'react-native';
 
 import {Facing} from 'Game/types';
-import {animateCraft, isVerticalFacing} from 'Game/utils';
+import {animateCraft, getNextAlley, isVerticalFacing} from 'Game/utils';
 import {itemDetectionRange, totalWidth} from 'Game/constants';
 import {useGameContext} from 'Game/GameContext';
 import {PLAYER_ID, Position} from 'Game/engine/Simulation';
@@ -93,6 +93,7 @@ function useEnemyCraftAnimation({
   const isDodgingRef = useRef(false);
   const isEliminatedRef = useRef(false);
   const isFrozenRef = useRef(false);
+  const freezeTravelRef = useRef<null | (() => void)>(null);
   const isPlayerEliminatedRef = useRef(isPlayerEliminated);
   const isPlayerInLineOfSightRef = useRef(false);
   const isPlayerInLineOfSightPrevRef = useRef(false);
@@ -406,25 +407,76 @@ function useEnemyCraftAnimation({
       return;
     }
 
-    // Park on the nearest grid intersection rather than the mid-segment
-    // point where detection happened, so the speeders a cargo ship releases
-    // here spawn aligned with the alleys.
-    const snappedPosition = {
-      top: Math.round(position.top / totalWidth) * totalWidth,
-      left: Math.round(position.left / totalWidth) * totalWidth,
-    };
-
     isFrozenRef.current = true;
     // Once a cargo ship commits to deploying, it can no longer be shot down.
     // A hit here would eliminate it before its speeders are registered, and
     // the board would read as clear — ending the level as the speeders spawn.
     simulation.setCollidable(simId, false);
-    simulation.setPosition(simId, snappedPosition);
+
+    const facing = facingRef.current;
+    const axis = isVerticalFacing(facing) ? 'top' : 'left';
+    const animation = axis === 'top' ? topAnim : leftAnim;
+
+    // Deploy from the next grid intersection *ahead* in the direction of
+    // travel. The cross axis already rides an alley; the travel axis is
+    // wherever detection happened, so the ship keeps going to the
+    // intersection in front of it — snapping to the nearest one would jump it
+    // backwards, and either way the speeders must spawn aligned to the grid.
+    const target =
+      getNextAlley(axis === 'top' ? position.top : position.left, facing) *
+      totalWidth;
+
+    const snappedPosition = {
+      top:
+        axis === 'top'
+          ? target
+          : Math.round(position.top / totalWidth) * totalWidth,
+      left:
+        axis === 'left'
+          ? target
+          : Math.round(position.left / totalWidth) * totalWidth,
+    };
+
+    // Fly the final leg to the release point, then drop the speeders. Stored
+    // so a pause mid-leg can restart it from the paused position on resume —
+    // a frozen ship is otherwise skipped by the resume path and would strand
+    // itself, never spawning its speeders.
+    const travelToReleasePoint = () => {
+      const current = simulation.getPosition(simId);
+
+      if (!current) {
+        return;
+      }
+
+      simulation.setSegment(simId, {
+        axis,
+        to: target,
+        speed: craftSpeedRef.current,
+      });
+
+      animateCraft({
+        animation,
+        callback: ({finished}) => {
+          if (!finished) {
+            return;
+          }
+
+          freezeTravelRef.current = null;
+          simulation.setPosition(simId, snappedPosition);
+          leftAnim.setValue(snappedPosition.left);
+          topAnim.setValue(snappedPosition.top);
+          setFrozenPosition(snappedPosition);
+        },
+        craftSpeed: craftSpeedRef.current,
+        from: axis === 'top' ? current.top : current.left,
+        toValue: target,
+      });
+    };
+
+    freezeTravelRef.current = travelToReleasePoint;
     leftAnim.stopAnimation();
     topAnim.stopAnimation();
-    leftAnim.setValue(snappedPosition.left);
-    topAnim.setValue(snappedPosition.top);
-    setFrozenPosition(snappedPosition);
+    travelToReleasePoint();
   }, [leftAnim, simId, simulation, topAnim]);
 
   // A commander that spots the player alerts the whole board. Each other enemy
@@ -536,7 +588,11 @@ function useEnemyCraftAnimation({
       topAnim.stopAnimation();
       isPausedPrevRef.current = true;
     } else if (isPausedPrevRef.current) {
-      if (hasInitialized && !isFrozenRef.current) {
+      if (isFrozenRef.current) {
+        // Resume the interrupted last leg to the release point (a no-op once
+        // the ship has already arrived and is deploying).
+        freezeTravelRef.current?.();
+      } else if (hasInitialized) {
         animate(craftSpeedRef.current);
       }
       isPausedPrevRef.current = false;
