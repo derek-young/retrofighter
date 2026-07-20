@@ -128,10 +128,12 @@ const Missile = ({
       return;
     }
 
-    // Resumes from the simulation's authoritative travel value, so the
-    // visual and the impact detection always agree.
+    // Resumes from the simulation's authoritative travel value and speed
+    // (which includes the owner's forward speed at launch), so the visual
+    // and the impact detection always agree.
     const value = simulation.getMissileValue(missileId) ?? startingTop;
-    const duration = ((value + maxScreenSize) / missileSpeed) * 1000;
+    const speed = simulation.getMissileSpeed(missileId) ?? missileSpeed;
+    const duration = ((value + maxScreenSize) / speed) * 1000;
 
     missileAnim.setValue(value);
     Animated.timing(missileAnim, {

@@ -83,6 +83,7 @@ export interface MissileConfig {
 interface MissileEntity extends MissileConfig {
   id: string;
   value: number; // anim value when startedAt was last (re)based
+  speed: number; // px per second: base missile speed + owner's forward speed at launch
   startedAt: number | null;
   threatenedCraftIds: Set<string>; // crafts already warned about this missile
   piercing: boolean; // cluster munitions carry through eliminated crafts
@@ -143,6 +144,7 @@ function isPointInBox(point: Position, box: Position) {
 function getIsMissileThreat(
   missilePos: Position,
   missileFacing: Facing,
+  missileSpeed: number,
   craftPos: Position,
   craftFacing: Facing,
   craftVelocity: {top: number; left: number},
@@ -496,11 +498,16 @@ class Simulation {
     };
   }
 
-  stopCraft(id: string, now = Date.now()): void {
+  /**
+   * Halts the craft and places it at an exact position (e.g. snapping a
+   * freezing craft back onto the grid).
+   */
+  setPosition(id: string, {top, left}: Position): void {
     const craft = this.crafts.get(id);
 
     if (craft) {
-      this.advanceCraft(craft, now);
+      craft.top = top;
+      craft.left = left;
       craft.segment = null;
     }
   }
@@ -518,26 +525,54 @@ class Simulation {
   }
 
   addMissile(id: string, config: MissileConfig, now = Date.now()): void {
+    const owner = this.crafts.get(config.ownerId);
+
     // A cluster bomb is a dedicated missile: firing it spends one of the
     // owner's stockpiled bombs. Regular missiles never consume a bomb or
     // pierce.
-    if (config.isClusterBomb) {
-      const owner = this.crafts.get(config.ownerId);
-
-      if (owner && owner.clusterBombCount > 0) {
-        owner.clusterBombCount -= 1;
-        owner.onClusterBombCountChange?.(owner.clusterBombCount);
-      }
+    if (config.isClusterBomb && owner && owner.clusterBombCount > 0) {
+      owner.clusterBombCount -= 1;
+      owner.onClusterBombCountChange?.(owner.clusterBombCount);
     }
 
     this.missiles.set(id, {
       ...config,
       id,
       value: config.startValue,
+      speed: missileSpeed + this.getLaunchSpeedBonus(owner, config.facing, now),
       startedAt: this.isPaused ? null : now,
       threatenedCraftIds: new Set(),
       piercing: Boolean(config.isClusterBomb),
     });
+  }
+
+  /**
+   * The owner's speed along the line of fire at launch. Missiles inherit it
+   * so a craft firing while charging — a locked-on speeder with a cluster
+   * bomb moves faster than a base missile — can never outrun its own shot.
+   */
+  private getLaunchSpeedBonus(
+    owner: CraftEntity | undefined,
+    facing: Facing,
+    now: number,
+  ): number {
+    if (!owner) {
+      return 0;
+    }
+
+    this.advanceCraft(owner, now);
+    const velocity = getCraftVelocity(owner);
+
+    switch (facing) {
+      case 'N':
+        return Math.max(0, -velocity.top);
+      case 'S':
+        return Math.max(0, velocity.top);
+      case 'E':
+        return Math.max(0, velocity.left);
+      case 'W':
+        return Math.max(0, -velocity.left);
+    }
   }
 
   removeMissile(id: string): void {
@@ -552,6 +587,14 @@ class Simulation {
     const missile = this.missiles.get(id);
 
     return missile === undefined ? undefined : this.missileValue(missile, now);
+  }
+
+  /**
+   * The missile's travel speed in px/s (base missile speed plus the owner's
+   * forward speed at launch). Undefined when the missile is not in flight.
+   */
+  getMissileSpeed(id: string): number | undefined {
+    return this.missiles.get(id)?.speed;
   }
 
   getMissiles(targetKind: TargetKind, now = Date.now()): MissileInfo[] {
@@ -769,6 +812,7 @@ class Simulation {
           getIsMissileThreat(
             missilePos,
             missile.facing,
+            missile.speed,
             craftPos,
             craft.facing,
             getCraftVelocity(craft),
@@ -829,7 +873,7 @@ class Simulation {
     const elapsedSeconds =
       missile.startedAt === null ? 0 : (now - missile.startedAt) / 1000;
 
-    return missile.value - elapsedSeconds * missileSpeed;
+    return missile.value - elapsedSeconds * missile.speed;
   }
 
   /**

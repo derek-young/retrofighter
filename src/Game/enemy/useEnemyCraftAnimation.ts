@@ -16,6 +16,7 @@ import {
   randomAnimation,
   getPixelsToMove,
   getShouldTrackToPlayerPosition,
+  getSnapToGridLeg,
 } from './animation';
 import type {AnimationProps} from './animation';
 
@@ -158,6 +159,12 @@ function useEnemyCraftAnimation({
         toValue: 0,
       };
 
+      // Branches that consume the detection refs defer clearing them until
+      // the planned move actually starts: a snap-to-grid leg may run first,
+      // and the re-plan after it needs the refs intact to make the same
+      // decision from the aligned position.
+      let commitPlan = () => {};
+
       const shouldTrackToPlayerPosition =
         detectedPlayerPositionRef.current &&
         getShouldTrackToPlayerPosition({
@@ -192,8 +199,10 @@ function useEnemyCraftAnimation({
           toValue: Math.round(nextPosition - (nextPosition % totalWidth)),
         };
 
-        controlledFacingRef.current = null;
-        detectedPlayerPositionRef.current = null;
+        commitPlan = () => {
+          controlledFacingRef.current = null;
+          detectedPlayerPositionRef.current = null;
+        };
       } else if (nearbyItem) {
         // Race to a nearby uncollected item: align on its column first,
         // then travel to its row. Each leg re-plans, so a taken item just
@@ -217,9 +226,11 @@ function useEnemyCraftAnimation({
           top: position.top,
         });
 
-        controlledFacingRef.current = null;
-        detectedPlayerFacingRef.current = null;
-        detectedPlayerPositionRef.current = null;
+        commitPlan = () => {
+          controlledFacingRef.current = null;
+          detectedPlayerFacingRef.current = null;
+          detectedPlayerPositionRef.current = null;
+        };
       }
 
       let {nextFacing, toValue} = nextAnimation;
@@ -236,6 +247,22 @@ function useEnemyCraftAnimation({
           left: position.left,
           top: position.top,
         }));
+      }
+
+      // A mid-segment re-plan (lock-on, lock lost, commander alert) can stop
+      // the craft between alleys; turning from there would leave it riding
+      // off the grid, so finish travelling to the intersection first.
+      const snapLeg = getSnapToGridLeg({
+        currFacing: facingRef.current,
+        nextFacing,
+        top: position.top,
+        left: position.left,
+      });
+
+      if (snapLeg) {
+        ({nextFacing, toValue} = snapLeg);
+      } else {
+        commitPlan();
       }
 
       const axis = isVerticalFacing(nextFacing) ? 'top' : 'left';
@@ -379,13 +406,21 @@ function useEnemyCraftAnimation({
       return;
     }
 
+    // Park on the nearest grid intersection rather than the mid-segment
+    // point where detection happened, so the speeders a cargo ship releases
+    // here spawn aligned with the alleys.
+    const snappedPosition = {
+      top: Math.round(position.top / totalWidth) * totalWidth,
+      left: Math.round(position.left / totalWidth) * totalWidth,
+    };
+
     isFrozenRef.current = true;
-    simulation.stopCraft(simId);
+    simulation.setPosition(simId, snappedPosition);
     leftAnim.stopAnimation();
     topAnim.stopAnimation();
-    leftAnim.setValue(position.left);
-    topAnim.setValue(position.top);
-    setFrozenPosition(position);
+    leftAnim.setValue(snappedPosition.left);
+    topAnim.setValue(snappedPosition.top);
+    setFrozenPosition(snappedPosition);
   }, [leftAnim, simId, simulation, topAnim]);
 
   // A commander that spots the player alerts the whole board. Each other enemy

@@ -1,10 +1,50 @@
 import {getNextAlley, isVerticalFacing} from 'Game/utils';
 import {Facing} from 'Game/types';
-import {alleyWidth} from 'Game/constants';
+import {alleyWidth, totalWidth} from 'Game/constants';
 
 export interface AnimationProps {
   nextFacing: Facing;
   toValue: number;
+}
+
+export function isGridAligned(position: number) {
+  return (
+    Math.abs(position - Math.round(position / totalWidth) * totalWidth) < 1
+  );
+}
+
+/**
+ * The leg a craft must run before it may turn onto the other axis: when its
+ * current travel axis was stopped between alleys (a mid-segment re-plan),
+ * turning immediately would leave it riding between rows or columns.
+ * Returns a leg that finishes travelling to the next grid intersection, or
+ * null when the turn is already safe.
+ */
+export function getSnapToGridLeg({
+  currFacing,
+  nextFacing,
+  top,
+  left,
+}: {
+  currFacing: Facing;
+  nextFacing: Facing;
+  top: number;
+  left: number;
+}): AnimationProps | null {
+  if (isVerticalFacing(nextFacing) === isVerticalFacing(currFacing)) {
+    return null;
+  }
+
+  const travelPosition = isVerticalFacing(currFacing) ? top : left;
+
+  if (isGridAligned(travelPosition)) {
+    return null;
+  }
+
+  return {
+    nextFacing: currFacing,
+    toValue: getNextAlley(travelPosition, currFacing) * totalWidth,
+  };
 }
 
 export function getPixelsToMove(

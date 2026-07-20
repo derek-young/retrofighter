@@ -2,14 +2,8 @@ import {Facing} from 'Game/types';
 import {getNextAlley, isVerticalFacing} from 'Game/utils';
 import {numColumns, totalWidth} from 'Game/constants';
 
-import {AnimationProps} from './enemyAnimation';
+import {AnimationProps, isGridAligned} from './enemyAnimation';
 import {getValidFacings} from './randomAnimation';
-
-function isGridAligned(position: number) {
-  return (
-    Math.abs(position - Math.round(position / totalWidth) * totalWidth) < 1
-  );
-}
 
 /**
  * The adjacent alley in the escape direction, clamped to the arena. From an

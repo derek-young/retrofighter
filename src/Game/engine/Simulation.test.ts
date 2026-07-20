@@ -290,6 +290,75 @@ describe('missiles', () => {
     expect(onImpact).toHaveBeenCalledTimes(1);
   });
 
+  it('inherits the owner forward speed at launch', () => {
+    const simulation = createSimulationWithPlayer();
+
+    simulation.addCraft('speeder', {
+      kind: 'enemy',
+      top: 0,
+      left: 100,
+      facing: 'S',
+      isCollidable: true,
+    });
+    // A locked-on speeder charges faster than a base missile flies; its
+    // shot must still pull ahead of it.
+    simulation.setSegment('speeder', {axis: 'top', to: 600, speed: 150}, 0);
+
+    simulation.addMissile(
+      'speeder-cluster-missile',
+      {
+        ownerId: 'speeder',
+        originTop: 0,
+        originLeft: 100,
+        facing: 'S',
+        positionOffset: 10,
+        startValue: 12,
+        targetKind: 'player',
+        isClusterBomb: true,
+        onImpact: () => {},
+      },
+      0,
+    );
+
+    expect(simulation.getMissileSpeed('speeder-cluster-missile')).toEqual(
+      missileSpeed + 150,
+    );
+    expect(
+      simulation.getMissileValue('speeder-cluster-missile', 1000),
+    ).toEqual(12 - (missileSpeed + 150));
+  });
+
+  it('gets no launch bonus when the owner moves away from the line of fire', () => {
+    const simulation = createSimulationWithPlayer();
+
+    simulation.addCraft('enemy-1', {
+      kind: 'enemy',
+      top: 300,
+      left: 100,
+      facing: 'S',
+      isCollidable: true,
+    });
+    // Retreating north while the missile flies south.
+    simulation.setSegment('enemy-1', {axis: 'top', to: 0, speed: 150}, 0);
+
+    simulation.addMissile(
+      'enemy-1-missile',
+      {
+        ownerId: 'enemy-1',
+        originTop: 300,
+        originLeft: 100,
+        facing: 'S',
+        positionOffset: 10,
+        startValue: 12,
+        targetKind: 'player',
+        onImpact: () => {},
+      },
+      0,
+    );
+
+    expect(simulation.getMissileSpeed('enemy-1-missile')).toEqual(missileSpeed);
+  });
+
   it('pauses missile travel with the simulation clock', () => {
     const simulation = createSimulationWithPlayer();
 
